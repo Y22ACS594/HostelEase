@@ -1,15 +1,15 @@
 import { useState } from "react";
 import api from "../../services/api";
+import "./AddStudent.css";
 
-const AddStudent = () => {
- const [form, setForm] = useState({
+const initialState = {
   fullName: "",
   email: "",
   password: "",
   rollNumber: "",
   course: "",
   department: "",
-  year: "",
+  batch: "",
   collegeName: "",
   gender: "",
   dateOfBirth: "",
@@ -22,9 +22,13 @@ const AddStudent = () => {
   medicalIssues: "None",
   roomNumber: "",
   bedNumber: "",
-});
+  address: "",
+};
 
+const AddStudent = () => {
+  const [form, setForm] = useState(initialState);
   const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -32,63 +36,184 @@ const AddStudent = () => {
 
   const submit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setMsg("");
 
     try {
       await api.post("/warden/students", form);
-      setMsg("✅ Student registered successfully");
-      setForm({});
+      setMsg("success");
+      setForm(initialState);
     } catch (err) {
-      setMsg(err.response?.data?.message || "❌ Error");
+      setMsg("error");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: "30px" }}>
-      <h2>Add New Student</h2>
-      {msg && <p>{msg}</p>}
+    <div className="student-page">
+      <div className="student-card">
+        <h2>Add New Student</h2>
+        <p className="subtitle">
+          Register a new student into hostel system
+        </p>
 
-      <form
-        onSubmit={submit}
-        style={{ display: "grid", gap: "8px", maxWidth: "600px" }}
-      >
-        {/* BASIC */}
-        <input name="fullName" placeholder="Full Name" onChange={handleChange} required />
-        <input name="email" placeholder="Email" onChange={handleChange} required />
-        <input name="password" placeholder="Temp Password" onChange={handleChange} required />
+        {msg === "success" && (
+          <div className="alert success">
+            Student registered successfully
+          </div>
+        )}
+        {msg === "error" && (
+          <div className="alert error">
+            Failed to register student
+          </div>
+        )}
 
-        <input name="rollNumber" placeholder="Roll Number" onChange={handleChange} required />
-        <input name="course" placeholder="Course (B.Tech)" onChange={handleChange} required />
-        <input name="department" placeholder="Department" onChange={handleChange} required />
-        <input name="year" placeholder="Year" onChange={handleChange} required />
-        <input name="collegeName" placeholder="College Name" onChange={handleChange} required />
+        <form onSubmit={submit} className="student-form">
+          
+          {/* BASIC INFO */}
+          <div className="section">
+            <h3>Basic Information</h3>
+            <div className="grid">
+              <div>
+                <label>Full Name</label>
+                <input name="fullName" value={form.fullName} onChange={handleChange} required />
+              </div>
+              <div>
+                <label>Email</label>
+                <input name="email" value={form.email} onChange={handleChange} required />
+              </div>
+              <div>
+                <label>Temporary Password</label>
+                <input name="password" value={form.password} onChange={handleChange} required />
+              </div>
+              <div>
+                <label>Roll Number</label>
+                <input name="rollNumber" value={form.rollNumber} onChange={handleChange} required />
+              </div>
+            </div>
+          </div>
 
-        {/* PERSONAL */}
-        <select name="gender" onChange={handleChange} required>
-          <option value="">Select Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-          <option value="Other">Other</option>
-        </select>
+          {/* ACADEMIC */}
+          <div className="section">
+            <h3>Academic Details</h3>
+            <div className="grid">
+              <div>
+                <label>Course</label>
+                <input name="course" value={form.course} onChange={handleChange} />
+              </div>
+              <div>
+                <label>Department</label>
+                <input name="department" value={form.department} onChange={handleChange} />
+              </div>
+                  <div>
+                  <label>Batch</label>
+                  <input
+                    name="batch"
+                    value={form.batch}
+                    onChange={handleChange}
+                    placeholder="2023-2027"
+                    required
+                  />
+      </div>
+              <div>
+                <label>College Name</label>
+                <input name="collegeName" value={form.collegeName} onChange={handleChange} />
+              </div>
+            </div>
+          </div>
 
-        <input type="date" name="dateOfBirth" onChange={handleChange} required />
-        <input name="bloodGroup" placeholder="Blood Group" onChange={handleChange} required />
+          {/* PERSONAL */}
+          <div className="section">
+            <h3>Personal Details</h3>
+            <div className="grid">
+              <div>
+                <label>Gender</label>
+                <select name="gender" value={form.gender} onChange={handleChange}>
+                  <option value="">Select</option>
+                  <option>Male</option>
+                  <option>Female</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div>
+                <label>Date of Birth</label>
+                <input type="date" name="dateOfBirth" value={form.dateOfBirth} onChange={handleChange} />
+              </div>
+              <div>
+                <label>Blood Group</label>
+                <input name="bloodGroup" value={form.bloodGroup} onChange={handleChange} />
+              </div>
+              <div>
+                <label>Medical Issues</label>
+                <input name="medicalIssues" value={form.medicalIssues} onChange={handleChange} />
+              </div>
+            </div>
+          </div>
 
-        {/* CONTACT */}
-        <input name="phoneNumber" placeholder="Student Phone" onChange={handleChange} required />
-        <input name="aadhaarNumber" placeholder="Aadhaar Number" onChange={handleChange} required />
+              {/* CONTACT */}
+        <div className="section">
+          <h3>Contact</h3>
+          <div className="grid">
+            <div>
+              <label>Phone Number</label>
+              <input name="phoneNumber" value={form.phoneNumber} onChange={handleChange} />
+            </div>
+            <div>
+              <label>Aadhaar Number</label>
+              <input name="aadhaarNumber" value={form.aadhaarNumber} onChange={handleChange} />
+            </div>
+            <div>
+              <label>Address</label>
+              <textarea
+                name="address"
+                value={form.address}
+                onChange={handleChange}
+                rows="3"
+              />
+            </div>
+          </div>
+        </div>
 
-        {/* PARENTS */}
-        <input name="fatherName" placeholder="Father Name" onChange={handleChange} required />
-        <input name="motherName" placeholder="Mother Name" onChange={handleChange} required />
-        <input name="parentContact" placeholder="Parent Contact" onChange={handleChange} required />
+          {/* PARENTS */}
+          <div className="section">
+            <h3>Parent Details</h3>
+            <div className="grid">
+              <div>
+                <label>Father Name</label>
+                <input name="fatherName" value={form.fatherName} onChange={handleChange} />
+              </div>
+              <div>
+                <label>Mother Name</label>
+                <input name="motherName" value={form.motherName} onChange={handleChange} />
+              </div>
+              <div>
+                <label>Parent Contact</label>
+                <input name="parentContact" value={form.parentContact} onChange={handleChange} />
+              </div>
+            </div>
+          </div>
 
-        {/* HOSTEL */}
-        <input name="roomNumber" placeholder="Room Number (optional)" onChange={handleChange} />
-        <input name="bedNumber" placeholder="Bed Number (optional)" onChange={handleChange} />
+          {/* HOSTEL */}
+          <div className="section">
+            <h3>Hostel Allocation</h3>
+            <div className="grid">
+              <div>
+                <label>Room Number</label>
+                <input name="roomNumber" value={form.roomNumber} onChange={handleChange} />
+              </div>
+              <div>
+                <label>Bed Number</label>
+                <input name="bedNumber" value={form.bedNumber} onChange={handleChange} />
+              </div>
+            </div>
+          </div>
 
-        <button type="submit">Register Student</button>
-      </form>
+          <button className="submit-btn" disabled={loading}>
+            {loading ? "Registering..." : "Register Student"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

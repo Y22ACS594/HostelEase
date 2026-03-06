@@ -19,6 +19,21 @@ const roomAllocationSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    checkInDate: {
+    type: Date,
+    default: Date.now
+  },
+
+  checkOutDate: {
+    type: Date,
+    default: null
+  },
+
+  status: {
+    type: String,
+    enum: ["active", "checkedOut"],
+    default: "active"
+  }
   },
   { timestamps: true }
 );

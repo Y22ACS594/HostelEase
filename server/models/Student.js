@@ -9,11 +9,20 @@ const studentSchema = new mongoose.Schema(
     },
 
     fullName: String,
-    rollNumber: String,
+    rollNumber: {
+      type: String,
+      required: true,
+      unique: true
+
+    },
     course: String,
     department: String,
-    year: String,
     collegeName: String,
+
+    batch: {
+      type: String,
+      required: true
+    },
 
     gender: String,
     dateOfBirth: Date,
@@ -30,6 +39,10 @@ const studentSchema = new mongoose.Schema(
       type: String,
       default: "None",
     },
+    address: {
+  type: String,
+  trim: true,
+},
   },
   { timestamps: true }
 );

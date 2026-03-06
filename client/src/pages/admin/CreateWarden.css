@@ -1,0 +1,121 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+* {
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+body {
+  background: radial-gradient(circle at top, #0f172a, #020617);
+  color: white;
+}
+
+/* Page Center */
+.warden-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Glass Card */
+.warden-card {
+  width: 420px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 22px;
+  padding: 40px;
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+}
+
+/* Title */
+.warden-card h2 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #38bdf8, #a78bfa);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.subtitle {
+  color: #94a3b8;
+  margin-top: 8px;
+  margin-bottom: 25px;
+  font-size: 0.95rem;
+}
+
+/* Inputs */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+}
+
+.input-group label {
+  font-size: 0.8rem;
+  color: #cbd5f5;
+  margin-bottom: 6px;
+}
+
+.input-group input {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  padding: 12px 14px;
+  border-radius: 10px;
+  color: white;
+  font-size: 0.95rem;
+  outline: none;
+  transition: 0.3s;
+}
+
+.input-group input:focus {
+  box-shadow: 0 0 0 2px #38bdf8;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Button */
+.create-btn {
+  margin-top: 20px;
+  width: 100%;
+  background: linear-gradient(135deg, #38bdf8, #6366f1);
+  border: none;
+  padding: 13px;
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.create-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(56, 189, 248, 0.4);
+}
+
+.create-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Messages */
+.success-msg {
+  background: rgba(74, 222, 128, 0.15);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  color: #4ade80;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+}
+
+.error-msg {
+  background: rgba(244, 63, 94, 0.15);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  color: #f43f5e;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+}

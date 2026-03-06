@@ -1,49 +1,101 @@
 import { useState } from "react";
 import { createRoom } from "../../services/roomService";
+import "./CreateRoom.css";
+
+const initialState = {
+  blockName: "",
+  roomNumber: "",
+  totalBeds: "",
+};
 
 const CreateRoom = () => {
-  const [form, setForm] = useState({
-    blockName: "",
-    roomNumber: "",
-    totalBeds: "",
-  });
+  const [form, setForm] = useState(initialState);
+  const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const submit = async () => {
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setStatus("");
+
     try {
       await createRoom(form);
-      alert("Room created successfully");
+      setStatus("success");
+      setForm(initialState);
     } catch (err) {
-      alert(err.response?.data?.message || "Error");
+      setStatus("error");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: 30 }}>
-      <h2>Create Room</h2>
+    <div className="room-page">
+      <div className="room-card">
+        
+        {/* TITLE (NOW CLEARLY VISIBLE) */}
+        <h1 className="room-title">Create New Room</h1>
+        <p className="room-subtitle">
+          Add new room details to hostel infrastructure
+        </p>
 
-      <input
-        placeholder="Block Name"
-        onChange={(e) =>
-          setForm({ ...form, blockName: e.target.value })
-        }
-      />
+        {status === "success" && (
+          <div className="alert success">
+            Room created successfully
+          </div>
+        )}
 
-      <input
-        placeholder="Room Number"
-        onChange={(e) =>
-          setForm({ ...form, roomNumber: e.target.value })
-        }
-      />
+        {status === "error" && (
+          <div className="alert error">
+            Failed to create room
+          </div>
+        )}
 
-      <input
-        placeholder="Total Beds"
-        type="number"
-        onChange={(e) =>
-          setForm({ ...form, totalBeds: e.target.value })
-        }
-      />
+        <form onSubmit={submit} className="room-form">
+          <div className="field">
+            <label>Block Name</label>
+            <input
+              name="blockName"
+              value={form.blockName}
+              onChange={handleChange}
+              placeholder="A Block"
+              required
+            />
+          </div>
 
-      <button onClick={submit}>Create Room</button>
+          <div className="field">
+            <label>Room Number</label>
+            <input
+              name="roomNumber"
+              value={form.roomNumber}
+              onChange={handleChange}
+              placeholder="101"
+              required
+            />
+          </div>
+
+          <div className="field">
+            <label>Total Beds</label>
+            <input
+              type="number"
+              name="totalBeds"
+              value={form.totalBeds}
+              onChange={handleChange}
+              placeholder="4"
+              min="1"
+              required
+            />
+          </div>
+
+          <button className="submit-btn" disabled={loading}>
+            {loading ? "Creating..." : "Create Room"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

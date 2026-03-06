@@ -2,15 +2,17 @@ const User = require("../models/User");
 const Student = require("../models/Student");
 const RoomAllocation = require("../models/RoomAllocation");
 const Room = require("../models/Room");
+const Payment = require("../models/Payment");
+const LeaveRequest = require("../models/LeaveRequest");
 const bcrypt = require("bcryptjs");
 
 /* ===============================
    ADD STUDENT (Warden)
-   - creates User
-   - creates Student
 ================================ */
 exports.addStudent = async (req, res) => {
   try {
+    console.log("Req Body:", req.body);
+
     const {
       fullName,
       email,
@@ -18,7 +20,7 @@ exports.addStudent = async (req, res) => {
       rollNumber,
       course,
       department,
-      year,
+      batch,
       collegeName,
       gender,
       dateOfBirth,
@@ -29,33 +31,33 @@ exports.addStudent = async (req, res) => {
       motherName,
       parentContact,
       medicalIssues,
+      address
     } = req.body;
 
-    // 🔍 check existing user
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
-      return res.status(400).json({ message: "Student already exists" });
+      return res.status(400).json({
+        message: "Student already exists"
+      });
     }
 
-    // 🔐 hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 1️⃣ create USER (login)
     const user = await User.create({
       name: fullName,
       email,
       password: hashedPassword,
-      role: "student",
+      role: "student"
     });
 
-    // 2️⃣ create STUDENT (profile)
     const student = await Student.create({
       user: user._id,
       fullName,
       rollNumber,
       course,
       department,
-      year,
+      batch,
       collegeName,
       gender,
       dateOfBirth,
@@ -66,69 +68,309 @@ exports.addStudent = async (req, res) => {
       motherName,
       parentContact,
       medicalIssues,
+      address
     });
 
     res.status(201).json({
       message: "Student registered successfully",
-      userId: user._id,      // 🔥 THIS is used for allocation
-      studentId: student._id // internal use
+      userId: user._id,
+      studentId: student._id
     });
+
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      message: "Server error"
+    });
   }
 };
 
+
 /* ===============================
-   ALLOCATE ROOM (Warden)
-   - frontend sends USER ID
-   - backend converts to STUDENT
+   GET ALL STUDENTS
+================================ */
+exports.getAllStudents = async (req, res) => {
+  try {
+
+    const students = await Student
+      .find()
+      .populate("user", "email role")
+      .sort({ createdAt: -1 });
+
+    res.json(students);
+
+  } catch (err) {
+    res.status(500).json({
+      message: err.message
+    });
+  }
+};
+
+
+/* ===============================
+   GET FULL STUDENT DETAILS
+================================ */
+exports.getStudentDetails = async (req, res) => {
+  try {
+
+    const student = await Student
+      .findById(req.params.id)
+      .populate("user", "email");
+
+    if (!student) {
+      return res.status(404).json({
+        message: "Student not found"
+      });
+    }
+
+    const payments = await Payment.find({ student: student._id });
+
+    const leaves = await LeaveRequest.find({ student: student._id });
+
+        const room = await RoomAllocation
+      .findOne({ student: student._id })
+      .populate("room")
+      .sort({ createdAt: -1 });
+    res.json({
+      student,
+      payments,
+      leaves,
+      room
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      message: err.message
+    });
+  }
+};
+
+
+/* ===============================
+   UPDATE STUDENT
+================================ */
+exports.updateStudent = async (req, res) => {
+  try {
+
+    const student = await Student.findById(req.params.id);
+
+    if (!student) {
+      return res.status(404).json({
+        message: "Student not found"
+      });
+    }
+
+    Object.assign(student, req.body);
+
+    await student.save();
+
+    res.status(200).json({
+      message: "Student updated successfully",
+      student
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Update failed",
+      error: error.message
+    });
+  }
+};
+
+
+/* ===============================
+   DELETE STUDENT COMPLETELY
+================================ */
+exports.deleteStudent = async (req, res) => {
+  try {
+
+    const student = await Student.findById(req.params.id);
+
+    if (!student) {
+      return res.status(404).json({
+        message: "Student not found"
+      });
+    }
+
+    await RoomAllocation.deleteMany({ student: student._id });
+    await Payment.deleteMany({ student: student._id });
+    await LeaveRequest.deleteMany({ student: student._id });
+
+    await User.findByIdAndDelete(student.user);
+
+    await student.deleteOne();
+
+    res.status(200).json({
+      message: "Student deleted successfully"
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      message: err.message
+    });
+  }
+};
+
+
+/* ===============================
+   ALLOCATE ROOM (CHECK-IN)
 ================================ */
 exports.allocateRoom = async (req, res) => {
   try {
+
     const { studentId, room, bedNumber } = req.body;
-    // ⚠️ studentId = USER ID (from users collection)
 
-    // 🔥 find student using USER ID
-    const student = await Student.findOne({ user: studentId });
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
-    }
-
-    // 🔁 prevent double allocation
-    const already = await RoomAllocation.findOne({ student: student._id });
-    if (already) {
-      return res.status(400).json({ message: "Room already allocated" });
-    }
-
-    // 🏠 check room
-    const roomDoc = await Room.findById(room);
-    if (!roomDoc) {
-      return res.status(404).json({ message: "Room not found" });
-    }
-
-    if (roomDoc.occupiedBeds >= roomDoc.totalBeds) {
-      return res.status(400).json({ message: "Room is full" });
-    }
-
-    // 🛏 allocate
-    const allocation = await RoomAllocation.create({
-      student: student._id,   // ✅ always STUDENT ID internally
-      room: roomDoc._id,
-      bedNumber,
-      allocatedBy: req.user.id,
+    const student = await Student.findOne({
+      rollNumber: studentId
     });
 
-    // ➕ update room count
+    if (!student) {
+      return res.status(404).json({
+        message: "Student not found"
+      });
+    }
+
+    const already = await RoomAllocation.findOne({
+      student: student._id,
+      status: "active"
+    });
+
+    if (already) {
+      return res.status(400).json({
+        message: "Student already has a room allocated"
+      });
+    }
+
+    const roomDoc = await Room.findById(room);
+
+    if (!roomDoc) {
+      return res.status(404).json({
+        message: "Room not found"
+      });
+    }
+
+    const allocation = await RoomAllocation.create({
+      student: student._id,
+      room,
+      bedNumber,
+      allocatedBy: req.user.id,
+      checkInDate: new Date(),
+      status: "active"
+    });
+
     roomDoc.occupiedBeds += 1;
     await roomDoc.save();
 
     res.status(201).json({
       message: "Room allocated successfully",
-      allocation,
+      allocation
     });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      message: err.message
+    });
+  }
+};
+
+
+/* ===============================
+   GET OCCUPIED BEDS BY ROOM
+================================ */
+exports.getOccupiedBeds = async (req, res) => {
+  try {
+
+    const { roomId } = req.params;
+
+    const allocations = await RoomAllocation.find({
+      room: roomId,
+      status: "active"
+    });
+
+    const occupiedBeds = allocations.map(a => a.bedNumber);
+
+    res.json(occupiedBeds);
+
+  } catch (err) {
+    res.status(500).json({
+      message: err.message
+    });
+  }
+};
+
+
+/* ===============================
+   GET BED DETAILS
+================================ */
+exports.getBedDetails = async (req, res) => {
+  try {
+
+    const { roomId, bedNumber } = req.params;
+
+    const allocation = await RoomAllocation
+      .findOne({
+        room: roomId,
+        bedNumber: bedNumber,
+        status: "active"
+      })
+      .populate("student");
+
+    if (!allocation) {
+      return res.status(404).json({
+        message: "Bed is empty"
+      });
+    }
+
+    res.json({
+      studentName: allocation.student.fullName,
+      rollNumber: allocation.student.rollNumber,
+      allocationId: allocation._id
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      message: err.message
+    });
+  }
+};
+
+
+/* ===============================
+   REMOVE BED (CHECK-OUT)
+================================ */
+exports.removeBed = async (req, res) => {
+  try {
+
+    const { allocationId } = req.params;
+
+    const allocation = await RoomAllocation.findById(allocationId);
+
+    if (!allocation) {
+      return res.status(404).json({
+        message: "Allocation not found"
+      });
+    }
+
+    const room = await Room.findById(allocation.room);
+
+    if (room) {
+      room.occupiedBeds -= 1;
+      await room.save();
+    }
+
+    // ✅ Instead of deleting → mark checkout
+    allocation.status = "checkedOut";
+    allocation.checkOutDate = new Date();
+
+    await allocation.save();
+
+    res.json({
+      message: "Student checked out successfully"
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      message: err.message
+    });
   }
 };

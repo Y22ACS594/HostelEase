@@ -1,67 +1,98 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import "./Login.css";
 
 const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
-      const role = await login(email, password);
+      const role = await login(form.email, form.password);
 
       if (role === "student") navigate("/student/dashboard");
       else if (role === "warden") navigate("/warden/dashboard");
       else if (role === "admin") navigate("/admin/dashboard");
-    } catch {
+    } catch (err) {
       setError("Invalid email or password");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: "40px" }}>
-      <h2>Login</h2>
+    <div className="login-container">
+      <div className="login-card">
+        <h2>Hostel Ease 👋</h2>
+        <p className="login-subtitle">
+          Sign in to your Hostel Management account
+        </p>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && <div className="login-error">{error}</div>}
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <br /><br />
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="input-group">
+            <input
+              className="login-input"
+              type="email"
+              name="email"
+              placeholder="Email address"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <br /><br />
+          <div className="input-group password-group">
+            <input
+              className="login-input"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+            <span
+              className="toggle-password"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? "🙈" : "👁️"}
+            </span>
+          </div>
 
-        <button type="submit">Login</button>
-      </form>
+          <button className="login-btn" type="submit" disabled={loading}>
+            {loading ? "Signing in..." : "Login"}
+          </button>
+        </form>
 
-      {/* 🔐 Forgot password link */}
-      <p style={{ marginTop: "15px" }}>
-        <span
-          style={{ color: "blue", cursor: "pointer" }}
-          onClick={() => navigate("/forgot-password")}
-        >
-          Forgot Password?
-        </span>
-      </p>
+        <div className="login-footer">
+          <span
+            className="forgot-link"
+            onClick={() => navigate("/forgot-password")}
+          >
+            Forgot password?
+          </span>
+        </div>
+      </div>
     </div>
   );
 };

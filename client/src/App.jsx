@@ -23,6 +23,12 @@ import AddStudent from "./pages/warden/AddStudent";
 import RoomAllocation from "./pages/warden/RoomAllocation";
 import LeaveApprovals from "./pages/warden/LeaveApprovals";
 import WardenPayments from "./pages/warden/Payments";
+import StudentsList from "./pages/warden/StudentsList";
+import StudentDetails from "./pages/warden/StudentDetails";
+import EditStudent from "./pages/warden/EditStudent";
+
+
+
 
 
 // Admin pages
@@ -96,6 +102,23 @@ function App() {
           </ProtectedRoute>
         }
       />
+          <Route
+      path="/warden/students"
+      element={
+        <ProtectedRoute role="warden">
+          <StudentsList />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/warden/student/:id"
+      element={
+        <ProtectedRoute role="warden">
+          <StudentDetails />
+        </ProtectedRoute>
+      }
+    />
 
         <Route
           path="/warden/add-student"
@@ -155,6 +178,14 @@ function App() {
       element={
         <ProtectedRoute role="student">
           <Payments />
+        </ProtectedRoute>
+      }
+    />
+        <Route
+      path="/warden/students/edit/:id"
+      element={
+        <ProtectedRoute role="warden">
+          <EditStudent />
         </ProtectedRoute>
       }
     />

@@ -1,0 +1,180 @@
+/* ================================
+   GLOBAL RESET
+================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #f4f7fb;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  color: #1f2937;
+}
+
+/* ================================
+   MAIN LAYOUT
+================================ */
+.leave-page {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 30px;
+  padding: 40px;
+}
+
+/* ================================
+   LEFT PANEL
+================================ */
+.left-panel h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #f0ebec;
+  margin-bottom: 30px;
+}
+
+.stats {
+  display: flex;
+  gap: 15px;
+}
+
+.stat-card {
+  flex: 1;
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+  font-weight: 600;
+  color: #334155;
+  position: relative;
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  border-radius: 16px 0 0 16px;
+}
+
+.stat-card.total::before { background: #6366f1; }
+.stat-card.pending::before { background: #facc15; }
+.stat-card.approved::before { background: #22c55e; }
+.stat-card.rejected::before { background: #ef4444; }
+
+/* ================================
+   FILTER
+================================ */
+.filter-box {
+  margin-top: 25px;
+}
+
+.filter-box select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  font-size: 14px;
+  color: #111827;
+  background: white;
+}
+
+/* ================================
+   RIGHT PANEL (TABLE)
+================================ */
+.right-panel {
+  background: white;
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+}
+
+/* TABLE */
+.right-panel table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* HEADERS */
+.right-panel th {
+  text-align: left;
+  padding: 14px 10px;
+  font-size: 13px;
+  color: #475569;   /* DARK - VISIBLE */
+  border-bottom: 2px solid #e5e7eb;
+}
+
+/* CELLS */
+.right-panel td {
+  padding: 14px 10px;
+  font-size: 14px;
+  color: #111827;   /* BLACK - VISIBLE */
+  border-bottom: 1px solid #f1f5f9;
+  font-weight: 500;
+}
+
+/* ROW HOVER */
+.right-panel tr:hover {
+  background: #f8fafc;
+}
+
+/* ================================
+   STATUS BADGES
+================================ */
+.badge {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.badge.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge.approved {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge.rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ================================
+   ACTION BUTTONS
+================================ */
+.action-btn {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+.approve-btn {
+  background: #22c55e;
+  color: white;
+}
+
+.reject-btn {
+  background: #ef4444;
+  color: white;
+}
+
+/* ================================
+   EMPTY STATE
+================================ */
+.empty {
+  text-align: center;
+  padding: 60px;
+  color: #64748b;
+  font-size: 15px;
+}

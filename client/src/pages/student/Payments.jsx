@@ -4,6 +4,7 @@ import {
   initiatePayment,
   confirmPayment,
 } from "../../services/paymentService";
+import "./Payments.css";
 
 const Payments = () => {
   const [payments, setPayments] = useState([]);
@@ -29,7 +30,7 @@ const Payments = () => {
       paymentMode,
     });
 
-    // ⏳ simulate Razorpay processing delay
+    // Simulated gateway processing
     setTimeout(async () => {
       await confirmPayment(res.data._id);
       await loadPayments();
@@ -40,85 +41,75 @@ const Payments = () => {
   };
 
   return (
-    <div style={{ padding: "30px", maxWidth: "600px", margin: "auto" }}>
-      <h2>💳 Hostel Fee Payments</h2>
+    <div className="payments-page">
+      <div className="payments-header">
+        <h1>Hostel Fee Payments</h1>
+        <p>Pay your hostel fees securely</p>
+      </div>
 
-      <div style={{ marginBottom: "20px" }}>
-        <button onClick={() => setShowModal(true)}>
-          Pay Hostel Fee
+      <div className="pay-card">
+        <h2>₹25,000</h2>
+        <p>Academic Year 2025–26</p>
+        <button className="pay-btn" onClick={() => setShowModal(true)}>
+          Pay Now
         </button>
       </div>
 
-      {/* PAYMENT HISTORY */}
-      <h3>Payment History</h3>
-      {payments.length === 0 && <p>No payments found</p>}
+      <h3 className="history-title">Payment History</h3>
 
-      <ul>
+      <div className="payment-table">
+        {payments.length === 0 && (
+          <p className="empty">No payments found</p>
+        )}
+
         {payments.map((p) => (
-          <li key={p._id} style={{ marginBottom: "10px" }}>
-            <strong>₹{p.amount}</strong> | {p.paymentStatus}
-            <br />
-            {p.receiptNumber && (
-              <small>Receipt: {p.receiptNumber}</small>
-            )}
-          </li>
+          <div className="payment-row" key={p._id}>
+            <span>₹{p.amount}</span>
+            <span>{p.paymentMode}</span>
+            <span className={`status ${p.paymentStatus.toLowerCase()}`}>
+              {p.paymentStatus}
+            </span>
+            <span>{p.receiptNumber || "-"}</span>
+          </div>
         ))}
-      </ul>
+      </div>
 
-      {/* PAYMENT MODAL */}
+      {/* Payment Modal */}
       {showModal && (
-        <div style={modalStyle}>
-          <div style={modalContent}>
-            <h3>HostelEase Payments</h3>
-            <p><strong>Amount:</strong> ₹25,000</p>
-            <p><strong>Academic Year:</strong> 2025–26</p>
+        <div className="modal-overlay">
+          <div className="payment-modal">
+            <h2>Complete Payment</h2>
+            <p className="amount">₹25,000</p>
 
-            <div>
-              <label>
-                <input
-                  type="radio"
-                  value="UPI"
-                  checked={paymentMode === "UPI"}
-                  onChange={() => setPaymentMode("UPI")}
-                />
-                UPI
-              </label>
-              <br />
-
-              <label>
-                <input
-                  type="radio"
-                  value="Card"
-                  checked={paymentMode === "Card"}
-                  onChange={() => setPaymentMode("Card")}
-                />
-                Card
-              </label>
-              <br />
-
-              <label>
-                <input
-                  type="radio"
-                  value="NetBanking"
-                  checked={paymentMode === "NetBanking"}
-                  onChange={() => setPaymentMode("NetBanking")}
-                />
-                Net Banking
-              </label>
+            <div className="modes">
+              {["UPI", "Card", "NetBanking"].map((mode) => (
+                <div
+                  key={mode}
+                  className={`mode-card ${
+                    paymentMode === mode ? "active" : ""
+                  }`}
+                  onClick={() => setPaymentMode(mode)}
+                >
+                  {mode}
+                </div>
+              ))}
             </div>
 
-            <div style={{ marginTop: "20px" }}>
-              <button onClick={startPayment} disabled={processing}>
-                {processing ? "Processing..." : "Confirm Payment"}
-              </button>
-              <button
-                onClick={() => setShowModal(false)}
-                style={{ marginLeft: "10px" }}
-                disabled={processing}
-              >
-                Cancel
-              </button>
-            </div>
+            <button
+              className="confirm-btn"
+              onClick={startPayment}
+              disabled={processing}
+            >
+              {processing ? "Processing..." : "Confirm & Pay"}
+            </button>
+
+            <button
+              className="cancel-btn"
+              onClick={() => setShowModal(false)}
+              disabled={processing}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
@@ -127,24 +118,3 @@ const Payments = () => {
 };
 
 export default Payments;
-
-/* ---------------- STYLES ---------------- */
-
-const modalStyle = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  width: "100%",
-  height: "100%",
-  background: "rgba(0,0,0,0.5)",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-};
-
-const modalContent = {
-  background: "#fff",
-  padding: "25px",
-  borderRadius: "8px",
-  width: "350px",
-};
