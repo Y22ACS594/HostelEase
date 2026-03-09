@@ -12,7 +12,9 @@ dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin:"*"
+}));
 app.use(express.json());
 
 // Routes
