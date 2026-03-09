@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://hostelease-ijl5.onrender.com/api"||"http://localhost:5000/api",
 });
 
 api.interceptors.request.use((config) => {
