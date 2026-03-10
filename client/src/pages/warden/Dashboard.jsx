@@ -3,35 +3,42 @@ import { useAuth } from "../../context/AuthContext";
 import "./Dashboard.css";
 
 const WardenDashboard = () => {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
         <div>
           <h1>🏨 Warden Dashboard</h1>
-          <p>Hostel Management System</p>
+          <p>Welcome, {user?.name || "Warden"} · Hostel Management System</p>
         </div>
-
-        <button
-          className="logout-btn"
-          onClick={() => {
-            logout();
-            navigate("/");
-          }}
-        >
+        <button className="logout-btn" onClick={handleLogout}>
           Logout
         </button>
       </div>
 
       <div className="dashboard-grid">
+
+        {/* ── Student Management ── */}
         <Link to="/warden/add-student" className="dashboard-card">
           <span>👩‍🎓</span>
           <h3>Add Student</h3>
           <p>Register new hostel student</p>
         </Link>
 
+        <Link to="/warden/students" className="dashboard-card">
+          <span>📋</span>
+          <h3>Students List</h3>
+          <p>View all registered students</p>
+        </Link>
+
+        {/* ── Room Management ── */}
         <Link to="/warden/create-room" className="dashboard-card">
           <span>🏠</span>
           <h3>Create Rooms</h3>
@@ -44,21 +51,34 @@ const WardenDashboard = () => {
           <p>Assign students to rooms</p>
         </Link>
 
+        {/* ── Leave Management ── */}
         <Link to="/warden/leaves" className="dashboard-card">
           <span>📄</span>
-          <h3>Leave Requests</h3>
-          <p>Approve or reject leaves</p>
+          <h3>Leave Approvals</h3>
+          <p>Approve or reject leave requests</p>
         </Link>
 
+        <Link to="/warden/leave-dashboard" className="dashboard-card">
+          <span>📊</span>
+          <h3>Leave Dashboard</h3>
+          <p>Analytics, charts & filters</p>
+        </Link>
+
+        {/* ── Analytics ── */}
+        <Link to="/warden/analytics" className="dashboard-card">
+          <span>📈</span>
+          <h3>Hostel Analytics</h3>
+          <p>Occupancy, trends & activity</p>
+        </Link>
+
+        {/* ── Payments ── */}
         <Link to="/warden/payments" className="dashboard-card">
           <span>💳</span>
           <h3>Payments</h3>
-          <p>View hostel payments</p>
+          <p>View hostel fee payments</p>
         </Link>
+
       </div>
-      <button onClick={() => navigate("/warden/students")}>
-  View Registered Students
-</button>
     </div>
   );
 };

@@ -6,9 +6,10 @@ const HomeRedirect = () => {
 
   if (!user) return <Navigate to="/login" replace />;
 
+  // ✅ All paths match App.jsx routes exactly
   if (user.role === "student") return <Navigate to="/student/dashboard" replace />;
-  if (user.role === "warden") return <Navigate to="/warden/dashboard" replace />;
-  if (user.role === "admin") return <Navigate to="/admin/dashboard" replace />;
+  if (user.role === "warden")  return <Navigate to="/warden/dashboard"  replace />;
+  if (user.role === "admin")   return <Navigate to="/admin/dashboard"   replace />;
 
   return <Navigate to="/login" replace />;
 };

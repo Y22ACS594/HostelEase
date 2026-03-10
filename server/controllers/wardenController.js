@@ -1,253 +1,245 @@
+// ============================================================
+// controllers/wardenController.js
+// Req 1: Duplicate prevention (email, rollNumber, phoneNumber)
+// Req 2: Atomic writes using MongoDB transactions
+// Req 9: Push notification on room allocation
+// Req 11: Audit logging
+// ============================================================
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+
 const User = require("../models/User");
 const Student = require("../models/Student");
 const RoomAllocation = require("../models/RoomAllocation");
 const Room = require("../models/Room");
 const Payment = require("../models/Payment");
 const LeaveRequest = require("../models/LeaveRequest");
-const bcrypt = require("bcryptjs");
 
-/* ===============================
-   ADD STUDENT (Warden)
-================================ */
-exports.addStudent = async (req, res) => {
+const auditLog = require("../utils/auditLogger");
+const pushNotification = require("../utils/notificationHelper");
+
+/* ═══════════════════════════════════════════════════════════
+   ADD STUDENT  ─  Req 1 + Req 2
+   Checks all three unique fields BEFORE touching the DB.
+   If User creation succeeds but Student fails, the
+   Mongoose session rolls back both writes atomically.
+═══════════════════════════════════════════════════════════ */
+exports.addStudent = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    console.log("Req Body:", req.body);
-
     const {
-      fullName,
-      email,
-      password,
-      rollNumber,
-      course,
-      department,
-      batch,
-      collegeName,
-      gender,
-      dateOfBirth,
-      bloodGroup,
-      phoneNumber,
-      aadhaarNumber,
-      fatherName,
-      motherName,
-      parentContact,
-      medicalIssues,
-      address
+      fullName, email, password, rollNumber, course,
+      department, batch, collegeName, gender, dateOfBirth,
+      bloodGroup, phoneNumber, aadhaarNumber,
+      fatherName, motherName, parentContact, medicalIssues, address,
     } = req.body;
 
-    const existingUser = await User.findOne({ email });
+    // ── Req 1: Pre-flight duplicate checks ──────────────────
+    const [emailExists, rollExists, phoneExists] = await Promise.all([
+      User.findOne({ email }).lean(),
+      Student.findOne({ rollNumber }).lean(),
+      Student.findOne({ phoneNumber }).lean(),
+    ]);
 
-    if (existingUser) {
-      return res.status(400).json({
-        message: "Student already exists"
+    if (emailExists || rollExists || phoneExists) {
+      const fields = [
+        emailExists  && "email",
+        rollExists   && "roll number",
+        phoneExists  && "phone number",
+      ].filter(Boolean).join(", ");
+
+      await session.abortTransaction();
+      session.endSession();
+
+      return res.status(409).json({
+        message: `Duplicate detected for: ${fields}. Registration cancelled — no record created.`,
+        duplicates: {
+          email: !!emailExists,
+          rollNumber: !!rollExists,
+          phoneNumber: !!phoneExists,
+        },
       });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // ── Req 2: Atomic write — both docs or neither ──────────
+    const hashedPassword = await bcrypt.hash(password, 12);
 
-    const user = await User.create({
-      name: fullName,
-      email,
-      password: hashedPassword,
-      role: "student"
+    const [user] = await User.create(
+      [{ name: fullName, email, password: hashedPassword, role: "student" }],
+      { session }
+    );
+
+    const [student] = await Student.create(
+      [{
+        user: user._id, fullName, rollNumber, course, department, batch,
+        collegeName, gender, dateOfBirth, bloodGroup, phoneNumber,
+        aadhaarNumber, fatherName, motherName, parentContact,
+        medicalIssues: medicalIssues || "None", address,
+      }],
+      { session }
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    // ── Req 11: Audit log ──────────────────────────────────
+    await auditLog({
+      actor: req.user.id,
+      actorRole: req.user.role,
+      action: "STUDENT_REGISTERED",
+      targetModel: "Student",
+      targetId: student._id,
+      description: `Warden registered student ${fullName} (${rollNumber})`,
+      ip: req.ip,
     });
 
-    const student = await Student.create({
-      user: user._id,
-      fullName,
-      rollNumber,
-      course,
-      department,
-      batch,
-      collegeName,
-      gender,
-      dateOfBirth,
-      bloodGroup,
-      phoneNumber,
-      aadhaarNumber,
-      fatherName,
-      motherName,
-      parentContact,
-      medicalIssues,
-      address
-    });
-
-    res.status(201).json({
+    return res.status(201).json({
       message: "Student registered successfully",
       userId: user._id,
-      studentId: student._id
+      studentId: student._id,
     });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Server error"
-    });
+    await session.abortTransaction();
+    session.endSession();
+    next(error);   // passes to centralised errorHandler
   }
 };
 
 
-/* ===============================
+/* ═══════════════════════════════════════════════════════════
    GET ALL STUDENTS
-================================ */
-exports.getAllStudents = async (req, res) => {
+═══════════════════════════════════════════════════════════ */
+exports.getAllStudents = async (req, res, next) => {
   try {
-
     const students = await Student
       .find()
-      .populate("user", "email role")
-      .sort({ createdAt: -1 });
+      .populate("user", "email role isActive")
+      .sort({ createdAt: -1 })
+      .lean();
 
     res.json(students);
-
-  } catch (err) {
-    res.status(500).json({
-      message: err.message
-    });
-  }
+  } catch (err) { next(err); }
 };
 
 
-/* ===============================
+/* ═══════════════════════════════════════════════════════════
    GET FULL STUDENT DETAILS
-================================ */
-exports.getStudentDetails = async (req, res) => {
+═══════════════════════════════════════════════════════════ */
+exports.getStudentDetails = async (req, res, next) => {
   try {
-
     const student = await Student
       .findById(req.params.id)
-      .populate("user", "email");
+      .populate("user", "email isActive")
+      .lean();
 
-    if (!student) {
-      return res.status(404).json({
-        message: "Student not found"
-      });
-    }
+    if (!student) return res.status(404).json({ message: "Student not found" });
 
-    const payments = await Payment.find({ student: student._id });
+    const [payments, leaves, room] = await Promise.all([
+      Payment.find({ student: student._id }).lean(),
+      LeaveRequest.find({ student: student._id }).sort({ createdAt: -1 }).lean(),
+      RoomAllocation.findOne({ student: student._id, status: "active" })
+        .populate("room").lean(),
+    ]);
 
-    const leaves = await LeaveRequest.find({ student: student._id });
-
-        const room = await RoomAllocation
-      .findOne({ student: student._id })
-      .populate("room")
-      .sort({ createdAt: -1 });
-    res.json({
-      student,
-      payments,
-      leaves,
-      room
-    });
-
-  } catch (err) {
-    res.status(500).json({
-      message: err.message
-    });
-  }
+    res.json({ student, payments, leaves, room });
+  } catch (err) { next(err); }
 };
 
 
-/* ===============================
+/* ═══════════════════════════════════════════════════════════
    UPDATE STUDENT
-================================ */
-exports.updateStudent = async (req, res) => {
+═══════════════════════════════════════════════════════════ */
+exports.updateStudent = async (req, res, next) => {
   try {
+    // Guard against overwriting protected fields
+    const { user: _u, _id: _i, ...safeUpdates } = req.body;
 
-    const student = await Student.findById(req.params.id);
+    const student = await Student.findByIdAndUpdate(
+      req.params.id,
+      safeUpdates,
+      { new: true, runValidators: true }
+    );
 
-    if (!student) {
-      return res.status(404).json({
-        message: "Student not found"
-      });
-    }
+    if (!student) return res.status(404).json({ message: "Student not found" });
 
-    Object.assign(student, req.body);
-
-    await student.save();
-
-    res.status(200).json({
-      message: "Student updated successfully",
-      student
+    await auditLog({
+      actor: req.user.id,
+      actorRole: req.user.role,
+      action: "STUDENT_UPDATED",
+      targetModel: "Student",
+      targetId: student._id,
+      description: `Updated profile for ${student.fullName}`,
+      ip: req.ip,
     });
 
-  } catch (error) {
-    res.status(500).json({
-      message: "Update failed",
-      error: error.message
-    });
-  }
+    res.json({ message: "Student updated successfully", student });
+  } catch (err) { next(err); }
 };
 
 
-/* ===============================
-   DELETE STUDENT COMPLETELY
-================================ */
-exports.deleteStudent = async (req, res) => {
+/* ═══════════════════════════════════════════════════════════
+   DELETE STUDENT  (cascades to all related collections)
+═══════════════════════════════════════════════════════════ */
+exports.deleteStudent = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-
-    const student = await Student.findById(req.params.id);
-
+    const student = await Student.findById(req.params.id).session(session);
     if (!student) {
-      return res.status(404).json({
-        message: "Student not found"
-      });
+      await session.abortTransaction(); session.endSession();
+      return res.status(404).json({ message: "Student not found" });
     }
 
-    await RoomAllocation.deleteMany({ student: student._id });
-    await Payment.deleteMany({ student: student._id });
-    await LeaveRequest.deleteMany({ student: student._id });
+    await Promise.all([
+      RoomAllocation.deleteMany({ student: student._id }).session(session),
+      Payment.deleteMany({ student: student._id }).session(session),
+      LeaveRequest.deleteMany({ student: student._id }).session(session),
+    ]);
 
-    await User.findByIdAndDelete(student.user);
+    await User.findByIdAndDelete(student.user).session(session);
+    await student.deleteOne({ session });
 
-    await student.deleteOne();
+    await session.commitTransaction();
+    session.endSession();
 
-    res.status(200).json({
-      message: "Student deleted successfully"
+    await auditLog({
+      actor: req.user.id,
+      actorRole: req.user.role,
+      action: "STUDENT_DELETED",
+      targetModel: "Student",
+      targetId: req.params.id,
+      description: `Deleted student ${student.fullName} (${student.rollNumber})`,
+      ip: req.ip,
     });
 
+    res.json({ message: "Student deleted successfully" });
   } catch (err) {
-    res.status(500).json({
-      message: err.message
-    });
+    await session.abortTransaction();
+    session.endSession();
+    next(err);
   }
 };
 
 
-/* ===============================
-   ALLOCATE ROOM (CHECK-IN)
-================================ */
-exports.allocateRoom = async (req, res) => {
+/* ═══════════════════════════════════════════════════════════
+   ALLOCATE ROOM  ─  Req 9 (notify student)
+═══════════════════════════════════════════════════════════ */
+exports.allocateRoom = async (req, res, next) => {
   try {
-
     const { studentId, room, bedNumber } = req.body;
 
-    const student = await Student.findOne({
-      rollNumber: studentId
-    });
+    const student = await Student.findOne({ rollNumber: studentId });
+    if (!student) return res.status(404).json({ message: "Student not found" });
 
-    if (!student) {
-      return res.status(404).json({
-        message: "Student not found"
-      });
-    }
-
-    const already = await RoomAllocation.findOne({
-      student: student._id,
-      status: "active"
-    });
-
-    if (already) {
-      return res.status(400).json({
-        message: "Student already has a room allocated"
-      });
-    }
+    const already = await RoomAllocation.findOne({ student: student._id, status: "active" });
+    if (already) return res.status(400).json({ message: "Student already has an active room" });
 
     const roomDoc = await Room.findById(room);
-
-    if (!roomDoc) {
-      return res.status(404).json({
-        message: "Room not found"
-      });
-    }
+    if (!roomDoc) return res.status(404).json({ message: "Room not found" });
 
     const allocation = await RoomAllocation.create({
       student: student._id,
@@ -255,122 +247,90 @@ exports.allocateRoom = async (req, res) => {
       bedNumber,
       allocatedBy: req.user.id,
       checkInDate: new Date(),
-      status: "active"
+      status: "active",
     });
 
     roomDoc.occupiedBeds += 1;
     await roomDoc.save();
 
-    res.status(201).json({
-      message: "Room allocated successfully",
-      allocation
+    // ── Req 9: Notify student ──────────────────────────────
+    await pushNotification(
+      student.user,
+      "ROOM_ALLOCATED",
+      "Room Allocated 🏠",
+      `You have been allocated Room ${roomDoc.roomNumber}, Bed ${bedNumber}.`,
+      { model: "RoomAllocation", id: allocation._id }
+    );
+
+    await auditLog({
+      actor: req.user.id,
+      actorRole: req.user.role,
+      action: "ROOM_ALLOCATED",
+      targetModel: "RoomAllocation",
+      targetId: allocation._id,
+      description: `Room ${roomDoc.roomNumber} bed ${bedNumber} allocated to ${student.fullName}`,
+      ip: req.ip,
     });
 
-  } catch (err) {
-    res.status(500).json({
-      message: err.message
-    });
-  }
+    res.status(201).json({ message: "Room allocated successfully", allocation });
+  } catch (err) { next(err); }
 };
 
 
-/* ===============================
-   GET OCCUPIED BEDS BY ROOM
-================================ */
-exports.getOccupiedBeds = async (req, res) => {
+/* ═══════════════════════════════════════════════════════════
+   GET OCCUPIED BEDS
+═══════════════════════════════════════════════════════════ */
+exports.getOccupiedBeds = async (req, res, next) => {
   try {
-
-    const { roomId } = req.params;
-
     const allocations = await RoomAllocation.find({
-      room: roomId,
-      status: "active"
-    });
+      room: req.params.roomId,
+      status: "active",
+    }).lean();
 
-    const occupiedBeds = allocations.map(a => a.bedNumber);
-
-    res.json(occupiedBeds);
-
-  } catch (err) {
-    res.status(500).json({
-      message: err.message
-    });
-  }
+    res.json(allocations.map((a) => a.bedNumber));
+  } catch (err) { next(err); }
 };
 
 
-/* ===============================
+/* ═══════════════════════════════════════════════════════════
    GET BED DETAILS
-================================ */
-exports.getBedDetails = async (req, res) => {
+═══════════════════════════════════════════════════════════ */
+exports.getBedDetails = async (req, res, next) => {
   try {
-
-    const { roomId, bedNumber } = req.params;
-
     const allocation = await RoomAllocation
       .findOne({
-        room: roomId,
-        bedNumber: bedNumber,
-        status: "active"
+        room: req.params.roomId,
+        bedNumber: req.params.bedNumber,
+        status: "active",
       })
       .populate("student");
 
-    if (!allocation) {
-      return res.status(404).json({
-        message: "Bed is empty"
-      });
-    }
+    if (!allocation) return res.status(404).json({ message: "Bed is empty" });
 
     res.json({
       studentName: allocation.student.fullName,
       rollNumber: allocation.student.rollNumber,
-      allocationId: allocation._id
+      allocationId: allocation._id,
     });
-
-  } catch (err) {
-    res.status(500).json({
-      message: err.message
-    });
-  }
+  } catch (err) { next(err); }
 };
 
 
-/* ===============================
+/* ═══════════════════════════════════════════════════════════
    REMOVE BED (CHECK-OUT)
-================================ */
-exports.removeBed = async (req, res) => {
+═══════════════════════════════════════════════════════════ */
+exports.removeBed = async (req, res, next) => {
   try {
-
-    const { allocationId } = req.params;
-
-    const allocation = await RoomAllocation.findById(allocationId);
-
-    if (!allocation) {
-      return res.status(404).json({
-        message: "Allocation not found"
-      });
-    }
+    const allocation = await RoomAllocation.findById(req.params.allocationId);
+    if (!allocation) return res.status(404).json({ message: "Allocation not found" });
 
     const room = await Room.findById(allocation.room);
+    if (room) { room.occupiedBeds = Math.max(0, room.occupiedBeds - 1); await room.save(); }
 
-    if (room) {
-      room.occupiedBeds -= 1;
-      await room.save();
-    }
-
-    // ✅ Instead of deleting → mark checkout
     allocation.status = "checkedOut";
     allocation.checkOutDate = new Date();
-
     await allocation.save();
 
-    res.json({
-      message: "Student checked out successfully"
-    });
-
-  } catch (err) {
-    res.status(500).json({
-      message: err.message
-    });
-  }
+    res.json({ message: "Student checked out successfully" });
+  } catch (err) { next(err); }
 };

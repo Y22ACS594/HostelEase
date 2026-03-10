@@ -3,16 +3,22 @@ import { useAuth } from "../../context/AuthContext";
 import "./Dashboard.css";
 
 const StudentDashboard = () => {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
     <div className="app-shell">
-      {/* Sidebar */}
+      {/* ── Sidebar ─────────────────────────────────────── */}
       <aside className="sidebar">
         <h2 className="logo">HostelEase</h2>
         <nav>
-          <Link to="/student" className="active">🏠 Dashboard</Link>
+          {/* ✅ Fixed: /student/dashboard not /student */}
+          <Link to="/student/dashboard" className="active">🏠 Dashboard</Link>
           <Link to="/student/room-status">🏨 My Room</Link>
           <Link to="/student/apply-leave">📝 Apply Leave</Link>
           <Link to="/student/leave-status">📄 Leave Status</Link>
@@ -20,22 +26,15 @@ const StudentDashboard = () => {
         </nav>
       </aside>
 
-      {/* Main */}
+      {/* ── Main ────────────────────────────────────────── */}
       <main className="main-area">
         {/* Top Bar */}
         <div className="topbar">
           <div>
             <h1>Welcome back 👋</h1>
-            <p>Student Hostel Dashboard</p>
+            <p>{user?.name || "Student"} · Hostel Dashboard</p>
           </div>
-
-          <button
-            className="logout-btn"
-            onClick={() => {
-              logout();
-              navigate("/");
-            }}
-          >
+          <button className="logout-btn" onClick={handleLogout}>
             Logout
           </button>
         </div>
@@ -60,7 +59,7 @@ const StudentDashboard = () => {
           </div>
         </div>
 
-        {/* Actions */}
+        {/* Action Cards */}
         <div className="action-grid">
           <Link to="/student/room-status" className="action-card">
             <h3>🏨 My Room</h3>
