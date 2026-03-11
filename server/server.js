@@ -28,6 +28,9 @@ app.use(mongoSanitize());                 // Prevents NoSQL injection
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   "http://localhost:5173",
+   "https://hostelease.online",
+  "https://www.hostelease.online"
+
 ].filter(Boolean);
 
 app.use(
