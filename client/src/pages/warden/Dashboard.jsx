@@ -58,24 +58,25 @@ const WardenDashboard = () => {
           <p>Approve or reject leave requests</p>
         </Link>
 
-        <Link to="/warden/leave-dashboard" className="dashboard-card">
-          <span>📊</span>
-          <h3>Leave Dashboard</h3>
-          <p>Analytics, charts & filters</p>
-        </Link>
-
-        {/* ── Analytics ── */}
-        <Link to="/warden/analytics" className="dashboard-card">
-          <span>📈</span>
-          <h3>Hostel Analytics</h3>
-          <p>Occupancy, trends & activity</p>
-        </Link>
-
         {/* ── Payments ── */}
         <Link to="/warden/payments" className="dashboard-card">
           <span>💳</span>
           <h3>Payments</h3>
           <p>View hostel fee payments</p>
+        </Link>
+
+        {/* ── Notifications ── */}
+        <Link to="/warden/notifications" className="dashboard-card">
+          <span>🔔</span>
+          <h3>Notifications</h3>
+          <p>View all system notifications</p>
+        </Link>
+
+        {/* ── Audit Logs ── */}
+        <Link to="/warden/audit-logs" className="dashboard-card">
+          <span>🗂️</span>
+          <h3>Audit Logs</h3>
+          <p>Track all warden activity logs</p>
         </Link>
 
       </div>

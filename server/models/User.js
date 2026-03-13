@@ -12,13 +12,14 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "warden", "student"],
       default: "student",
     },
-    resetPasswordToken: {
-  type: String,
-},
-resetPasswordExpire: {
-  type: Date,
-},
 
+    // ── Password Reset ─────────────────────────────────────────
+    resetPasswordToken: {
+      type: String,
+    },
+    resetPasswordExpires: {
+      type: Date,
+    },
 
     isActive: {
       type: Boolean,

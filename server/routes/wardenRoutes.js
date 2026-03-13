@@ -9,7 +9,7 @@ const {
   allocateRoom,
   getAllStudents,
   getStudentDetails,
-  deallocateRoom,
+  getRoomsWithBeds,
   deleteStudent,
   getOccupiedBeds,
   getBedDetails,
@@ -59,13 +59,6 @@ router.put(
   updateStudent
 );
 
-router.get(
-  "/rooms/:roomId/occupied-beds",
-  protect,
-  authorize("warden"),
-  getOccupiedBeds
-);
-
 // Delete Student
 router.delete(
   "/students/:id",
@@ -79,6 +72,14 @@ router.delete(
 // ROOM MANAGEMENT
 // ======================
 
+// Get Rooms With Beds (fast API)
+router.get(
+  "/rooms-with-beds",
+  protect,
+  authorize("warden"),
+  getRoomsWithBeds
+);
+
 // Allocate Room
 router.post(
   "/allocate-room",
@@ -87,6 +88,7 @@ router.post(
   allocateRoom
 );
 
+// Get Bed Details
 router.get(
   "/rooms/:roomId/bed/:bedNumber",
   protect,
@@ -94,6 +96,7 @@ router.get(
   getBedDetails
 );
 
+// Deallocate Bed (Checkout)
 router.delete(
   "/bed/:allocationId",
   protect,
@@ -121,5 +124,6 @@ router.put(
   authorize("warden"),
   updateLeaveStatus
 );
+
 
 module.exports = router;

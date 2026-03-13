@@ -1,33 +1,26 @@
-// ============================================================
 // controllers/leaveController.js
-// Req 6: Advanced filters  |  Req 7: Rejection reason
-// Req 9: Notify on approve/reject  |  Req 11: Audit log
-// ============================================================
-const LeaveRequest = require("../models/LeaveRequest");
-const Student = require("../models/Student");
-const auditLog = require("../utils/auditLogger");
+// Req 6: Filters | Req 7: Rejection reason
+// Req 9: Notify warden on apply, student on decision | Req 11: Audit
+const LeaveRequest     = require("../models/LeaveRequest");
+const Student          = require("../models/Student");
+const User             = require("../models/User");
+const auditLog         = require("../utils/auditLogger");
 const pushNotification = require("../utils/notificationHelper");
 const { sendEmail, buildLeaveStatusEmail } = require("../utils/sendEmail");
 
-
-/* ═══════════════════════════════════════════════════════════
-   STUDENT → APPLY LEAVE
-═══════════════════════════════════════════════════════════ */
+/* ── STUDENT → APPLY LEAVE ─────────────────────────────────── */
 exports.applyLeave = async (req, res, next) => {
   try {
     const { leaveType, reason, fromDate, toDate, destination, emergencyContact } = req.body;
 
-    if (!leaveType || !reason || !fromDate || !toDate || !destination || !emergencyContact) {
+    if (!leaveType || !reason || !fromDate || !toDate || !destination || !emergencyContact)
       return res.status(400).json({ message: "All fields are required" });
-    }
-    if (reason.length < 10) {
+    if (reason.length < 10)
       return res.status(400).json({ message: "Reason must be at least 10 characters" });
-    }
-    if (new Date(fromDate) > new Date(toDate)) {
+    if (new Date(fromDate) > new Date(toDate))
       return res.status(400).json({ message: "fromDate cannot be after toDate" });
-    }
 
-    const student = await Student.findOne({ user: req.user.id });
+    const student = await Student.findOne({ user: req.user.id }).lean();
     if (!student) return res.status(404).json({ message: "Student profile not found" });
 
     const leave = await LeaveRequest.create({
@@ -35,34 +28,44 @@ exports.applyLeave = async (req, res, next) => {
       leaveType, reason, fromDate, toDate, destination, emergencyContact,
     });
 
+    // ── Notify ALL wardens ─────────────────────────────────
+    const wardens = await User.find({ role: "warden" }).select("_id").lean();
+    const isUrgent = ["Emergency", "Medical"].includes(leaveType);
+    const prefix   = leaveType === "Emergency" ? "🚨 URGENT: "
+                   : leaveType === "Medical"   ? "🏥 Medical: " : "";
+
+    const from = String(fromDate).slice(0, 10);
+    const to   = String(toDate).slice(0, 10);
+
+    await Promise.all(wardens.map((w) =>
+      pushNotification(
+        w._id,
+        "LEAVE_APPLIED",
+        `${prefix}New ${leaveType} Leave Request`,
+        `${student.fullName} (${student.department || "—"}) applied for ${leaveType} leave ` +
+        `from ${from} to ${to}.${isUrgent ? " Requires immediate attention." : ""}`,
+        { model: "LeaveRequest", id: leave._id }
+      )
+    ));
+
     res.status(201).json(leave);
   } catch (err) { next(err); }
 };
 
-
-/* ═══════════════════════════════════════════════════════════
-   STUDENT → VIEW OWN LEAVES
-═══════════════════════════════════════════════════════════ */
+/* ── STUDENT → VIEW OWN LEAVES ────────────────────────────── */
 exports.getMyLeaves = async (req, res, next) => {
   try {
     const student = await Student.findOne({ user: req.user.id });
     if (!student) return res.status(404).json({ message: "Student not found" });
-
     const leaves = await LeaveRequest
       .find({ student: student._id })
       .sort({ createdAt: -1 })
       .lean();
-
     res.json(leaves);
   } catch (err) { next(err); }
 };
 
-
-/* ═══════════════════════════════════════════════════════════
-   WARDEN → GET ALL LEAVES  (Req 6: Filters)
-   Query params:  studentName | department | batch | leaveType | status
-                  page | limit | fromDate | toDate
-═══════════════════════════════════════════════════════════ */
+/* ── WARDEN → GET ALL LEAVES (paginated + filtered) ────────── */
 exports.getAllLeaves = async (req, res, next) => {
   try {
     const {
@@ -72,11 +75,10 @@ exports.getAllLeaves = async (req, res, next) => {
       fromDate, toDate,
     } = req.query;
 
-    // Build the student filter
     const studentFilter = {};
-    if (studentName) studentFilter.fullName = { $regex: studentName, $options: "i" };
-    if (department)  studentFilter.department = { $regex: department, $options: "i" };
-    if (batch)       studentFilter.batch = batch;
+    if (studentName) studentFilter.fullName   = { $regex: studentName, $options: "i" };
+    if (department)  studentFilter.department = { $regex: department,  $options: "i" };
+    if (batch)       studentFilter.batch      = batch;
 
     let studentIds;
     if (Object.keys(studentFilter).length > 0) {
@@ -84,11 +86,10 @@ exports.getAllLeaves = async (req, res, next) => {
       studentIds = students.map((s) => s._id);
     }
 
-    // Build the leave filter
     const leaveFilter = {};
-    if (studentIds)  leaveFilter.student = { $in: studentIds };
-    if (leaveType)   leaveFilter.leaveType = leaveType;
-    if (status)      leaveFilter.status = status;
+    if (studentIds)        leaveFilter.student   = { $in: studentIds };
+    if (leaveType)         leaveFilter.leaveType  = leaveType;
+    if (status)            leaveFilter.status     = status;
     if (fromDate || toDate) {
       leaveFilter.fromDate = {};
       if (fromDate) leaveFilter.fromDate.$gte = new Date(fromDate);
@@ -96,103 +97,76 @@ exports.getAllLeaves = async (req, res, next) => {
     }
 
     const skip = (Number(page) - 1) * Number(limit);
-
     const [leaves, total] = await Promise.all([
       LeaveRequest.find(leaveFilter)
-        .populate({
-          path: "student",
-          select: "fullName rollNumber department batch",
-        })
+        .populate({ path: "student", select: "fullName rollNumber department batch" })
         .populate("approvedBy", "name email")
         .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(Number(limit))
-        .lean(),
+        .skip(skip).limit(Number(limit)).lean(),
       LeaveRequest.countDocuments(leaveFilter),
     ]);
 
     res.json({
       leaves,
-      pagination: {
-        total,
-        page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(total / Number(limit)),
-      },
+      pagination: { total, page: Number(page), limit: Number(limit),
+        totalPages: Math.ceil(total / Number(limit)) },
     });
   } catch (err) { next(err); }
 };
 
-
-/* ═══════════════════════════════════════════════════════════
-   WARDEN → APPROVE / REJECT  (Req 7, 9, 11)
-   Rejected leaves MUST include a rejectionReason
-═══════════════════════════════════════════════════════════ */
+/* ── WARDEN → APPROVE / REJECT ─────────────────────────────── */
 exports.updateLeaveStatus = async (req, res, next) => {
   try {
     const { status, remarks, rejectionReason } = req.body;
 
-    if (!["Approved", "Rejected"].includes(status)) {
+    if (!["Approved", "Rejected"].includes(status))
       return res.status(400).json({ message: "Status must be 'Approved' or 'Rejected'" });
-    }
-
-    // Req 7: rejection reason is mandatory
-    if (status === "Rejected" && (!rejectionReason || rejectionReason.trim().length < 5)) {
-      return res.status(400).json({
-        message: "A rejection reason (min 5 characters) is required when rejecting a leave.",
-      });
-    }
+    if (status === "Rejected" && (!rejectionReason || rejectionReason.trim().length < 5))
+      return res.status(400).json({ message: "Rejection reason (min 5 chars) is required" });
 
     const leave = await LeaveRequest.findById(req.params.id)
       .populate({ path: "student", populate: { path: "user", select: "email name" } });
 
     if (!leave) return res.status(404).json({ message: "Leave request not found" });
-
-    if (leave.status !== "Pending") {
+    if (leave.status !== "Pending")
       return res.status(400).json({ message: "Only pending leaves can be updated" });
-    }
 
-    leave.status = status;
-    leave.remarks = remarks || "";
+    leave.status          = status;
+    leave.remarks         = remarks || "";
     leave.rejectionReason = status === "Rejected" ? rejectionReason : undefined;
-    leave.approvedBy = req.user.id;
+    leave.approvedBy      = req.user.id;
     await leave.save();
 
     const studentUser = leave.student?.user;
-
-    // ── Req 9: In-app notification ─────────────────────────
     if (studentUser) {
-      const notifType = status === "Approved" ? "LEAVE_APPROVED" : "LEAVE_REJECTED";
-      const notifTitle = status === "Approved" ? "Leave Approved ✅" : "Leave Rejected ❌";
-      const notifMsg = status === "Approved"
-        ? `Your ${leave.leaveType} leave has been approved.`
-        : `Your ${leave.leaveType} leave was rejected. Reason: ${rejectionReason}`;
+      const from = String(leave.fromDate).slice(0, 10);
+      const to   = String(leave.toDate).slice(0, 10);
 
-      await pushNotification(studentUser._id, notifType, notifTitle, notifMsg, {
-        model: "LeaveRequest",
-        id: leave._id,
-      });
+      await pushNotification(
+        studentUser._id,
+        status === "Approved" ? "LEAVE_APPROVED" : "LEAVE_REJECTED",
+        status === "Approved" ? "✅ Leave Approved" : "❌ Leave Rejected",
+        status === "Approved"
+          ? `Your ${leave.leaveType} leave (${from} → ${to}) has been approved. Have a safe trip!`
+          : `Your ${leave.leaveType} leave was rejected. Reason: ${rejectionReason}`,
+        { model: "LeaveRequest", id: leave._id }
+      );
 
-      // Email notification (best-effort — don't fail the request if email fails)
       try {
         await sendEmail(
           studentUser.email,
-          `SmartHostel: Leave ${status}`,
+          `HostelEase: Leave ${status}`,
           buildLeaveStatusEmail(studentUser.name, status, leave.leaveType, rejectionReason)
         );
-      } catch (emailErr) {
-        console.error("Leave status email failed:", emailErr.message);
-      }
+      } catch (e) { console.error("Email failed:", e.message); }
     }
 
-    // ── Req 11: Audit log ──────────────────────────────────
     await auditLog({
-      actor: req.user.id,
-      actorRole: req.user.role,
+      actor: req.user.id, actorRole: req.user.role,
       action: status === "Approved" ? "LEAVE_APPROVED" : "LEAVE_REJECTED",
-      targetModel: "LeaveRequest",
-      targetId: leave._id,
-      description: `Leave ${status.toLowerCase()} for student ${leave.student?.fullName}${status === "Rejected" ? ` — Reason: ${rejectionReason}` : ""}`,
+      targetModel: "LeaveRequest", targetId: leave._id,
+      description: `Leave ${status.toLowerCase()} for ${leave.student?.fullName}` +
+        (status === "Rejected" ? ` – Reason: ${rejectionReason}` : ""),
       ip: req.ip,
     });
 
@@ -200,62 +174,41 @@ exports.updateLeaveStatus = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-
-/* ═══════════════════════════════════════════════════════════
-   WARDEN → LEAVE STATISTICS  (Req 4 + 5)
-   Returns counts and chart data for the Leave Dashboard
-═══════════════════════════════════════════════════════════ */
+/* ── WARDEN → LEAVE STATISTICS ─────────────────────────────── */
 exports.getLeaveStats = async (req, res, next) => {
   try {
-    // Overall counts
     const [total, approved, pending, rejected] = await Promise.all([
       LeaveRequest.countDocuments(),
       LeaveRequest.countDocuments({ status: "Approved" }),
-      LeaveRequest.countDocuments({ status: "Pending" }),
+      LeaveRequest.countDocuments({ status: "Pending"  }),
       LeaveRequest.countDocuments({ status: "Rejected" }),
     ]);
 
-    // Monthly requests for the current year
-    const year = new Date().getFullYear();
+    const year    = new Date().getFullYear();
     const monthly = await LeaveRequest.aggregate([
       { $match: { createdAt: { $gte: new Date(`${year}-01-01`) } } },
-      { $group: {
-        _id: { month: { $month: "$createdAt" }, status: "$status" },
-        count: { $sum: 1 },
-      }},
+      { $group: { _id: { month: { $month: "$createdAt" }, status: "$status" }, count: { $sum: 1 } } },
       { $sort: { "_id.month": 1 } },
     ]);
 
-    // Leave type distribution
     const byType = await LeaveRequest.aggregate([
       { $group: { _id: "$leaveType", count: { $sum: 1 } } },
       { $sort: { count: -1 } },
     ]);
 
-    // Department-wise leave stats
     const byDepartment = await LeaveRequest.aggregate([
-      { $lookup: {
-        from: "students",
-        localField: "student",
-        foreignField: "_id",
-        as: "studentData",
-      }},
-      { $unwind: "$studentData" },
+      { $lookup: { from: "students", localField: "student", foreignField: "_id", as: "s" } },
+      { $unwind: "$s" },
       { $group: {
-        _id: "$studentData.department",
-        total: { $sum: 1 },
-        approved: { $sum: { $cond: [{ $eq: ["$status", "Approved"] }, 1, 0] } },
-        rejected: { $sum: { $cond: [{ $eq: ["$status", "Rejected"] }, 1, 0] } },
-        pending:  { $sum: { $cond: [{ $eq: ["$status", "Pending"] },  1, 0] } },
+        _id: "$s.department",
+        total:    { $sum: 1 },
+        approved: { $sum: { $cond: [{ $eq: ["$status","Approved"] }, 1, 0] } },
+        rejected: { $sum: { $cond: [{ $eq: ["$status","Rejected"] }, 1, 0] } },
+        pending:  { $sum: { $cond: [{ $eq: ["$status","Pending"]  }, 1, 0] } },
       }},
       { $sort: { total: -1 } },
     ]);
 
-    res.json({
-      summary: { total, approved, pending, rejected },
-      monthly,
-      byType,
-      byDepartment,
-    });
+    res.json({ summary: { total, approved, pending, rejected }, monthly, byType, byDepartment });
   } catch (err) { next(err); }
 };

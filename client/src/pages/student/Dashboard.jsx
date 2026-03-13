@@ -75,7 +75,13 @@ const StudentDashboard = () => {
             <h3>📄 Leave Status</h3>
             <p>Track approvals</p>
           </Link>
-
+           {/* ── Notifications ── */}
+                  <Link to="/warden/notifications" className="dashboard-card">
+                    <span>🔔</span>
+                    <h3>Notifications</h3>
+                    <p>View all system notifications</p>
+                  </Link>
+          
           <Link to="/student/payments" className="action-card">
             <h3>💳 Payments</h3>
             <p>Fee & transaction history</p>

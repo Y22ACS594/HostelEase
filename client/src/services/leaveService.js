@@ -1,18 +1,30 @@
 // services/leaveService.js
-//
-// ✅ FIX: Uses the shared `api` instance (baseURL = http://localhost:5000/api)
-//    OLD bug: used raw axios + `${VITE_API_URL}/api/leave/apply`
-//            = http://localhost:5000/api/api/leave/apply  ← 404 double /api/
-//    NOW: api.post("/leave/apply") = http://localhost:5000/api/leave/apply ✅
-
 import api from "./api";
 
-// ── STUDENT ──────────────────────────────────────────────────
+// ── STUDENT ────────────────────────────────────────────────────────────
 export const applyLeave  = (data) => api.post("/leave/apply",    data);
 export const getMyLeaves = ()     => api.get("/leave/my-leaves");
 
-// ── WARDEN ───────────────────────────────────────────────────
-export const getAllLeaves = () => api.get("/warden/leaves");
+// ── WARDEN ─────────────────────────────────────────────────────────────
+
+/**
+ * getAllLeaves({ page, limit, status, leaveType, studentName, department })
+ * Returns: { leaves, pagination: { total, page, limit, totalPages } }
+ */
+export const getAllLeaves = (params = {}) => {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => {
+    if (v !== undefined && v !== "" && v !== "All") query.set(k, v);
+  });
+  const qs = query.toString();
+  return api.get(`/warden/leaves${qs ? `?${qs}` : ""}`);
+};
+
+/**
+ * getLeaveStats()
+ * Returns: { summary, monthly, byType, byDepartment }
+ */
+export const getLeaveStats = () => api.get("/leave/stats");
 
 export const updateLeaveStatus = (id, status, rejectionReason = "") => {
   const body = { status };

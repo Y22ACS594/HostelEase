@@ -1071,158 +1071,306 @@ export default ForgotPassword;
 ==========================================
 FILE: C:\HostelEase\client\src\pages\auth\Login.css
 ==========================================
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   HostelEase Login â€” Clean SaaS Style
+   No Google OAuth
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
-/* Container */
-.login-container {
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(circle at top, #1e293b, #020617);
-  font-family: "Inter", sans-serif;
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap");
+
+:root {
+  --white:      #ffffff;
+  --bg:         #f5f6fa;
+  --border:     #e5e7ef;
+  --border-2:   #d1d5e0;
+  --text-1:     #0d1117;
+  --text-2:     #4b5568;
+  --text-3:     #9ca3af;
+  --accent:     #111827;
+  --accent-2:   #374151;
+  --green-light:#ecfdf5;
+  --amber-light:#fffbeb;
+  --red-light:  #fef2f2;
+  --shadow-xs:  0 1px 2px rgba(0,0,0,.05);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:  0 4px 6px -1px rgba(0,0,0,.07),0 2px 4px -1px rgba(0,0,0,.04);
+  --shadow-xl:  0 20px 25px -5px rgba(0,0,0,.10),0 10px 10px -5px rgba(0,0,0,.04);
+  --radius-sm:  8px;
+  --radius:     12px;
+  --radius-xl:  20px;
+  --font:       "Plus Jakarta Sans", system-ui, sans-serif;
+  --ease:       cubic-bezier(0.4,0,0.2,1);
+  --fast:       150ms;
 }
 
-/* Card */
-.login-card {
-  width: 380px;
-  padding: 40px 35px;
-  border-radius: 18px;
-  background: #111827; /* solid dark background */
-  border: 1px solid #1f2937;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-  color: white;
-  text-align: center;
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:var(--font); background:var(--bg); }
+
+/* â”€â”€ Root Layout â”€â”€ */
+.he-root {
+  min-height:100vh; display:grid;
+  grid-template-columns:420px 1fr;
+  font-family:var(--font);
 }
 
-/* Title */
-.login-card h2 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 8px;
+/* â•â• LEFT PANEL â•â• */
+.he-left {
+  background:var(--white);
+  display:flex; align-items:center; justify-content:center;
+  padding:48px 40px;
+  border-right:1px solid var(--border);
+  position:relative; z-index:2;
+  box-shadow:var(--shadow-xl);
+}
+.he-left-inner {
+  width:100%; max-width:340px;
+  animation:slide-up .45s var(--ease) both;
+}
+@keyframes slide-up {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
 }
 
-.login-subtitle {
-  color: #9ca3af;
-  font-size: 0.9rem;
-  margin-bottom: 25px;
+/* Logo */
+.he-logo { display:flex; align-items:center; gap:10px; margin-bottom:36px; }
+.he-logo-icon {
+  width:36px; height:36px; background:var(--accent);
+  border-radius:10px; display:flex; align-items:center;
+  justify-content:center; font-size:18px;
+}
+.he-logo-text { font-size:17px; font-weight:700; color:var(--text-1); letter-spacing:-.03em; }
+
+.he-title { font-size:26px; font-weight:700; color:var(--text-1); letter-spacing:-.04em; margin-bottom:6px; }
+.he-sub   { font-size:14px; color:var(--text-3); margin-bottom:28px; line-height:1.5; }
+
+/* Role Toggle */
+.he-role-wrap { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:22px; }
+.he-role {
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  padding:10px 12px; border:1.5px solid var(--border);
+  border-radius:var(--radius-sm); background:transparent;
+  font-family:var(--font); font-size:13.5px; font-weight:500;
+  color:var(--text-2); cursor:pointer;
+  transition:all var(--fast) var(--ease);
+}
+.he-role:hover:not(.active) { border-color:var(--border-2); background:var(--bg); }
+.he-role.active {
+  background:var(--text-1); border-color:var(--text-1);
+  color:#fff; box-shadow:var(--shadow-sm);
 }
 
 /* Error */
-.login-error {
-  background: #7f1d1d;
-  color: #fecaca;
-  padding: 10px;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  margin-bottom: 15px;
+.he-err {
+  background:var(--red-light); border:1px solid #fca5a5;
+  border-radius:var(--radius-sm); padding:10px 13px;
+  font-size:13px; color:#b91c1c;
+  margin-bottom:16px; line-height:1.5;
+  animation:shake .3s var(--ease);
+}
+@keyframes shake {
+  0%,100% { transform:translateX(0); }
+  25%      { transform:translateX(-5px); }
+  75%      { transform:translateX(5px); }
 }
 
 /* Form */
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
+.he-form { display:flex; flex-direction:column; gap:16px; }
+.he-field { display:flex; flex-direction:column; gap:6px; }
+.he-field label { font-size:13px; font-weight:600; color:var(--text-1); }
 
-/* Input Group */
-.input-group {
-  position: relative;
+.he-input-wrap {
+  position:relative; display:flex; align-items:center;
+  border:1.5px solid var(--border); border-radius:var(--radius-sm);
+  background:var(--bg);
+  transition:border-color var(--fast) var(--ease),
+             box-shadow var(--fast) var(--ease),
+             background var(--fast) var(--ease);
 }
+.he-input-wrap.focused {
+  border-color:var(--text-1); background:var(--white);
+  box-shadow:0 0 0 3px rgba(17,24,39,.08);
+}
+.he-ico {
+  position:absolute; left:13px; color:var(--text-3);
+  display:flex; pointer-events:none;
+  transition:color var(--fast) var(--ease);
+}
+.he-input-wrap.focused .he-ico { color:var(--text-1); }
+.he-input-wrap input {
+  width:100%; padding:11px 40px 11px 38px;
+  border:none; background:transparent;
+  font-family:var(--font); font-size:14px;
+  color:var(--text-1); outline:none;
+}
+.he-input-wrap input::placeholder { color:var(--text-3); }
+.he-eye {
+  position:absolute; right:12px; background:none; border:none;
+  cursor:pointer; color:var(--text-3); display:flex; padding:4px;
+  border-radius:4px; transition:color var(--fast) var(--ease);
+}
+.he-eye:hover { color:var(--text-1); }
 
-/* Inputs (FORCED STYLING) */
-.login-container input {
-  width: 100%;
-  padding: 13px 14px;
-  border-radius: 10px;
-  border: 1px solid #374151;
-  background-color: #1f2937 !important;  /* dark background */
-  color: #ffffff !important;             /* visible white text */
-  font-size: 0.95rem;
-  outline: none;
-  transition: 0.2s ease;
+.he-forgot-row { display:flex; justify-content:flex-end; margin-top:4px; }
+.he-forgot {
+  font-size:12.5px; font-weight:500; color:var(--text-2);
+  text-decoration:none; transition:color var(--fast) var(--ease);
 }
+.he-forgot:hover { color:var(--text-1); }
 
-/* Placeholder */
-.login-container input::placeholder {
-  color: #9ca3af !important;
+/* Sign in button */
+.he-btn-primary {
+  width:100%; padding:13px; margin-top:4px;
+  background:var(--text-1); color:var(--white);
+  border:none; border-radius:var(--radius-sm);
+  font-family:var(--font); font-size:15px; font-weight:600;
+  cursor:pointer; letter-spacing:-.01em;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  transition:background var(--fast) var(--ease),
+             transform var(--fast) var(--ease),
+             box-shadow var(--fast) var(--ease);
+  box-shadow:var(--shadow-sm);
 }
+.he-btn-primary:hover:not(:disabled) {
+  background:var(--accent-2); transform:translateY(-1px); box-shadow:var(--shadow-md);
+}
+.he-btn-primary:active:not(:disabled) { transform:translateY(0); }
+.he-btn-primary:disabled { opacity:.6; cursor:not-allowed; }
 
-/* Focus */
-.login-container input:focus {
-  border-color: #3b82f6;
-  background-color: #111827 !important;
-  box-shadow: 0 0 0 2px rgba(59,130,246,0.3);
+/* Spinner */
+.he-spin {
+  width:15px; height:15px; border-radius:50%;
+  border:2px solid rgba(255,255,255,.3); border-top-color:#fff;
+  animation:spin .65s linear infinite;
 }
-
-/* Chrome Autofill Fix */
-.login-container input:-webkit-autofill,
-.login-container input:-webkit-autofill:hover,
-.login-container input:-webkit-autofill:focus {
-  -webkit-text-fill-color: #ffffff !important;
-  box-shadow: 0 0 0px 1000px #1f2937 inset !important;
-  transition: background-color 5000s ease-in-out 0s;
-}
-
-/* Password Eye */
-.password-group {
-  position: relative;
-}
-
-.toggle-password {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  font-size: 1.1rem;
-  opacity: 0.7;
-}
-
-.toggle-password:hover {
-  opacity: 1;
-}
-
-/* Button */
-.login-btn {
-  margin-top: 10px;
-  padding: 13px;
-  border-radius: 12px;
-  border: none;
-  background: linear-gradient(135deg, #3b82f6, #6366f1);
-  color: white;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.login-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(99,102,241,0.4);
-}
-
-.login-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+@keyframes spin { to { transform:rotate(360deg); } }
 
 /* Footer */
-.login-footer {
-  margin-top: 20px;
+.he-bottom { text-align:center; margin-top:24px; font-size:13px; color:var(--text-3); }
+.he-link { color:var(--text-1); font-weight:600; text-decoration:none; }
+.he-link:hover { text-decoration:underline; }
+
+/* â•â• RIGHT PANEL â•â• */
+.he-right {
+  display:flex; align-items:center; justify-content:center;
+  padding:40px 48px; background:var(--bg);
+  position:relative; overflow:hidden;
+}
+.he-right::before {
+  content:""; position:absolute; inset:0;
+  background-image:
+    linear-gradient(var(--border) 1px,transparent 1px),
+    linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:32px 32px; opacity:.5; pointer-events:none;
 }
 
-.forgot-link {
-  color: #3b82f6;
-  font-size: 0.85rem;
-  cursor: pointer;
+.he-preview {
+  position:relative; z-index:1; width:100%; max-width:640px;
+  background:var(--white); border:1px solid var(--border);
+  border-radius:var(--radius-xl); padding:24px;
+  box-shadow:var(--shadow-xl);
+  animation:fade-in .6s var(--ease) .15s both;
+}
+@keyframes fade-in {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:translateY(0); }
 }
 
-.forgot-link:hover {
-  text-decoration: underline;
+/* Top bar */
+.pv-topbar { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:20px; }
+.pv-gday { font-size:15px; font-weight:700; color:var(--text-1); letter-spacing:-.02em; }
+.pv-gsub { font-size:12px; color:var(--text-3); margin-top:2px; }
+.pv-week-tag {
+  font-size:11.5px; font-weight:600; color:var(--text-2);
+  background:var(--bg); border:1px solid var(--border);
+  border-radius:6px; padding:4px 10px;
 }
 
+/* Stat cards */
+.pv-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:20px; }
+.pv-stat-card {
+  background:var(--bg); border:1px solid var(--border);
+  border-radius:var(--radius); padding:14px 14px 12px;
+  transition:box-shadow var(--fast) var(--ease);
+}
+.pv-stat-card:hover { box-shadow:var(--shadow-sm); }
+.pv-stat-card.dark { background:var(--text-1); border-color:var(--text-1); }
+
+.pv-stat-label {
+  font-size:11px; font-weight:600; color:var(--text-3);
+  text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px;
+}
+.pv-stat-label.light { color:rgba(255,255,255,.55); }
+.pv-stat-value-row { display:flex; align-items:flex-end; gap:6px; }
+.pv-stat-num { font-size:22px; font-weight:700; color:var(--text-1); letter-spacing:-.04em; line-height:1; }
+.pv-stat-num.light { color:#fff; }
+.pv-pct { font-size:14px; font-weight:600; }
+.pv-stat-badge {
+  font-size:10.5px; font-weight:600; border-radius:5px; padding:2px 6px;
+  display:flex; align-items:center; gap:3px; margin-bottom:2px;
+}
+.pv-stat-badge.green  { background:var(--green-light); color:#065f46; }
+.pv-stat-badge.yellow { background:var(--amber-light); color:#92400e; }
+.pv-stat-badge.red    { background:var(--red-light);   color:#991b1b; }
+
+/* Chart section */
+.pv-section { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:16px; }
+.pv-tabs { display:flex; border-bottom:1px solid var(--border); background:var(--bg); padding:0 12px; }
+.pv-tab {
+  padding:10px 14px; font-size:12.5px; font-weight:500; color:var(--text-3);
+  background:none; border:none; border-bottom:2px solid transparent;
+  cursor:pointer; font-family:var(--font);
+  transition:all var(--fast) var(--ease); margin-bottom:-1px;
+}
+.pv-tab.active { color:var(--text-1); border-bottom-color:var(--text-1); font-weight:600; }
+.pv-tab:hover:not(.active) { color:var(--text-2); }
+
+.pv-chart-title { font-size:12px; font-weight:600; color:var(--text-2); padding:12px 16px 0; }
+
+/* Bar Chart */
+.pv-chart-wrap { padding:10px 16px 14px; }
+.pv-chart-legend {
+  display:flex; gap:14px; margin-bottom:12px;
+  font-size:11px; color:var(--text-3); font-weight:500; align-items:center;
+}
+.pv-leg-dot { width:8px; height:8px; border-radius:2px; display:inline-block; margin-right:4px; }
+.pv-bars-grid { display:flex; gap:5px; align-items:flex-end; height:110px; }
+.pv-bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; height:100%; }
+.pv-bar-group { flex:1; width:100%; display:flex; align-items:flex-end; gap:1.5px; justify-content:center; }
+.pv-bar {
+  flex:1; border-radius:3px 3px 0 0; min-height:3px;
+  animation:bar-grow .6s var(--ease) both; transform-origin:bottom;
+}
+@keyframes bar-grow {
+  from { transform:scaleY(0); opacity:0; }
+  to   { transform:scaleY(1); opacity:1; }
+}
+.pv-bar-label { font-size:9px; color:var(--text-3); font-weight:500; }
+
+/* Leave breakdown */
+.pv-leave-types { border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px; }
+.pv-lt-heading { font-size:12px; font-weight:700; color:var(--text-1); margin-bottom:12px; }
+.pv-lt-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.pv-lt-row:last-child { margin-bottom:0; }
+.pv-lt-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.pv-lt-name { font-size:12px; font-weight:500; color:var(--text-2); min-width:90px; }
+.pv-lt-bar-wrap { flex:1; height:6px; background:var(--bg); border-radius:100px; overflow:hidden; }
+.pv-lt-bar { height:100%; border-radius:100px; animation:bar-fill .8s var(--ease) both; transform-origin:left; }
+@keyframes bar-fill { from { transform:scaleX(0); } to { transform:scaleX(1); } }
+.pv-lt-count { font-size:12px; font-weight:700; color:var(--text-1); min-width:28px; text-align:right; }
+
+/* â”€â”€ Responsive â”€â”€ */
+@media (max-width:1100px) {
+  .he-root { grid-template-columns:380px 1fr; }
+  .pv-stats { grid-template-columns:repeat(2,1fr); }
+}
+@media (max-width:860px) {
+  .he-root { grid-template-columns:1fr; }
+  .he-right { display:none; }
+  .he-left { box-shadow:none; border-right:none; }
+}
+@media (max-width:480px) {
+  .he-left { padding:32px 24px; }
+}
 
 ==========================================
 FILE: C:\HostelEase\client\src\pages\auth\Login.jsx
@@ -1232,83 +1380,306 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "./Login.css";
 
+/* â”€â”€â”€ SVG Icons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+const MailIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="4" width="20" height="16" rx="2"/>
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+  </svg>
+);
+const LockIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="11" width="18" height="11" rx="2"/>
+    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+  </svg>
+);
+const EyeIcon = ({ open }) => open ? (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+) : (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+);
+const StudentIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+    <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+  </svg>
+);
+const WardenIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+  </svg>
+);
+const TrendUpIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+    <polyline points="17 6 23 6 23 12"/>
+  </svg>
+);
+
+/* â”€â”€â”€ Dashboard Preview Data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const LEAVE_DATA = {
+  medical:   [12, 18, 14, 22, 16, 28, 24, 19, 15, 21, 17, 13],
+  emergency: [5,  8,  6,  10, 7,  14, 11, 9,  6,  8,  5,  7],
+  casual:    [20, 25, 22, 30, 27, 35, 32, 28, 24, 29, 26, 23],
+};
+const maxVal = Math.max(...LEAVE_DATA.casual);
+
+const MiniBarChart = () => (
+  <div className="pv-chart-wrap">
+    <div className="pv-chart-legend">
+      <span><span className="pv-leg-dot" style={{background:"#6366f1"}} />Medical</span>
+      <span><span className="pv-leg-dot" style={{background:"#f59e0b"}} />Emergency</span>
+      <span><span className="pv-leg-dot" style={{background:"#10b981"}} />Casual</span>
+    </div>
+    <div className="pv-bars-grid">
+      {MONTHS.map((m, i) => (
+        <div key={m} className="pv-bar-col">
+          <div className="pv-bar-group">
+            <div className="pv-bar" style={{ height:`${(LEAVE_DATA.casual[i]/maxVal)*100}%`,    background:"linear-gradient(180deg,#10b981,#059669)", animationDelay:`${i*55}ms` }} />
+            <div className="pv-bar" style={{ height:`${(LEAVE_DATA.medical[i]/maxVal)*100}%`,   background:"linear-gradient(180deg,#818cf8,#6366f1)", animationDelay:`${i*55+18}ms` }} />
+            <div className="pv-bar" style={{ height:`${(LEAVE_DATA.emergency[i]/maxVal)*100}%`, background:"linear-gradient(180deg,#fbbf24,#f59e0b)", animationDelay:`${i*55+36}ms` }} />
+          </div>
+          <span className="pv-bar-label">{m}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+/* â”€â”€â”€ Role mismatch messages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+const ROLE_MISMATCH = {
+  warden:  "These credentials belong to a Warden account. Switch to the Warden tab.",
+  student: "These credentials belong to a Student account. Switch to the Student tab.",
+  admin:   "This is an Admin account. Please use the Admin Login link below.",
+};
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   LOGIN COMPONENT
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const Login = () => {
   const { login } = useAuth();
   const navigate  = useNavigate();
 
-  const [email,    setEmail]    = useState("");
-  const [password, setPassword] = useState("");
-  const [error,    setError]    = useState("");
-  const [loading,  setLoading]  = useState(false);
+  const [selectedRole, setSelectedRole] = useState("student");
+  const [email,        setEmail]        = useState("");
+  const [password,     setPassword]     = useState("");
+  const [showPass,     setShowPass]     = useState(false);
+  const [error,        setError]        = useState("");
+  const [loading,      setLoading]      = useState(false);
+  const [focused,      setFocused]      = useState("");
+  const [activeTab,    setActiveTab]    = useState("leaves");
+
+  const navigateByRole = (role) => {
+    if (role === "student")     navigate("/student/dashboard");
+    else if (role === "warden") navigate("/warden/dashboard");
+    else if (role === "admin")  navigate("/admin/dashboard");
+    else navigate("/");
+  };
+
+  const handleRoleChange = (r) => { setSelectedRole(r); setError(""); };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
-
+    setError(""); setLoading(true);
     try {
-      const role = await login(email, password);
-
-      // âœ… Navigate to the correct dashboard based on role
-      if (role === "student") navigate("/student/dashboard");
-      else if (role === "warden") navigate("/warden/dashboard");
-      else if (role === "admin")  navigate("/admin/dashboard");
-      else navigate("/");
-
+      const resolvedRole = await login(email, password);
+      if (resolvedRole !== selectedRole && resolvedRole !== "admin") {
+        setError(ROLE_MISMATCH[resolvedRole] ?? "Account role mismatch. Select the correct tab.");
+        return;
+      }
+      navigateByRole(resolvedRole);
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid email or password");
-    } finally {
-      setLoading(false);
-    }
+      setError(err.response?.data?.message || "Invalid email or password.");
+    } finally { setLoading(false); }
   };
 
   return (
-    <div className="login-page">
-      <div className="login-card">
-        <div className="login-logo">ðŸ </div>
-        <h1 className="login-title">HostelEase</h1>
-        <p className="login-subtitle">Student &amp; Warden Portal</p>
+    <div className="he-root">
 
-        {error && <div className="login-error">{error}</div>}
+      {/* â•â• LEFT â€” LOGIN FORM â•â• */}
+      <div className="he-left">
+        <div className="he-left-inner">
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <label>Email Address</label>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-            />
+          {/* Logo */}
+          <div className="he-logo">
+            <span className="he-logo-icon">ðŸ </span>
+            <span className="he-logo-text">HostelEase</span>
           </div>
 
-          <div className="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-            />
+          <h1 className="he-title">Welcome back</h1>
+          <p className="he-sub">Sign in to continue to your dashboard</p>
+
+          {/* Role Toggle */}
+          <div className="he-role-wrap">
+            <button type="button"
+              className={`he-role ${selectedRole === "student" ? "active" : ""}`}
+              onClick={() => handleRoleChange("student")}>
+              <StudentIcon /> Student
+            </button>
+            <button type="button"
+              className={`he-role ${selectedRole === "warden" ? "active" : ""}`}
+              onClick={() => handleRoleChange("warden")}>
+              <WardenIcon /> Warden
+            </button>
           </div>
 
-          <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? "Signing inâ€¦" : "Sign In"}
-          </button>
-        </form>
+          {/* Error */}
+          {error && (
+            <div className="he-err" role="alert" key={error}>
+              âš ï¸ {error}
+            </div>
+          )}
 
-        <div className="login-footer">
-          <Link to="/forgot-password">Forgot Password?</Link>
-        </div>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="he-form" noValidate>
 
-        <div className="login-admin-link">
-          <Link to="/admin/login">Admin Login â†’</Link>
+            <div className="he-field">
+              <label htmlFor="hf-email">Email</label>
+              <div className={`he-input-wrap ${focused === "email" ? "focused" : ""}`}>
+                <span className="he-ico"><MailIcon /></span>
+                <input
+                  id="hf-email" type="email"
+                  placeholder={selectedRole === "student" ? "student@college.edu" : "warden@hostel.edu"}
+                  value={email} onChange={e => setEmail(e.target.value)}
+                  onFocus={() => setFocused("email")} onBlur={() => setFocused("")}
+                  required autoComplete="email"
+                />
+              </div>
+            </div>
+
+            <div className="he-field">
+              <label htmlFor="hf-pass">Password</label>
+              <div className={`he-input-wrap ${focused === "password" ? "focused" : ""}`}>
+                <span className="he-ico"><LockIcon /></span>
+                <input
+                  id="hf-pass" type={showPass ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={password} onChange={e => setPassword(e.target.value)}
+                  onFocus={() => setFocused("password")} onBlur={() => setFocused("")}
+                  required autoComplete="current-password"
+                />
+                <button type="button" className="he-eye" onClick={() => setShowPass(p => !p)}>
+                  <EyeIcon open={showPass} />
+                </button>
+              </div>
+              <div className="he-forgot-row">
+                <Link to="/forgot-password" className="he-forgot">Forgot Password?</Link>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className={`he-btn-primary ${loading ? "busy" : ""}`}
+              disabled={loading}
+            >
+              {loading ? <><span className="he-spin" /> Signing inâ€¦</> : "Sign in"}
+            </button>
+
+          </form>
+
+          <p className="he-bottom">
+            Admin? <Link to="/admin/login" className="he-link">Admin login â†’</Link>
+          </p>
+
         </div>
       </div>
+
+      {/* â•â• RIGHT â€” DASHBOARD PREVIEW â•â• */}
+      <div className="he-right">
+        <div className="he-preview">
+
+          <div className="pv-topbar">
+            <div>
+              <p className="pv-gday">Good Morning, HostelEase ðŸ‘‹</p>
+              <p className="pv-gsub">Summary of the complete data set</p>
+            </div>
+            <span className="pv-week-tag">This Month</span>
+          </div>
+
+          {/* Stat cards */}
+          <div className="pv-stats">
+            <div className="pv-stat-card">
+              <p className="pv-stat-label">Total Students</p>
+              <div className="pv-stat-value-row">
+                <span className="pv-stat-num">486</span>
+                <span className="pv-stat-badge green"><TrendUpIcon />+5.2%</span>
+              </div>
+            </div>
+            <div className="pv-stat-card dark">
+              <p className="pv-stat-label light">Total Rooms</p>
+              <div className="pv-stat-value-row">
+                <span className="pv-stat-num light">240</span>
+                <span className="pv-stat-badge yellow"><TrendUpIcon />+2.1%</span>
+              </div>
+            </div>
+            <div className="pv-stat-card">
+              <p className="pv-stat-label">Occupancy</p>
+              <div className="pv-stat-value-row">
+                <span className="pv-stat-num">94<span className="pv-pct">%</span></span>
+                <span className="pv-stat-badge green"><TrendUpIcon />+1.8%</span>
+              </div>
+            </div>
+            <div className="pv-stat-card">
+              <p className="pv-stat-label">Pending Fees</p>
+              <div className="pv-stat-value-row">
+                <span className="pv-stat-num">â‚¹2.4k</span>
+                <span className="pv-stat-badge red">12 due</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Chart section */}
+          <div className="pv-section">
+            <div className="pv-tabs">
+              {["leaves","rooms","fees"].map(t => (
+                <button key={t}
+                  className={`pv-tab ${activeTab === t ? "active" : ""}`}
+                  onClick={() => setActiveTab(t)}>
+                  {t.charAt(0).toUpperCase() + t.slice(1)}
+                </button>
+              ))}
+            </div>
+            <div className="pv-chart-title">
+              {activeTab === "leaves" && "Leave Requests â€” Monthly Overview"}
+              {activeTab === "rooms"  && "Room Occupancy â€” Monthly Overview"}
+              {activeTab === "fees"   && "Fee Collection â€” Monthly Overview"}
+            </div>
+            <MiniBarChart />
+          </div>
+
+          {/* Leave breakdown */}
+          <div className="pv-leave-types">
+            <p className="pv-lt-heading">Leave Summary</p>
+            <div className="pv-lt-row">
+              <span className="pv-lt-dot" style={{background:"#6366f1"}} />
+              <span className="pv-lt-name">Medical Leave</span>
+              <div className="pv-lt-bar-wrap"><div className="pv-lt-bar" style={{width:"62%",background:"#6366f1"}} /></div>
+              <span className="pv-lt-count">186</span>
+            </div>
+            <div className="pv-lt-row">
+              <span className="pv-lt-dot" style={{background:"#f59e0b"}} />
+              <span className="pv-lt-name">Emergency</span>
+              <div className="pv-lt-bar-wrap"><div className="pv-lt-bar" style={{width:"32%",background:"#f59e0b"}} /></div>
+              <span className="pv-lt-count">96</span>
+            </div>
+            <div className="pv-lt-row">
+              <span className="pv-lt-dot" style={{background:"#10b981"}} />
+              <span className="pv-lt-name">Casual Leave</span>
+              <div className="pv-lt-bar-wrap"><div className="pv-lt-bar" style={{width:"84%",background:"#10b981"}} /></div>
+              <span className="pv-lt-count">251</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </div>
   );
 };
@@ -1604,42 +1975,1016 @@ export default ResetPassword;
 
 
 ==========================================
+FILE: C:\HostelEase\client\src\pages\home\Home.css
+==========================================
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap');
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   RESET + TOKENS
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#0f172a;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit}
+
+:root{
+  --g:#16a34a; --g-dk:#15803d; --g-lt:#dcfce7; --g-muted:#bbf7d0;
+  --dark:#0f172a; --dark2:#1e293b; --slate:#64748b; --slate-lt:#94a3b8;
+  --border:#e2e8f0; --bg:#f8fafc; --bg2:#f1f5f9;
+  --amber:#f59e0b; --amber-lt:#fef3c7;
+  --blue:#3b82f6; --blue-lt:#eff6ff;
+
+  --fd:'Playfair Display',serif; 
+  --fb:'Plus Jakarta Sans',sans-serif;
+
+  /* NEW FONT FOR STEP TITLES */
+  --step-font:'Poppins',sans-serif;
+
+  --sh-sm:0 1px 3px rgba(0,0,0,.07); 
+  --sh-md:0 4px 20px rgba(0,0,0,.08);
+  --sh-lg:0 12px 48px rgba(0,0,0,.12); 
+  --sh-green:0 8px 24px rgba(22,163,74,.28);
+
+  --r-sm:8px; 
+  --r-md:12px; 
+  --r-lg:16px; 
+  --r-xl:20px; 
+  --r-2xl:28px;
+}
+/* â•â• ANIMATIONS â•â• */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes underlineGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes barGrow{from{height:0}to{height:var(--bar-h)}}
+.anim-in{animation:fadeUp .55s ease both}
+
+/* â•â• PAGE â•â• */
+.he-page{overflow-x:hidden}
+
+/* â•â• BUTTONS â•â• */
+.btn-green{background:var(--g);color:#fff;border:none;border-radius:var(--r-md);padding:.55rem 1.3rem;font-family:var(--fb);font-size:.88rem;font-weight:700;display:inline-flex;align-items:center;gap:.4rem;transition:background .15s,transform .15s,box-shadow .15s;box-shadow:var(--sh-green)}
+.btn-green:hover{background:var(--g-dk);transform:translateY(-2px)}
+.btn-green.btn-lg{padding:.8rem 1.75rem;font-size:.96rem;border-radius:var(--r-lg)}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--dark);border-radius:var(--r-sm);padding:.5rem 1.1rem;font-size:.88rem;font-weight:600;transition:border-color .15s,background .15s}
+.btn-ghost:hover{border-color:var(--slate);background:var(--bg)}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--dark);border-radius:var(--r-lg);padding:.78rem 1.4rem;font-size:.94rem;font-weight:600;display:inline-flex;align-items:center;gap:.4rem;transition:border-color .15s}
+.btn-outline:hover{border-color:var(--slate)}
+.btn-white-outline{background:transparent;border:1.5px solid rgba(255,255,255,.2);color:#fff;border-radius:var(--r-lg);padding:.78rem 1.6rem;font-size:.94rem;font-weight:600;transition:border-color .15s}
+.btn-white-outline:hover{border-color:rgba(255,255,255,.5)}
+
+/* â•â• NAVBAR â•â• */
+.he-nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;padding:0 3rem;display:flex;align-items:center;justify-content:space-between;transition:background .2s,box-shadow .2s;background:transparent}
+.he-nav.scrolled{background:rgba(255,255,255,.95);backdrop-filter:blur(14px);box-shadow:0 1px 0 var(--border)}
+.he-nav-brand{display:flex;align-items:center;gap:.7rem}
+.he-nav-logo{width:36px;height:36px;background:linear-gradient(135deg,var(--g),#166534);border-radius:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(22,163,74,.35)}
+.he-nav-logo.small{width:30px;height:30px;border-radius:7px}
+.he-nav-name{font-family:var(--fd);font-size:1.2rem;font-weight:900;color:#fff;letter-spacing:-.2px}
+.he-nav-name em{font-style:normal;color:#4ade80}
+.he-nav.scrolled .he-nav-name{color:var(--dark)}
+.he-nav.scrolled .he-nav-name em{color:var(--g)}
+.he-nav-links{display:flex;gap:.25rem}
+.he-nav-links a{padding:.4rem .85rem;border-radius:var(--r-sm);font-size:.87rem;font-weight:500;color:rgba(255,255,255,.75);transition:color .15s,background .15s}
+.he-nav-links a:hover{color:#fff;background:rgba(255,255,255,.1)}
+.he-nav.scrolled .he-nav-links a{color:var(--slate)}
+.he-nav.scrolled .he-nav-links a:hover{color:var(--dark);background:var(--bg2)}
+.he-nav-cta{display:flex;align-items:center;gap:.6rem}
+.he-nav .btn-ghost{border-color:rgba(255,255,255,.3);color:#fff}
+.he-nav .btn-ghost:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.5)}
+.he-nav.scrolled .btn-ghost{border-color:var(--border);color:var(--dark)}
+.he-nav.scrolled .btn-ghost:hover{background:var(--bg)}
+
+/* â•â• HERO â•â• */
+.he-hero{min-height:100vh;background:linear-gradient(160deg,#0f172a 0%,#0d2a1a 55%,#0f172a 100%);padding:5rem 3rem 4rem;display:flex;align-items:center;position:relative;overflow:hidden}
+.hero-grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(22,163,74,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(22,163,74,.06) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
+.hero-glow-1{position:absolute;top:-80px;right:10%;width:520px;height:520px;background:radial-gradient(circle,rgba(22,163,74,.18) 0%,transparent 65%);pointer-events:none}
+.hero-glow-2{position:absolute;bottom:-100px;left:-60px;width:380px;height:380px;background:radial-gradient(circle,rgba(245,158,11,.1) 0%,transparent 65%);pointer-events:none}
+.hero-inner{max-width:1240px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;position:relative;z-index:1}
+.hero-left{display:flex;flex-direction:column;gap:1.75rem}
+.hero-pill{display:inline-flex;align-items:center;gap:.5rem;width:fit-content;background:rgba(22,163,74,.12);border:1px solid rgba(22,163,74,.25);border-radius:100px;padding:.38rem 1rem;font-size:.8rem;font-weight:600;color:#4ade80}
+.pill-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pulseDot 2s ease infinite}
+.hero-h1{font-family:var(--fd);font-size:3.6rem;font-weight:900;line-height:1.1;letter-spacing:-.5px;color:#fff}
+.hero-h1-accent{color:#4ade80;position:relative;display:inline-block}
+.hero-h1-accent::after{content:'';position:absolute;left:0;bottom:2px;width:100%;height:3px;background:var(--amber);border-radius:2px;transform-origin:left;animation:underlineGrow .6s .5s ease both}
+.hero-sub{font-size:1rem;color:rgba(255,255,255,.58);line-height:1.8;max-width:480px;font-weight:400}
+.hero-btns{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.hero-trust{display:flex;gap:0;border:1px solid rgba(255,255,255,.08);border-radius:var(--r-lg);background:rgba(255,255,255,.04);overflow:hidden;width:fit-content}
+.trust-item{display:flex;flex-direction:column;align-items:center;padding:.9rem 1.4rem;border-right:1px solid rgba(255,255,255,.08)}
+.trust-item:last-child{border-right:none}
+.trust-val{font-family:var(--fd);font-size:1.2rem;font-weight:900;color:#fff;line-height:1}
+.trust-lbl{font-size:.68rem;color:rgba(255,255,255,.4);margin-top:3px;font-weight:500}
+
+/* hero mock */
+.hero-right{position:relative;animation:fadeUp .65s .22s ease both}
+.mock-window{background:#1e293b;border:1px solid rgba(255,255,255,.1);border-radius:var(--r-2xl);overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.mock-bar{background:#0f172a;padding:.75rem 1.1rem;display:flex;align-items:center;gap:.4rem}
+.mock-dot{width:10px;height:10px;border-radius:50%}
+.mock-dot.r{background:#ef4444}.mock-dot.y{background:#f59e0b}.mock-dot.g{background:#22c55e}
+.mock-title{font-size:.7rem;color:#475569;margin-left:.5rem;font-weight:500}
+.mock-body{padding:1.1rem 1.25rem;display:flex;flex-direction:column;gap:.9rem}
+.mock-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem}
+.mock-stat{background:#0f172a;border-radius:var(--r-sm);padding:.65rem .6rem;display:flex;flex-direction:column;gap:2px;border:1px solid rgba(255,255,255,.06)}
+.msv{font-family:var(--fd);font-size:1rem;font-weight:900;color:#4ade80;line-height:1}
+.msl{font-size:.62rem;color:#475569;font-weight:500}
+.mock-section-label{font-size:.65rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.08em}
+.mock-rooms{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin-top:4px}
+.mock-room{aspect-ratio:1;border-radius:3px}
+.mock-room.occ{background:var(--g)}.mock-room.vac{background:rgba(22,163,74,.15);border:1px solid rgba(22,163,74,.25)}.mock-room.pend{background:var(--amber)}.mock-room.maint{background:#334155}
+.mock-legend{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:4px}
+.mock-legend-item{display:flex;align-items:center;gap:.3rem;font-size:.6rem;color:#475569}
+.mock-leg-dot{width:7px;height:7px;border-radius:2px}
+.mock-leg-dot.occ{background:var(--g)}.mock-leg-dot.vac{background:rgba(22,163,74,.3);border:1px solid rgba(22,163,74,.4)}.mock-leg-dot.pend{background:var(--amber)}.mock-leg-dot.maint{background:#334155}
+.mock-students{display:flex;flex-direction:column;gap:.35rem}
+.mock-student{display:flex;align-items:center;gap:.5rem;background:#0f172a;border-radius:var(--r-sm);padding:.45rem .65rem;border:1px solid rgba(255,255,255,.05)}
+.mock-ava{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:800;color:#fff;flex-shrink:0}
+.mock-sname{font-size:.72rem;font-weight:600;color:#e2e8f0;flex:1}
+.mock-sroom{font-size:.65rem;color:#475569}
+.mock-stag{font-size:.6rem;font-weight:700;padding:.15rem .45rem;border-radius:100px}
+.mock-stag.active{background:rgba(22,163,74,.2);color:#4ade80}
+.mock-stag.leave{background:rgba(245,158,11,.15);color:#fbbf24}
+.float-badge{position:absolute;background:#fff;border:1.5px solid var(--border);border-radius:var(--r-lg);padding:.65rem 1rem;display:flex;align-items:center;gap:.65rem;box-shadow:var(--sh-lg);min-width:190px}
+.badge-1{top:18%;right:-40px;animation:floatY 4s ease infinite}
+.badge-2{bottom:14%;left:-36px;animation:floatY 4s ease infinite 2s}
+.fb-icon{font-size:1.1rem;flex-shrink:0}
+.fb-t{font-size:.78rem;font-weight:700;color:var(--dark)}
+.fb-s{font-size:.66rem;color:var(--slate)}
+
+/* â•â• LOGOS â•â• */
+.logos-bar{background:var(--bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:1.25rem 3rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;justify-content:center}
+.logos-label{font-size:.78rem;color:var(--slate-lt);font-weight:500;white-space:nowrap}
+.logos-row{display:flex;gap:.5rem;flex-wrap:wrap}
+.logo-chip{background:#fff;border:1px solid var(--border);border-radius:var(--r-sm);padding:.3rem .85rem;font-family:var(--fb);font-size:.76rem;font-weight:700;color:var(--slate);transition:border-color .15s,color .15s}
+.logo-chip:hover{border-color:var(--g);color:var(--g)}
+
+/* â•â• SECTIONS SHARED â•â• */
+.section{padding:5.5rem 3rem}
+.section-inner{max-width:1240px;margin:0 auto}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:2rem;margin-bottom:3.5rem;flex-wrap:wrap}
+.eyebrow{display:inline-block;font-size:.74rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--g);margin-bottom:.5rem}
+.section-h2{font-family:var(--fd);font-size:2.5rem;font-weight:900;line-height:1.18;letter-spacing:-.3px;color:var(--dark)}
+.section-sub{font-size:.93rem;color:var(--slate);line-height:1.75;max-width:380px;text-align:right}
+
+/* â•â• STEPS â•â• */
+.steps-section{background:#fff}
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;position:relative}
+.steps-grid::before{content:'';position:absolute;top:2rem;left:calc(33.33%/2 + 1.5rem);right:calc(33.33%/2 + 1.5rem);height:1px;background:linear-gradient(90deg,var(--g-muted),var(--g-muted));z-index:0}
+.step-card{position:relative;z-index:1;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-2xl);padding:2.25rem 2rem;transition:border-color .2s,box-shadow .2s,transform .2s}
+.step-card:hover{border-color:var(--g-muted);box-shadow:var(--sh-md);transform:translateY(-4px)}
+.step-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+.step-num-badge{width:42px;height:42px;border-radius:50%;background:var(--g-lt);border:3px solid #fff;box-shadow:0 0 0 1.5px var(--g-muted);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:.82rem;font-weight:900;color:#166534}
+.step-icon-lrg{font-size:1.6rem}
+.step-title{
+  font-family:var(--step-font);
+  font-size:1.2rem;
+  font-weight:700;
+  letter-spacing:.2px;
+  color:var(--dark);
+  margin-bottom:.55rem;
+  line-height:1.35;
+}
+.step-desc{font-size:.87rem;color:var(--slate);line-height:1.75}
+
+/* â•â• FEATURES â•â• */
+.features-section{background:var(--bg)}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.feat-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--r-2xl);padding:2rem 1.75rem;transition:border-color .2s,box-shadow .2s,transform .2s}
+.feat-card:hover{border-color:var(--g-muted);box-shadow:var(--sh-md);transform:translateY(-3px)}
+.feat-card.feat-dark{background:var(--dark);border-color:transparent}
+.feat-card.feat-dark .feat-title{color:#fff}
+.feat-card.feat-dark .feat-desc{color:#64748b}
+.feat-icon-wrap{width:52px;height:52px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;margin-bottom:1.1rem}
+.feat-card.feat-dark .feat-icon-wrap{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.08)}
+.feat-emoji{font-size:1.5rem}
+.feat-title{font-family:var(--fd);font-size:1rem;font-weight:800;color:var(--dark);margin-bottom:.45rem;line-height:1.3}
+.feat-desc{font-size:.86rem;color:var(--slate);line-height:1.75}
+
+/* â•â• ABOUT â•â• */
+.about-section{background:#fff}
+.about-stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2.5rem}
+.about-stat-card{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-xl);padding:1.5rem 1.25rem;position:relative;overflow:hidden;transition:box-shadow .2s,transform .2s}
+.about-stat-card:hover{box-shadow:var(--sh-md);transform:translateY(-3px)}
+.about-stat-bar{position:absolute;top:0;left:0;right:0;height:3px}
+.about-stat-val{font-family:var(--fd);font-size:2.2rem;font-weight:900;line-height:1;margin-bottom:.35rem}
+.about-stat-lbl{font-size:.82rem;color:var(--slate);font-weight:500}
+
+/* dashboard panels grid */
+.about-dashboards{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:1.25rem;margin-bottom:2.5rem}
+
+/* panel base */
+.dash-panel{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-2xl);padding:1.5rem}
+.dash-panel-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem}
+.dash-panel-title{font-family:var(--fd);font-size:1rem;font-weight:800;color:var(--dark)}
+.dash-panel-sub{font-size:.75rem;color:var(--slate);margin-top:2px}
+.dash-panel-badge{font-size:.7rem;font-weight:700;padding:.25rem .65rem;border-radius:100px}
+.dash-panel-badge.green{background:var(--g-lt);color:#166534}
+.dash-panel-badge.blue{background:var(--blue-lt);color:#1d4ed8;position:relative}
+.dash-panel-badge.blue::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#22c55e;margin-right:4px;animation:pulseDot 1.5s ease infinite}
+
+/* bar chart */
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:120px;padding:0 4px}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+.bar-val{font-size:.65rem;font-weight:700;color:var(--slate);line-height:1}
+.bar-fill{width:100%;background:linear-gradient(180deg,var(--g) 0%,#4ade80 100%);border-radius:4px 4px 2px 2px;transition:height .4s ease;min-height:4px}
+.bar-lbl{font-size:.62rem;color:var(--slate-lt);font-weight:500}
+.chart-legend-row{display:flex;align-items:center;gap:.5rem;margin-top:.9rem;font-size:.72rem;color:var(--slate)}
+.chart-leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.green-dot{background:var(--g)}.amber-dot{background:var(--amber)}.blue-dot{background:#3b82f6}
+.chart-leg-txt{flex:1}
+.chart-leg-num{font-weight:700;color:var(--dark)}
+
+/* right panel stack */
+.dash-panel-right{display:flex;flex-direction:column;gap:1rem;padding:0;background:transparent;border:none}
+
+/* mini calendar */
+.mini-cal{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-xl);padding:1.1rem}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.cal-month{font-family:var(--fd);font-size:.88rem;font-weight:800;color:var(--dark)}
+.cal-nav{display:flex;gap:.25rem}
+.cal-nav-btn{background:var(--bg2);border:1px solid var(--border);border-radius:6px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--slate);cursor:pointer;transition:background .15s}
+.cal-nav-btn:hover{background:var(--g-lt);color:var(--g)}
+.cal-days-header{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px}
+.cal-day-hd{text-align:center;font-size:.62rem;font-weight:700;color:var(--slate-lt)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-day{text-align:center;font-size:.68rem;font-weight:500;color:var(--slate);padding:3px 0;border-radius:5px;cursor:pointer;transition:background .15s}
+.cal-day:hover{background:var(--bg2)}
+.cal-day.today{background:#3b82f6;color:#fff;font-weight:800}
+.cal-day.leave-day{background:var(--g-lt);color:#166534;font-weight:700}
+.cal-day.event-day{background:var(--amber-lt);color:#92400e;font-weight:700}
+.cal-legend{display:flex;gap:.65rem;margin-top:.65rem;flex-wrap:wrap}
+.cal-legend span{display:flex;align-items:center;gap:.25rem;font-size:.65rem;color:var(--slate)}
+.cl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* quick metrics */
+.quick-metrics{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-xl);padding:1.1rem;display:flex;flex-direction:column;gap:.75rem}
+.qm-row{display:flex;flex-direction:column;gap:.3rem}
+.qm-info{display:flex;justify-content:space-between;align-items:center}
+.qm-label{font-size:.76rem;color:var(--slate);font-weight:500}
+.qm-val{font-family:var(--fd);font-size:.88rem;font-weight:800;color:var(--dark)}
+.qm-track{height:6px;background:var(--bg2);border-radius:100px;overflow:hidden}
+.qm-fill{height:100%;border-radius:100px;transition:width .5s ease}
+
+/* donut */
+.donut-wrap{display:flex;justify-content:center;margin:1rem 0}
+.donut-svg{width:130px;height:130px}
+.donut-pct{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;fill:#0f172a}
+.donut-sub-txt{font-size:8px;fill:#64748b;font-family:'Plus Jakarta Sans',sans-serif}
+.occ-breakdown{display:flex;flex-direction:column;gap:.45rem}
+.occ-row{display:flex;align-items:center;gap:.5rem;font-size:.78rem}
+.occ-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+.occ-lbl{flex:1;color:var(--dark);font-weight:500}
+.occ-rooms{color:var(--slate);font-size:.72rem}
+.occ-pct{font-weight:700;color:var(--dark);min-width:28px;text-align:right}
+
+/* about blurb */
+.about-blurb{display:grid;grid-template-columns:1.4fr 1fr;gap:2.5rem;align-items:start;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-2xl);padding:2.5rem}
+.about-blurb-h3{font-family:var(--fd);font-size:1.4rem;font-weight:900;color:var(--dark);margin-bottom:1rem;line-height:1.3}
+.about-blurb-text p{font-size:.9rem;color:var(--slate);line-height:1.8}
+.about-blurb-badges{display:flex;flex-direction:column;gap:.85rem}
+.about-badge-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--r-lg);padding:1rem 1.1rem;display:flex;align-items:center;gap:.85rem;transition:border-color .15s,box-shadow .15s}
+.about-badge-card:hover{border-color:var(--g-muted);box-shadow:var(--sh-sm)}
+.about-badge-icon{font-size:1.4rem;flex-shrink:0}
+.about-badge-title{font-family:var(--fd);font-size:.88rem;font-weight:800;color:var(--dark)}
+.about-badge-sub{font-size:.74rem;color:var(--slate);margin-top:1px}
+
+/* â•â• TESTIMONIALS â•â• */
+.testi-section{background:var(--bg)}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.testi-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--r-2xl);padding:2rem 1.75rem;display:flex;flex-direction:column;gap:.9rem}
+.testi-stars{color:var(--amber);font-size:.9rem}
+.testi-quote{font-size:.9rem;color:var(--dark2);line-height:1.8;font-style:italic;flex:1}
+.testi-author{display:flex;align-items:center;gap:.65rem}
+.testi-ava{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:.85rem;font-weight:900;color:#fff;flex-shrink:0}
+.testi-name{font-family:var(--fd);font-size:.86rem;font-weight:800;color:var(--dark)}
+.testi-role{font-size:.72rem;color:var(--slate)}
+
+/* â•â• CTA â•â• */
+.cta-section{background:var(--dark);padding:5.5rem 3rem;position:relative;overflow:hidden}
+.cta-glow{position:absolute;top:-120px;right:-80px;width:500px;height:500px;background:radial-gradient(circle,rgba(22,163,74,.12) 0%,transparent 60%);pointer-events:none}
+.cta-inner{max-width:1240px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:3rem;flex-wrap:wrap;position:relative;z-index:1}
+.cta-h2{font-family:var(--fd);font-size:2.8rem;font-weight:900;line-height:1.15;letter-spacing:-.3px;color:#fff;margin-bottom:.75rem}
+.cta-h2 span{color:#4ade80}
+.cta-sub{font-size:.95rem;color:#64748b;line-height:1.75;max-width:440px}
+.cta-btns{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.cta-main{font-size:1rem !important;padding:.9rem 2rem !important}
+
+/* â•â• FOOTER â•â• */
+.he-footer{background:#0a0f1a;border-top:1px solid rgba(255,255,255,.05);padding:1.6rem 3rem}
+.footer-inner{max-width:1240px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.footer-brand{display:flex;align-items:center;gap:.65rem}
+.footer-name{font-family:var(--fd);font-size:.95rem;font-weight:900;color:#fff}
+.footer-name em{font-style:normal;color:#4ade80}
+.footer-links{display:flex;gap:1.5rem;flex-wrap:wrap}
+.footer-links a{font-size:.82rem;color:#334155;transition:color .15s}
+.footer-links a:hover{color:#64748b}
+.footer-copy{font-size:.78rem;color:#1e293b}
+
+/* â•â• RESPONSIVE â•â• */
+@media(max-width:1024px){
+  .hero-inner{grid-template-columns:1fr}
+  .hero-right{display:none}
+  .hero-h1{font-size:2.8rem}
+  .about-dashboards{grid-template-columns:1fr 1fr}
+  .about-dashboards>.dash-panel:last-child{grid-column:span 2}
+}
+@media(max-width:768px){
+  .he-nav-links,.hero-right{display:none}
+  .he-nav,.he-hero,.section,.cta-section,.logos-bar{padding-left:1.5rem;padding-right:1.5rem}
+  .steps-grid,.features-grid,.testi-grid,.about-stats-row,.about-dashboards{grid-template-columns:1fr}
+  .steps-grid::before{display:none}
+  .section-head{flex-direction:column;align-items:flex-start}
+  .section-sub{text-align:left}
+  .cta-inner{flex-direction:column;align-items:flex-start}
+  .hero-trust{overflow-x:auto;width:100%}
+  .section-h2{font-size:2rem}
+  .about-blurb{grid-template-columns:1fr}
+  .about-dashboards>.dash-panel:last-child{grid-column:span 1}
+}
+
+
+==========================================
 FILE: C:\HostelEase\client\src\pages\home\Home.jsx
 ==========================================
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './Home.css';
 
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+const AnimDiv = ({ delay = 0, children, className = '', style = {} }) => (
+  <div className={`anim-in ${className}`} style={{ animationDelay: `${delay}ms`, ...style }}>
+    {children}
+  </div>
+);
 
-const Home = () => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+/* â”€â”€ NAV â”€â”€ */
+const NAV_LINKS = [
+  { label: 'Features',     href: '#features'     },
+  { label: 'How it works', href: '#how-it-works'  },
+  { label: 'About',        href: '#about'         },
+];
+
+/* â”€â”€ HERO STATS â”€â”€ */
+const STATS = [
+  { val: '5,200+', lbl: 'Students managed' },
+  { val: '130+',   lbl: 'Hostels onboard'  },
+  { val: '4.9 â˜…',  lbl: 'Avg warden rating'},
+  { val: '< 30m',  lbl: 'Setup time'       },
+    { val: '1,200+', lbl: 'Bapatla Engineering College students' }, // 
+];
+
+/* â”€â”€ STEPS â”€â”€ */
+const STEPS = [
+  {
+    num: '01',
+    icon: 'ðŸ ',
+    title: 'Set up your hostel in minutes',
+    desc: 'Map every block, floor and room digitally. HostelEase builds your hostel structure instantly â€” no spreadsheets, no IT team, no headaches.',
+  },
+  {
+    num: '02',
+    icon: 'ðŸŽ“',
+    title: 'Students discover & apply',
+    desc: 'Students browse available rooms with photos, amenities and block details. Apply, track status and receive confirmation â€” all from their phone.',
+  },
+  {
+    num: '03',
+    icon: 'âš¡',
+    title: 'Manage everything in real time',
+    desc: 'Approve leaves, collect fees, send announcements and monitor live occupancy â€” every action reflected instantly across the entire platform.',
+  },
+];
+
+/* â”€â”€ FEATURES â”€â”€ */
+const FEATURES = [
+  {
+    icon: 'ðŸ—ºï¸',
+    title: 'Live Room Allocation Map',
+    desc: 'A visual, colour-coded floor plan of every block. See occupancy at a glance, drag-assign students and flag rooms for maintenance â€” all in one place.',
+  },
+  {
+    icon: 'ðŸ“‹',
+    title: 'Effortless Leave Management',
+    desc: 'Students submit leave requests from mobile. Wardens review, approve or reject with one tap. Automated push notifications keep everyone in the loop.',
+  },
+  {
+    icon: 'ðŸ’³',
+    title: 'Secure Fee Collection',
+    desc: 'Razorpay-powered payments with automatic receipts, overdue alerts and full transaction history. Zero manual follow-up, zero missed fees.',
+  },
+  {
+    icon: 'ðŸ’¬',
+    title: 'Real-time Messaging',
+    desc: 'Direct, threaded conversations between wardens and students. Share images, documents and notices â€” no more scattered WhatsApp groups.',
+  },
+  {
+    icon: 'ðŸ“Š',
+    title: 'Intelligent Analytics',
+    desc: 'Auto-generated dashboards tracking occupancy trends, leave patterns, revenue flow and student activity â€” presented beautifully, updated live.',
+    dark: true,
+  },
+  {
+    icon: 'ðŸ””',
+    title: 'Smart Push Notifications',
+    desc: 'Instant alerts for approvals, fee dues, hostel notices and maintenance updates â€” delivered on web and Android without any configuration.',
+  },
+];
+
+/* â”€â”€ TESTIMONIALS â”€â”€ */
+const TESTIMONIALS = [
+  {
+    name: 'Sriram Venkat',
+    role: 'Chief Warden Â· VIT Chennai',
+    color: '#16a34a',
+    quote: 'Our paperwork dropped by 90% overnight. Leave approvals that took two working days now take under 60 seconds. For a hostel of 800 students, that is transformative.',
+  },
+  {
+    name: 'Yeduru Mouli Reddy',
+    role: 'Student Â· Bapatla Engineering College',
+    color: '#7c3aed',
+    quote: 'I found my room, paid my fees and got my leave approved without stepping into the warden office once. This is how college hostel life should feel.',
+  },
+  {
+    name: 'Dr. Ramesh Kumar',
+    role: 'Director of Hostels Â· SRM University',
+    color: '#0ea5e9',
+    quote: 'The room allocation map alone saved us three staff positions. The analytics dashboard gives me a full-picture view of six hostels from a single screen.',
+  },
+  {
+    name: 'Hostel Administration',
+    role: 'Bapatla Engineering College',
+    color: '#f59e0b',
+    quote: 'After digitalizing leave management with HostelEase, our hostel office no longer handles manual leave registers. Students submit leave online and approvals happen instantly, making hostel administration much more efficient.',
+  },
+];
+
+/* â”€â”€ ABOUT STATS â”€â”€ */
+const ABOUT_STATS = [
+  { val: '5,200+', lbl: 'Students on platform', color: '#16a34a' },
+  { val: '130+',   lbl: 'Hostels onboarded',    color: '#7c3aed' },
+  { val: '98%',    lbl: 'Warden satisfaction',  color: '#0ea5e9' },
+  { val: 'â‚¹4.2Cr', lbl: 'Fees processed',       color: '#f59e0b' },
+];
+
+/* â”€â”€ LEAVE CHART DATA â”€â”€ */
+const LEAVE_BARS = [
+  { month: 'Jul', val: 12 },
+  { month: 'Aug', val: 28 },
+  { month: 'Sep', val: 19 },
+  { month: 'Oct', val: 35 },
+  { month: 'Nov', val: 22 },
+  { month: 'Dec', val: 41 },
+  { month: 'Jan', val: 17 },
+];
+const MAX_BAR = 45;
+
+/* â”€â”€ ROOM GRID â”€â”€ */
+const ROOMS = Array.from({ length: 40 }, (_, i) => {
+  const r = (i * 7 + 13) % 10;
+  return r < 6 ? 'occ' : r < 8 ? 'vac' : r < 9 ? 'pend' : 'maint';
+});
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• COMPONENTS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+
+function Navbar({ onLogin }) {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', fn);
+    return () => window.removeEventListener('scroll', fn);
+  }, []);
+
+  const handleNav = (e, href) => {
+    e.preventDefault();
+    const el = document.querySelector(href);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
-    <div style={{ padding: "40px" }}>
-      <h1>ðŸ  HostelEase</h1>
+    <nav className={`he-nav ${scrolled ? 'scrolled' : ''}`}>
+      <div className="he-nav-brand">
+        <div className="he-nav-logo">
+          <svg width="18" height="18" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24">
+            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
+            <path d="M9 21V12h6v9"/>
+          </svg>
+        </div>
+        <span className="he-nav-name">Hostel<em>Ease</em></span>
+      </div>
 
-      {!user ? (
-        <button onClick={() => navigate("/login")}>Login</button>
-      ) : (
-        <>
-          <p>
-            Logged in as: <b>{user.role}</b>
-          </p>
-          <button
-            onClick={() => {
-              logout();
-              navigate("/");
-            }}
-          >
-            Logout
-          </button>
-        </>
-      )}
+      <div className="he-nav-links">
+        {NAV_LINKS.map(l => (
+          <a key={l.label} href={l.href} onClick={e => handleNav(e, l.href)}>{l.label}</a>
+        ))}
+      </div>
+
+      <div className="he-nav-cta">
+        <button className="btn-ghost" onClick={onLogin}>Log in</button>
+        <button className="btn-green" onClick={onLogin}>Get Started â†’</button>
+      </div>
+    </nav>
+  );
+}
+
+/* â”€â”€ HERO â”€â”€ */
+function Hero({ onLogin }) {
+  return (
+    <section className="he-hero">
+      <div className="hero-grid-bg" aria-hidden />
+      <div className="hero-glow-1"  aria-hidden />
+      <div className="hero-glow-2"  aria-hidden />
+
+      <div className="hero-inner">
+        {/* LEFT */}
+        <div className="hero-left">
+          <AnimDiv delay={0}>
+            <div className="hero-pill">
+              <span className="pill-dot" /> Trusted by 130+ campuses across India
+            </div>
+          </AnimDiv>
+
+          <AnimDiv delay={80}>
+            <h1 className="hero-h1">
+              Your hostel,<br />
+              <span className="hero-h1-accent">managed smart</span><br />
+              from day one
+            </h1>
+          </AnimDiv>
+
+          <AnimDiv delay={160}>
+            <p className="hero-sub">
+              HostelEase gives wardens complete control â€” room allocation,
+              leave approvals, secure fee collection and real-time communication â€”
+              in one beautifully simple platform.
+            </p>
+          </AnimDiv>
+
+          <AnimDiv delay={240} className="hero-btns">
+            <button className="btn-green btn-lg" onClick={onLogin}>
+              Start for free
+              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+            <button className="btn-outline btn-lg" onClick={onLogin}>
+              <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>
+              </svg>
+              Watch demo
+            </button>
+          </AnimDiv>
+
+          <AnimDiv delay={320} className="hero-trust">
+            {STATS.map((s, i) => (
+              <div key={i} className="trust-item">
+                <span className="trust-val">{s.val}</span>
+                <span className="trust-lbl">{s.lbl}</span>
+              </div>
+            ))}
+          </AnimDiv>
+        </div>
+
+        {/* RIGHT â€” Dashboard mock */}
+        <AnimDiv delay={200} className="hero-right">
+          <div className="mock-window">
+            <div className="mock-bar">
+              <span className="mock-dot r"/><span className="mock-dot y"/><span className="mock-dot g"/>
+              <span className="mock-title">HostelEase â€” Warden Dashboard</span>
+            </div>
+            <div className="mock-body">
+              <div className="mock-stats">
+                {[['312','Students'],['91%','Occupancy'],['7','Pending'],['â‚¹2.4L','Collected']].map(([v,l]) => (
+                  <div key={l} className="mock-stat">
+                    <span className="msv">{v}</span>
+                    <span className="msl">{l}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mock-section-label">Room Map â€” Block A</div>
+              <div className="mock-rooms">
+                {ROOMS.map((t,i) => <div key={i} className={`mock-room ${t}`} />)}
+              </div>
+              <div className="mock-legend">
+                {[['occ','Occupied'],['vac','Vacant'],['pend','Pending'],['maint','Maint.']].map(([c,l]) => (
+                  <div key={l} className="mock-legend-item">
+                    <span className={`mock-leg-dot ${c}`}/>{l}
+                  </div>
+                ))}
+              </div>
+
+              <div className="mock-section-label" style={{marginTop:10}}>Recent Students</div>
+              <div className="mock-students">
+                {[['A','Aditya S.','A-101','Active','#16a34a'],
+                  ['P','Priya M.','B-204','On Leave','#7c3aed'],
+                  ['R','Rahul K.','C-312','Active','#0ea5e9']
+                ].map(([init,name,room,status,col]) => (
+                  <div key={name} className="mock-student">
+                    <div className="mock-ava" style={{background:col}}>{init}</div>
+                    <span className="mock-sname">{name}</span>
+                    <span className="mock-sroom">{room}</span>
+                    <span className={`mock-stag ${status==='Active'?'active':'leave'}`}>{status}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="float-badge badge-1">
+            <span className="fb-icon">âœ“</span>
+            <div><div className="fb-t">Leave approved</div><div className="fb-s">Student notified instantly</div></div>
+          </div>
+          <div className="float-badge badge-2">
+            <span className="fb-icon">ðŸ’³</span>
+            <div><div className="fb-t">â‚¹8,500 received</div><div className="fb-s">Hostel fee Â· Room A-101</div></div>
+          </div>
+        </AnimDiv>
+      </div>
+    </section>
+  );
+}
+
+/* â”€â”€ LOGOS STRIP â”€â”€ */
+function Logos() {
+  const names = ['VIT','NIT Trichy','SRM','Manipal','BITS Pilani','Anna Univ.','Amity','Lovely Pro.'];
+  return (
+    <div className="logos-bar">
+      <span className="logos-label">Trusted by campuses across India â€”</span>
+      <div className="logos-row">
+        {names.map(n => <span key={n} className="logo-chip">{n}</span>)}
+      </div>
     </div>
   );
-};
+}
 
-export default Home;
+/* â”€â”€ HOW IT WORKS â”€â”€ */
+function Steps() {
+  return (
+    <section className="section steps-section" id="how-it-works">
+      <div className="section-inner">
+        <div className="section-head">
+          <div>
+            <div className="eyebrow">How it works</div>
+            <h2 className="section-h2">From first login<br/>to fully operational</h2>
+          </div>
+          <p className="section-sub">
+            No lengthy onboarding. No training sessions required.<br/>
+            Most wardens are live within the same afternoon.
+          </p>
+        </div>
+
+        <div className="steps-grid">
+          {STEPS.map((s, i) => (
+            <div key={i} className="step-card">
+              <div className="step-top-row">
+                <div className="step-num-badge">{s.num}</div>
+                <span className="step-icon-lrg">{s.icon}</span>
+              </div>
+              <h3 className="step-title">{s.title}</h3>
+              <p className="step-desc">{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* â”€â”€ FEATURES â”€â”€ */
+function Features() {
+  return (
+    <section className="section features-section" id="features">
+      <div className="section-inner">
+        <div className="section-head">
+          <div>
+            <div className="eyebrow">Platform features</div>
+            <h2 className="section-h2">A complete hostel<br/>operating system</h2>
+          </div>
+          <p className="section-sub">
+            Every tool a modern campus hostel needs â€”
+            purpose-built for Indian universities, not retrofitted from generic software.
+          </p>
+        </div>
+
+        <div className="features-grid">
+          {FEATURES.map((f, i) => (
+            <div key={i} className={`feat-card${f.dark ? ' feat-dark' : ''}`}>
+              <div className="feat-icon-wrap">
+                <span className="feat-emoji">{f.icon}</span>
+              </div>
+              <h3 className="feat-title">{f.title}</h3>
+              <p className="feat-desc">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* â”€â”€ ABOUT + DASHBOARD GRAPHS â”€â”€ */
+function About() {
+  return (
+    <section className="section about-section" id="about">
+      <div className="section-inner">
+        {/* header */}
+        <div className="section-head">
+          <div>
+            <div className="eyebrow">About HostelEase</div>
+            <h2 className="section-h2">Built for the reality<br/>of Indian campus hostels</h2>
+          </div>
+          <p className="section-sub">
+            HostelEase was created after witnessing wardens drown in paperwork
+            and students queue for hours for simple leave signatures.
+            We digitalised every step.
+          </p>
+        </div>
+
+        {/* big stats row */}
+        <div className="about-stats-row">
+          {ABOUT_STATS.map((s, i) => (
+            <div key={i} className="about-stat-card">
+              <div className="about-stat-bar" style={{ background: s.color }} />
+              <div className="about-stat-val" style={{ color: s.color }}>{s.val}</div>
+              <div className="about-stat-lbl">{s.lbl}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* dashboard panels */}
+        <div className="about-dashboards">
+
+          {/* LEAVE REQUESTS BAR CHART */}
+          <div className="dash-panel">
+            <div className="dash-panel-header">
+              <div>
+                <div className="dash-panel-title">Leave Requests</div>
+                <div className="dash-panel-sub">Monthly overview Â· 2025â€“26</div>
+              </div>
+              <div className="dash-panel-badge green">â†‘ 18% this month</div>
+            </div>
+            <div className="bar-chart">
+              {LEAVE_BARS.map((b, i) => (
+                <div key={i} className="bar-col">
+                  <div className="bar-val">{b.val}</div>
+                  <div
+                    className="bar-fill"
+                    style={{ height: `${(b.val / MAX_BAR) * 100}%` }}
+                  />
+                  <div className="bar-lbl">{b.month}</div>
+                </div>
+              ))}
+            </div>
+            <div className="chart-legend-row">
+              <span className="chart-leg-dot green-dot" />
+              <span className="chart-leg-txt">Leave applications submitted</span>
+              <span className="chart-leg-num">Total: 174 this year</span>
+            </div>
+          </div>
+
+          {/* CALENDAR + QUICK METRICS */}
+          <div className="dash-panel dash-panel-right">
+
+            {/* mini calendar */}
+            <div className="mini-cal">
+              <div className="cal-header">
+                <span className="cal-month">December 2025</span>
+                <div className="cal-nav">
+                  <button className="cal-nav-btn">â€¹</button>
+                  <button className="cal-nav-btn">â€º</button>
+                </div>
+              </div>
+              <div className="cal-days-header">
+                {['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => (
+                  <span key={d} className="cal-day-hd">{d}</span>
+                ))}
+              </div>
+              <div className="cal-grid">
+                {/* offset + days */}
+                {Array.from({length:6}).map((_,i) => <span key={`e${i}`} />)}
+                {Array.from({length:31}).map((_,i) => {
+                  const d = i + 1;
+                  const hasLeave  = [5,12,18,20,25,27].includes(d);
+                  const isToday   = d === 11;
+                  const hasEvent  = [3,8,15,22,29].includes(d);
+                  return (
+                    <span
+                      key={d}
+                      className={`cal-day ${isToday?'today':''} ${hasLeave?'leave-day':''} ${hasEvent?'event-day':''}`}
+                    >
+                      {d}
+                    </span>
+                  );
+                })}
+              </div>
+              <div className="cal-legend">
+                <span><span className="cl-dot green-dot" /> Leave days</span>
+                <span><span className="cl-dot amber-dot" /> Events</span>
+                <span><span className="cl-dot blue-dot"  /> Today</span>
+              </div>
+            </div>
+
+            {/* quick metrics below calendar */}
+            <div className="quick-metrics">
+              {[
+                { label: 'Approved leaves',  val: '38', pct: 78, color: '#16a34a' },
+                { label: 'Pending review',   val: '7',  pct: 14, color: '#f59e0b' },
+                { label: 'Rejected',         val: '4',  pct:  8, color: '#ef4444' },
+              ].map((m, i) => (
+                <div key={i} className="qm-row">
+                  <div className="qm-info">
+                    <span className="qm-label">{m.label}</span>
+                    <span className="qm-val">{m.val}</span>
+                  </div>
+                  <div className="qm-track">
+                    <div className="qm-fill" style={{ width: `${m.pct}%`, background: m.color }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* OCCUPANCY DONUT + BREAKDOWN */}
+          <div className="dash-panel">
+            <div className="dash-panel-header">
+              <div>
+                <div className="dash-panel-title">Occupancy Breakdown</div>
+                <div className="dash-panel-sub">All blocks Â· Real time</div>
+              </div>
+              <div className="dash-panel-badge blue">Live</div>
+            </div>
+
+            {/* SVG donut */}
+            <div className="donut-wrap">
+              <svg viewBox="0 0 120 120" className="donut-svg">
+                {/* bg circle */}
+                <circle cx="60" cy="60" r="48" fill="none" stroke="#f1f5f9" strokeWidth="16"/>
+                {/* occupied 91% */}
+                <circle cx="60" cy="60" r="48" fill="none" stroke="#16a34a" strokeWidth="16"
+                  strokeDasharray={`${0.91*301.6} ${301.6}`}
+                  strokeDashoffset="75.4"
+                  strokeLinecap="round"/>
+                {/* pending 5% */}
+                <circle cx="60" cy="60" r="48" fill="none" stroke="#f59e0b" strokeWidth="16"
+                  strokeDasharray={`${0.05*301.6} ${301.6}`}
+                  strokeDashoffset={`${-(0.91*301.6) + 75.4}`}
+                  strokeLinecap="round"/>
+                <text x="60" y="55" textAnchor="middle" className="donut-pct">91%</text>
+                <text x="60" y="70" textAnchor="middle" className="donut-sub-txt">Occupied</text>
+              </svg>
+            </div>
+
+            <div className="occ-breakdown">
+              {[
+                ['#16a34a', 'Occupied',    '284 rooms', '91%'],
+                ['#f59e0b', 'Pending',     '16 rooms',   '5%'],
+                ['#bbf7d0', 'Vacant',      '9 rooms',    '3%'],
+                ['#e2e8f0', 'Maintenance', '3 rooms',    '1%'],
+              ].map(([c, l, r, p]) => (
+                <div key={l} className="occ-row">
+                  <span className="occ-dot" style={{ background: c }} />
+                  <span className="occ-lbl">{l}</span>
+                  <span className="occ-rooms">{r}</span>
+                  <span className="occ-pct">{p}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>{/* /about-dashboards */}
+
+        {/* about text blurb */}
+        <div className="about-blurb">
+          <div className="about-blurb-text">
+            <h3 className="about-blurb-h3">Why HostelEase exists</h3>
+            <p>
+              In 2023, the founders spent a semester in a tier-1 Indian engineering college and watched
+              the warden's office handle 800 students with printed registers, WhatsApp forwards and
+              handwritten leave slips. Room allocations were done on paper, fees were collected in cash,
+              and complaints disappeared into a physical suggestion box.
+            </p>
+            <p style={{marginTop: '0.85rem'}}>
+              HostelEase was built to fix exactly that â€” a platform that respects the complexity of
+              campus hostel operations while making every interaction simple, fast and transparent for
+              both wardens and students.
+            </p>
+          </div>
+          <div className="about-blurb-badges">
+            {[
+              { icon: 'ðŸ”’', title: 'Razorpay Secured', sub: 'PCI-DSS compliant payments' },
+              { icon: 'ðŸ“±', title: 'Android + Web',    sub: 'Works on any device' },
+              { icon: 'ðŸ‡®ðŸ‡³', title: 'Made for India',   sub: 'Built for Indian universities' },
+            ].map((b, i) => (
+              <div key={i} className="about-badge-card">
+                <span className="about-badge-icon">{b.icon}</span>
+                <div>
+                  <div className="about-badge-title">{b.title}</div>
+                  <div className="about-badge-sub">{b.sub}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
+/* â”€â”€ TESTIMONIALS â”€â”€ */
+function Testimonials() {
+  return (
+    <section className="section testi-section">
+      <div className="section-inner">
+        <div className="section-head">
+          <div>
+            <div className="eyebrow">Loved by campuses</div>
+            <h2 className="section-h2">Wardens & students<br/>both agree</h2>
+          </div>
+        </div>
+        <div className="testi-grid">
+          {TESTIMONIALS.map((t, i) => (
+            <div key={i} className="testi-card">
+              <div className="testi-stars">â˜…â˜…â˜…â˜…â˜…</div>
+              <p className="testi-quote">"{t.quote}"</p>
+              <div className="testi-author">
+                <div className="testi-ava" style={{ background: t.color }}>{t.name[0]}</div>
+                <div>
+                  <div className="testi-name">{t.name}</div>
+                  <div className="testi-role">{t.role}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* â”€â”€ CTA â”€â”€ */
+function CTA({ onLogin }) {
+  return (
+    <section className="cta-section">
+      <div className="cta-glow" aria-hidden />
+      <div className="cta-inner">
+        <div className="cta-left">
+          <h2 className="cta-h2">Ready to modernise<br/>your <span>hostel?</span></h2>
+          <p className="cta-sub">
+            Join 130+ hostels already running on HostelEase.
+            Setup takes under 30 minutes â€” no IT team required.
+          </p>
+        </div>
+        <div className="cta-btns">
+          <button className="btn-green btn-lg cta-main" onClick={onLogin}>Create free account â†’</button>
+          <button className="btn-white-outline btn-lg" onClick={onLogin}>Download Android APK</button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* â”€â”€ FOOTER â”€â”€ */
+function Footer() {
+  return (
+    <footer className="he-footer">
+      <div className="footer-inner">
+        <div className="footer-brand">
+          <div className="he-nav-logo small">
+            <svg width="14" height="14" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
+              <path d="M9 21V12h6v9"/>
+            </svg>
+          </div>
+          <span className="footer-name">Hostel<em>Ease</em></span>
+        </div>
+        <div className="footer-links">
+          {['Terms','Privacy','For Wardens','For Students','Contact'].map(l => (
+            <a key={l} href="#">{l}</a>
+          ))}
+        </div>
+        <span className="footer-copy">Â© 2026 HostelEase. All rights reserved.</span>
+      </div>
+    </footer>
+  );
+}
+
+/* â”€â”€ PAGE â”€â”€ */
+export default function Home() {
+  const navigate = useNavigate();
+  const goLogin = () => navigate('/login');
+
+  return (
+    <div className="he-page">
+      <Navbar onLogin={goLogin} />
+      <Hero   onLogin={goLogin} />
+      <Logos />
+      <Steps />
+      <Features />
+      <About />
+      <Testimonials />
+      <CTA onLogin={goLogin} />
+      <Footer />
+    </div>
+  );
+}
 
 
 ==========================================
@@ -4589,210 +5934,287 @@ export default AddStudent;
 ==========================================
 FILE: C:\HostelEase\client\src\pages\warden\AnalyticsDashboard.jsx
 ==========================================
-// ============================================================
-// pages/warden/AnalyticsDashboard.jsx
-// Req 10: Total students, room occupancy, leave trends, audit log
-// ============================================================
 import { useState, useEffect } from "react";
-import {
-  AreaChart, Area, BarChart, Bar, XAxis, YAxis,
-  CartesianGrid, Tooltip, ResponsiveContainer, Legend,
-} from "recharts";
 import axios from "axios";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend
+} from "recharts";
 
 const API = import.meta.env.VITE_API_URL;
+
 const token = () => localStorage.getItem("token");
 
-// â”€â”€â”€ KPI Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const KPICard = ({ icon, label, value, subValue, color }) => (
-  <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+  <div className="bg-white rounded-xl p-5 shadow border border-gray-100">
     <div
-      className="w-10 h-10 rounded-xl flex items-center justify-center text-xl mb-3"
-      style={{ background: `${color}18` }}
+      className="w-10 h-10 flex items-center justify-center rounded-lg text-xl mb-3"
+      style={{ background: `${color}20` }}
     >
       {icon}
     </div>
+
     <div className="text-2xl font-bold text-gray-900">{value}</div>
-    <div className="text-sm text-gray-500 mt-0.5">{label}</div>
+    <div className="text-sm text-gray-500">{label}</div>
+
     {subValue && (
-      <div className="text-xs mt-1" style={{ color }}>{subValue}</div>
+      <div className="text-xs mt-1" style={{ color }}>
+        {subValue}
+      </div>
     )}
   </div>
 );
 
-// â”€â”€â”€ Occupancy Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const OccupancyBar = ({ room }) => {
-  const pct = room.occupancyPercent;
-  const color = pct >= 90 ? "#ef4444" : pct >= 60 ? "#f59e0b" : "#10b981";
-  return (
-    <div className="mb-3">
-      <div className="flex justify-between text-xs mb-1 text-gray-600">
-        <span className="font-medium">Room {room.roomNumber}</span>
-        <span>{room.occupiedBeds}/{room.totalBeds} beds Â· {pct}%</span>
-      </div>
-      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-        <div
-          className="h-full rounded-full transition-all duration-500"
-          style={{ width: `${pct}%`, background: color }}
-        />
-      </div>
-    </div>
-  );
-};
-
 export default function AnalyticsDashboard() {
-  const [overview,   setOverview]   = useState(null);
-  const [trends,     setTrends]     = useState([]);
-  const [occupancy,  setOccupancy]  = useState([]);
-  const [loading,    setLoading]    = useState(true);
+  const [overview, setOverview] = useState(null);
+  const [trends, setTrends] = useState([]);
+  const [occupancy, setOccupancy] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const headers = { Authorization: `Bearer ${token()}` };
+    const headers = {
+      Authorization: `Bearer ${token()}`
+    };
+
     setLoading(true);
+
     Promise.all([
-      axios.get(`${API}/api/analytics/overview`,       { headers }),
-      axios.get(`${API}/api/analytics/leave-trends`,   { headers }),
-      axios.get(`${API}/api/analytics/room-occupancy`, { headers }),
-    ]).then(([ov, tr, oc]) => {
-      setOverview(ov.data);
-      setTrends(tr.data);
-      setOccupancy(oc.data);
-    }).catch(console.error)
+      axios.get(`${API}/api/analytics/overview`, { headers }),
+      axios.get(`${API}/api/analytics/leave-trends`, { headers }),
+      axios.get(`${API}/api/analytics/room-occupancy`, { headers })
+    ])
+      .then(([ov, tr, oc]) => {
+        setOverview(ov.data);
+        setTrends(tr.data);
+        setOccupancy(oc.data);
+      })
+      .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 
-  // Transform trend data for AreaChart
-  const MONTH_NAMES = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const MONTHS = [
+    "",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+  ];
+
   const trendChart = (() => {
     const map = {};
+
     trends.forEach(({ _id, count }) => {
-      const key = `${MONTH_NAMES[_id.month]} ${_id.year}`;
-      if (!map[key]) map[key] = { month: key, Approved: 0, Pending: 0, Rejected: 0 };
+      const key = `${MONTHS[_id.month]} ${_id.year}`;
+
+      if (!map[key])
+        map[key] = {
+          month: key,
+          Approved: 0,
+          Pending: 0,
+          Rejected: 0
+        };
+
       map[key][_id.status] = count;
     });
+
     return Object.values(map).slice(-6);
   })();
 
-  const ACTION_ICON = {
-    STUDENT_REGISTERED: "ðŸŽ“",
-    LEAVE_APPROVED:     "âœ…",
-    LEAVE_REJECTED:     "âŒ",
-    ROOM_ALLOCATED:     "ðŸ ",
-    STUDENT_DELETED:    "ðŸ—‘ï¸",
-    STUDENT_UPDATED:    "âœï¸",
-    PAYMENT_VERIFIED:   "ðŸ’³",
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
-  const cards = overview?.cards ?? {};
+  const cards = overview?.cards || {};
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Hostel Analytics</h1>
-        <p className="text-gray-400 text-sm mt-1">Real-time overview of your hostel operations.</p>
+        <h1 className="text-2xl font-bold text-gray-900">
+          Hostel Analytics
+        </h1>
+        <p className="text-sm text-gray-400">
+          Real-time hostel statistics
+        </p>
       </div>
 
-      {/* â”€â”€ KPI Cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* KPI Cards */}
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <KPICard icon="ðŸ‘¥" label="Total Students"    value={cards.totalStudents}     color="#6366f1" />
-        <KPICard icon="ðŸ " label="Total Rooms"        value={cards.totalRooms}         color="#8b5cf6" />
+
         <KPICard
-          icon="ðŸ›ï¸" label="Room Occupancy"
-          value={`${cards.occupiedBeds} / ${cards.totalBeds}`}
-          subValue={`${cards.occupancyRate}% occupied  Â·  ${cards.vacantBeds} vacant`}
+          icon="ðŸ‘¥"
+          label="Total Students"
+          value={cards.totalStudents || 0}
+          color="#6366f1"
+        />
+
+        <KPICard
+          icon="ðŸ "
+          label="Total Rooms"
+          value={cards.totalRooms || 0}
+          color="#8b5cf6"
+        />
+
+        <KPICard
+          icon="ðŸ›ï¸"
+          label="Occupied Beds"
+          value={`${cards.occupiedBeds || 0}/${cards.totalBeds || 0}`}
+          subValue={`${cards.vacantBeds || 0} beds available`}
           color="#10b981"
         />
+
         <KPICard
-          icon="ðŸ“‹" label="Pending Leaves"
-          value={cards.pendingLeaves}
-          subValue={`${cards.approvedLeavesThisMonth} approved this month`}
+          icon="ðŸ“‹"
+          label="Pending Leaves"
+          value={cards.pendingLeaves || 0}
+          subValue={`${cards.approvedLeavesThisMonth || 0} approved this month`}
           color="#f59e0b"
         />
+
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* â”€â”€ Leave Trends Chart â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-        <div className="lg:col-span-2 bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <h3 className="font-semibold text-gray-800 mb-4">Leave Trends (Last 6 Months)</h3>
-          <ResponsiveContainer width="100%" height={260}>
+
+        {/* Leave Trends Chart */}
+
+        <div className="lg:col-span-2 bg-white rounded-xl p-5 shadow border border-gray-100">
+
+          <h3 className="font-semibold mb-4">
+            Leave Trends (Last 6 Months)
+          </h3>
+
+          <ResponsiveContainer width="100%" height={250}>
             <AreaChart data={trendChart}>
+
               <defs>
-                <linearGradient id="gApproved" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#10b981" stopOpacity={0.25} />
+
+                <linearGradient id="approved" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
                   <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                 </linearGradient>
-                <linearGradient id="gPending" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#f59e0b" stopOpacity={0.25} />
+
+                <linearGradient id="pending" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
                   <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
                 </linearGradient>
+
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-              <YAxis tick={{ fontSize: 11 }} />
-              <Tooltip
-                contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}
-              />
+
+              <CartesianGrid strokeDasharray="3 3" />
+
+              <XAxis dataKey="month" />
+
+              <YAxis />
+
+              <Tooltip />
+
               <Legend />
-              <Area type="monotone" dataKey="Approved" stroke="#10b981" fill="url(#gApproved)" strokeWidth={2} />
-              <Area type="monotone" dataKey="Pending"  stroke="#f59e0b" fill="url(#gPending)"  strokeWidth={2} />
-              <Area type="monotone" dataKey="Rejected" stroke="#ef4444" fill="none"            strokeWidth={2} strokeDasharray="4 2" />
+
+              <Area
+                type="monotone"
+                dataKey="Approved"
+                stroke="#10b981"
+                fill="url(#approved)"
+              />
+
+              <Area
+                type="monotone"
+                dataKey="Pending"
+                stroke="#f59e0b"
+                fill="url(#pending)"
+              />
+
+              <Area
+                type="monotone"
+                dataKey="Rejected"
+                stroke="#ef4444"
+                fill="none"
+              />
+
             </AreaChart>
           </ResponsiveContainer>
+
         </div>
 
-        {/* â”€â”€ Room Occupancy â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <h3 className="font-semibold text-gray-800 mb-4">Room Occupancy</h3>
-          <div className="max-h-64 overflow-y-auto pr-1">
-            {occupancy.length === 0 ? (
-              <p className="text-gray-400 text-sm text-center py-8">No rooms configured</p>
-            ) : (
-              occupancy.map((r) => <OccupancyBar key={r.roomNumber} room={r} />)
-            )}
-          </div>
-        </div>
+        {/* Room Occupancy */}
 
-        {/* â”€â”€ Recent Activity Feed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-        <div className="lg:col-span-3 bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <h3 className="font-semibold text-gray-800 mb-4">Recent Activity</h3>
-          {overview?.recentActivity?.length === 0 ? (
-            <p className="text-gray-400 text-sm text-center py-6">No activity yet</p>
+        <div className="bg-white rounded-xl p-5 shadow border border-gray-100">
+
+          <h3 className="font-semibold mb-4">
+            Room Occupancy
+          </h3>
+
+          {occupancy.length === 0 ? (
+            <p className="text-sm text-gray-400">
+              No rooms configured
+            </p>
           ) : (
-            <div className="space-y-0 divide-y divide-gray-50">
-              {(overview?.recentActivity ?? []).map((log) => (
-                <div key={log._id} className="flex items-center gap-3 py-3">
-                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-base shrink-0">
-                    {ACTION_ICON[log.action] ?? "âš¡"}
+            occupancy.map((room) => {
+
+              const percent = room.occupancyPercent;
+
+              return (
+                <div key={room.roomNumber} className="mb-3">
+
+                  <div className="flex justify-between text-xs mb-1">
+
+                    <span>Room {room.roomNumber}</span>
+
+                    <span>
+                      {room.occupiedBeds}/{room.totalBeds}
+                    </span>
+
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-800 truncate">{log.description}</p>
-                    <p className="text-xs text-gray-400">
-                      by {log.actor?.name ?? "System"} Â·{" "}
-                      {new Date(log.createdAt).toLocaleString()}
-                    </p>
+
+                  <div className="w-full bg-gray-200 h-2 rounded">
+
+                    <div
+                      className="h-2 rounded"
+                      style={{
+                        width: `${percent}%`,
+                        background:
+                          percent > 90
+                            ? "#ef4444"
+                            : percent > 60
+                            ? "#f59e0b"
+                            : "#10b981"
+                      }}
+                    />
+
                   </div>
-                  <span className="text-xs font-medium text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full whitespace-nowrap">
-                    {log.action.replace(/_/g, " ")}
-                  </span>
+
                 </div>
-              ))}
-            </div>
+              );
+            })
           )}
+
         </div>
+
       </div>
+
     </div>
   );
 }
-
 
 ==========================================
 FILE: C:\HostelEase\client\src\pages\warden\CreateRoom.css
@@ -7064,14 +8486,11 @@ const RoomAllocation = () => {
   });
 
   const [selectedBed, setSelectedBed] = useState(null);
-
   const [studentId, setStudentId] = useState("");
   const [studentName, setStudentName] = useState("");
 
   const [modalOpen, setModalOpen] = useState(false);
-
   const [loading, setLoading] = useState(false);
-
   const [bedInfo, setBedInfo] = useState(null);
 
   useEffect(() => {
@@ -7079,50 +8498,30 @@ const RoomAllocation = () => {
   }, []);
 
   /* =============================
-     LOAD ROOMS + BEDS
+     LOAD ROOMS
   ============================= */
 
   const loadRooms = async () => {
+
     try {
 
-      const res = await api.get("/rooms");
+      const res = await api.get("/warden/rooms-with-beds");
       const roomsData = res.data;
 
       let totalBeds = 0;
       let occupiedBeds = 0;
 
-      const updatedRooms = await Promise.all(
+      roomsData.forEach(room => {
 
-        roomsData.map(async (room) => {
+        totalBeds += room.totalBeds;
 
-          const occRes = await api.get(
-            `/warden/rooms/${room._id}/occupied-beds`
-          );
-
-          const occupied = occRes.data;
-
-          totalBeds += room.totalBeds;
-          occupiedBeds += occupied.length;
-
-          const beds = [];
-
-          for (let i = 1; i <= room.totalBeds; i++) {
-
-            const bedNumber = String(i);
-
-            const isOccupied = occupied.includes(bedNumber);
-
-            beds.push({
-              number: bedNumber,
-              status: isOccupied ? "occupied" : "available",
-            });
-
+        room.beds.forEach(bed => {
+          if (bed.status === "occupied") {
+            occupiedBeds++;
           }
+        });
 
-          return { ...room, beds };
-
-        })
-      );
+      });
 
       const availableBeds = totalBeds - occupiedBeds;
 
@@ -7130,20 +8529,21 @@ const RoomAllocation = () => {
         total: totalBeds,
         available: availableBeds,
         occupied: occupiedBeds,
-        percent:
-          totalBeds === 0
-            ? 0
-            : Math.round((availableBeds / totalBeds) * 100),
+        percent: totalBeds === 0
+          ? 0
+          : Math.round((availableBeds / totalBeds) * 100),
       });
 
-      setRooms(updatedRooms);
+      setRooms(roomsData);
 
     } catch (err) {
 
-      console.error("Error loading rooms", err);
+      console.error("Failed to load rooms", err);
 
     }
+
   };
+
 
   /* =============================
      BED CLICK
@@ -7154,7 +8554,6 @@ const RoomAllocation = () => {
     if (bed.status === "occupied") {
 
       fetchBedDetails(room._id, bed.number);
-
       return;
 
     }
@@ -7170,10 +8569,12 @@ const RoomAllocation = () => {
     setBedInfo(null);
 
     setModalOpen(true);
+
   };
 
+
   /* =============================
-     FETCH STUDENT BY ROLL
+     FETCH STUDENT
   ============================= */
 
   const fetchStudent = async () => {
@@ -7186,7 +8587,6 @@ const RoomAllocation = () => {
     try {
 
       const res = await api.get(`/students/by-roll/${studentId}`);
-
       setStudentName(res.data.fullName);
 
     } catch {
@@ -7196,6 +8596,7 @@ const RoomAllocation = () => {
     }
 
   };
+
 
   /* =============================
      ALLOCATE BED
@@ -7228,7 +8629,7 @@ const RoomAllocation = () => {
 
     } catch (err) {
 
-      if (err.response && err.response.data.message) {
+      if (err.response?.data?.message) {
         alert(err.response.data.message);
       } else {
         alert("Allocation failed");
@@ -7242,8 +8643,9 @@ const RoomAllocation = () => {
 
   };
 
+
   /* =============================
-     FETCH OCCUPIED BED DETAILS
+     FETCH BED DETAILS
   ============================= */
 
   const fetchBedDetails = async (roomId, bedNumber) => {
@@ -7270,6 +8672,7 @@ const RoomAllocation = () => {
     }
 
   };
+
 
   /* =============================
      DEALLOCATE BED
@@ -7301,6 +8704,7 @@ const RoomAllocation = () => {
     }
 
   };
+
 
   /* =============================
      UI
@@ -7339,7 +8743,7 @@ const RoomAllocation = () => {
 
       {/* ROOMS */}
 
-      {rooms.map((room) => (
+      {rooms.map(room => (
 
         <div key={room._id} className="room-box">
 
@@ -7349,7 +8753,7 @@ const RoomAllocation = () => {
 
           <div className="beds-grid">
 
-            {room.beds.map((bed) => (
+            {room.beds.map(bed => (
 
               <div
                 key={bed.number}
@@ -7382,8 +8786,6 @@ const RoomAllocation = () => {
         <div className="modal-overlay">
 
           <div className="modal-box">
-
-            {/* OCCUPIED BED DETAILS */}
 
             {bedInfo ? (
 
@@ -7424,16 +8826,14 @@ const RoomAllocation = () => {
 
               <>
                 <h3>
-                  Allocate Bed-{selectedBed.bedNumber}
+                  Allocate Bed-{selectedBed?.bedNumber}
                 </h3>
 
                 <input
                   type="text"
                   placeholder="Enter Roll Number"
                   value={studentId}
-                  onChange={(e) =>
-                    setStudentId(e.target.value)
-                  }
+                  onChange={(e) => setStudentId(e.target.value)}
                 />
 
                 <button
@@ -7456,9 +8856,7 @@ const RoomAllocation = () => {
                     onClick={allocateBed}
                     disabled={loading}
                   >
-                    {loading
-                      ? "Allocating..."
-                      : "Confirm"}
+                    {loading ? "Allocating..." : "Confirm"}
                   </button>
 
                   <button
@@ -7469,7 +8867,6 @@ const RoomAllocation = () => {
                   </button>
 
                 </div>
-
               </>
 
             )}
@@ -7482,6 +8879,7 @@ const RoomAllocation = () => {
 
     </div>
   );
+
 };
 
 export default RoomAllocation;
@@ -8599,6 +9997,8 @@ FILE: C:\HostelEase\client\src\App.jsx
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import HomeRedirect from "./pages/HomeRedirect";
+import Home from "./pages/home/Home";
+
 
 // â”€â”€ Auth pages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 import Login         from "./pages/auth/Login";
@@ -8638,7 +10038,8 @@ function App() {
         {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
             PUBLIC ROUTES
         â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
-        <Route path="/"                        element={<HomeRedirect />} />
+        
+        <Route path="/" element={<Home />} />
         <Route path="/login"                   element={<Login />} />
         <Route path="/admin/login"             element={<AdminLogin />} />
         <Route path="/forgot-password"         element={<ForgotPassword />} />
@@ -8816,6 +10217,64 @@ function App() {
 export default App;
 
 ==========================================
+FILE: C:\HostelEase\client\src\globals.css
+==========================================
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap');
+
+:root {
+  --green: #16a34a;
+  --green-dark: #15803d;
+  --green-deeper: #166534;
+  --green-light: #dcfce7;
+  --green-muted: #bbf7d0;
+  --amber: #f59e0b;
+  --amber-light: #fef3c7;
+  --dark: #0f172a;
+  --dark-2: #1e293b;
+  --slate: #64748b;
+  --slate-light: #94a3b8;
+  --bg: #f8fafc;
+  --bg-2: #f1f5f9;
+  --white: #ffffff;
+  --border: #e2e8f0;
+  --border-dark: #cbd5e1;
+  --red: #ef4444;
+  --blue: #3b82f6;
+  --font-display: 'Outfit', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-green: 0 8px 24px rgba(22,163,74,0.25);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--white);
+  color: var(--dark);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
+}
+
+button { cursor: pointer; font-family: inherit; }
+a { text-decoration: none; color: inherit; }
+input, textarea { font-family: inherit; }
+
+
+==========================================
 FILE: C:\HostelEase\client\src\index.css
 ==========================================
 @tailwind base;
@@ -8829,7 +10288,6 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
-
 import { AuthProvider } from "./context/AuthContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -8840,11 +10298,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   </React.StrictMode>
 );
 
-
 ==========================================
 FILE: C:\HostelEase\client\.env
 ==========================================
-# For local dev:
 VITE_API_URL=http://localhost:5000/api
 
 ==========================================
@@ -8912,9 +10368,12 @@ FILE: C:\HostelEase\client\package-lock.json
       "name": "smarthostel-client",
       "version": "2.0.0",
       "dependencies": {
+        "@react-oauth/google": "^0.13.4",
         "axios": "^1.7.2",
+        "framer-motion": "^12.35.2",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
+        "react-icons": "^5.6.0",
         "react-router-dom": "^6.23.1",
         "recharts": "^2.12.7"
       },
@@ -9810,6 +11269,16 @@ FILE: C:\HostelEase\client\package-lock.json
       },
       "engines": {
         "node": ">= 8"
+      }
+    },
+    "node_modules/@react-oauth/google": {
+      "version": "0.13.4",
+      "resolved": "https://registry.npmjs.org/@react-oauth/google/-/google-0.13.4.tgz",
+      "integrity": "sha512-hGKyNEH+/PK8M0sFEuo3MAEk0txtHpgs94tDQit+s2LXg7b6z53NtzHfqDvoB2X8O6lGB+FRg80hY//X6hfD+w==",
+      "license": "MIT",
+      "peerDependencies": {
+        "react": ">=16.8.0",
+        "react-dom": ">=16.8.0"
       }
     },
     "node_modules/@remix-run/router": {
@@ -10935,17 +12404,6 @@ FILE: C:\HostelEase\client\package-lock.json
         "node": ">=0.4.0"
       }
     },
-    "node_modules/detect-libc": {
-      "version": "2.1.2",
-      "resolved": "https://registry.npmjs.org/detect-libc/-/detect-libc-2.1.2.tgz",
-      "integrity": "sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==",
-      "dev": true,
-      "license": "Apache-2.0",
-      "optional": true,
-      "engines": {
-        "node": ">=8"
-      }
-    },
     "node_modules/didyoumean": {
       "version": "1.2.2",
       "resolved": "https://registry.npmjs.org/didyoumean/-/didyoumean-1.2.2.tgz",
@@ -11454,6 +12912,33 @@ FILE: C:\HostelEase\client\package-lock.json
         "url": "https://github.com/sponsors/rawify"
       }
     },
+    "node_modules/framer-motion": {
+      "version": "12.35.2",
+      "resolved": "https://registry.npmjs.org/framer-motion/-/framer-motion-12.35.2.tgz",
+      "integrity": "sha512-dhfuEMaNo0hc+AEqyHiIfiJRNb9U9UQutE9FoKm5pjf7CMitp9xPEF1iWZihR1q86LBmo6EJ7S8cN8QXEy49AA==",
+      "license": "MIT",
+      "dependencies": {
+        "motion-dom": "^12.35.2",
+        "motion-utils": "^12.29.2",
+        "tslib": "^2.4.0"
+      },
+      "peerDependencies": {
+        "@emotion/is-prop-valid": "*",
+        "react": "^18.0.0 || ^19.0.0",
+        "react-dom": "^18.0.0 || ^19.0.0"
+      },
+      "peerDependenciesMeta": {
+        "@emotion/is-prop-valid": {
+          "optional": true
+        },
+        "react": {
+          "optional": true
+        },
+        "react-dom": {
+          "optional": true
+        }
+      }
+    },
     "node_modules/fs.realpath": {
       "version": "1.0.0",
       "resolved": "https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz",
@@ -11885,237 +13370,6 @@ FILE: C:\HostelEase\client\package-lock.json
         "node": ">= 0.8.0"
       }
     },
-    "node_modules/lightningcss-android-arm64": {
-      "version": "1.30.2",
-      "resolved": "https://registry.npmjs.org/lightningcss-android-arm64/-/lightningcss-android-arm64-1.30.2.tgz",
-      "integrity": "sha512-BH9sEdOCahSgmkVhBLeU7Hc9DWeZ1Eb6wNS6Da8igvUwAe0sqROHddIlvU06q3WyXVEOYDZ6ykBZQnjTbmo4+A==",
-      "cpu": [
-        "arm64"
-      ],
-      "dev": true,
-      "license": "MPL-2.0",
-      "optional": true,
-      "os": [
-        "android"
-      ],
-      "engines": {
-        "node": ">= 12.0.0"
-      },
-      "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/parcel"
-      }
-    },
-    "node_modules/lightningcss-darwin-arm64": {
-      "version": "1.30.2",
-      "resolved": "https://registry.npmjs.org/lightningcss-darwin-arm64/-/lightningcss-darwin-arm64-1.30.2.tgz",
-      "integrity": "sha512-ylTcDJBN3Hp21TdhRT5zBOIi73P6/W0qwvlFEk22fkdXchtNTOU4Qc37SkzV+EKYxLouZ6M4LG9NfZ1qkhhBWA==",
-      "cpu": [
-        "arm64"
-      ],
-      "dev": true,
-      "license": "MPL-2.0",
-      "optional": true,
-      "os": [
-        "darwin"
-      ],
-      "engines": {
-        "node": ">= 12.0.0"
-      },
-      "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/parcel"
-      }
-    },
-    "node_modules/lightningcss-darwin-x64": {
-      "version": "1.30.2",
-      "resolved": "https://registry.npmjs.org/lightningcss-darwin-x64/-/lightningcss-darwin-x64-1.30.2.tgz",
-      "integrity": "sha512-oBZgKchomuDYxr7ilwLcyms6BCyLn0z8J0+ZZmfpjwg9fRVZIR5/GMXd7r9RH94iDhld3UmSjBM6nXWM2TfZTQ==",
-      "cpu": [
-        "x64"
-      ],
-      "dev": true,
-      "license": "MPL-2.0",
-      "optional": true,
-      "os": [
-        "darwin"
-      ],
-      "engines": {
-        "node": ">= 12.0.0"
-      },
-      "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/parcel"
-      }
-    },
-    "node_modules/lightningcss-freebsd-x64": {
-      "version": "1.30.2",
-      "resolved": "https://registry.npmjs.org/lightningcss-freebsd-x64/-/lightningcss-freebsd-x64-1.30.2.tgz",
-      "integrity": "sha512-c2bH6xTrf4BDpK8MoGG4Bd6zAMZDAXS569UxCAGcA7IKbHNMlhGQ89eRmvpIUGfKWNVdbhSbkQaWhEoMGmGslA==",
-      "cpu": [
-        "x64"
-      ],
-      "dev": true,
-      "license": "MPL-2.0",
-      "optional": true,
-      "os": [
-        "freebsd"
-      ],
-      "engines": {
-        "node": ">= 12.0.0"
-      },
-      "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/parcel"
-      }
-    },
-    "node_modules/lightningcss-linux-arm-gnueabihf": {
-      "version": "1.30.2",
-      "resolved": "https://registry.npmjs.org/lightningcss-linux-arm-gnueabihf/-/lightningcss-linux-arm-gnueabihf-1.30.2.tgz",
-      "integrity": "sha512-eVdpxh4wYcm0PofJIZVuYuLiqBIakQ9uFZmipf6LF/HRj5Bgm0eb3qL/mr1smyXIS1twwOxNWndd8z0E374hiA==",
-      "cpu": [
-        "arm"
-      ],
-      "dev": true,
-      "license": "MPL-2.0",
-      "optional": true,
-      "os": [
-        "linux"
-      ],
-      "engines": {
-        "node": ">= 12.0.0"
-      },
-      "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/parcel"
-      }
-    },
-    "node_modules/lightningcss-linux-arm64-gnu": {
-      "version": "1.30.2",
-      "resolved": "https://registry.npmjs.org/lightningcss-linux-arm64-gnu/-/lightningcss-linux-arm64-gnu-1.30.2.tgz",
-      "integrity": "sha512-UK65WJAbwIJbiBFXpxrbTNArtfuznvxAJw4Q2ZGlU8kPeDIWEX1dg3rn2veBVUylA2Ezg89ktszWbaQnxD/e3A==",
-      "cpu": [
-        "arm64"
-      ],
-      "dev": true,
-      "license": "MPL-2.0",
-      "optional": true,
-      "os": [
-        "linux"
-      ],
-      "engines": {
-        "node": ">= 12.0.0"
-      },
-      "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/parcel"
-      }
-    },
-    "node_modules/lightningcss-linux-arm64-musl": {
-      "version": "1.30.2",
-      "resolved": "https://registry.npmjs.org/lightningcss-linux-arm64-musl/-/lightningcss-linux-arm64-musl-1.30.2.tgz",
-      "integrity": "sha512-5Vh9dGeblpTxWHpOx8iauV02popZDsCYMPIgiuw97OJ5uaDsL86cnqSFs5LZkG3ghHoX5isLgWzMs+eD1YzrnA==",
-      "cpu": [
-        "arm64"
-      ],
-      "dev": true,
-      "license": "MPL-2.0",
-      "optional": true,
-      "os": [
-        "linux"
-      ],
-      "engines": {
-        "node": ">= 12.0.0"
-      },
-      "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/parcel"
-      }
-    },
-    "node_modules/lightningcss-linux-x64-gnu": {
-      "version": "1.30.2",
-      "resolved": "https://registry.npmjs.org/lightningcss-linux-x64-gnu/-/lightningcss-linux-x64-gnu-1.30.2.tgz",
-      "integrity": "sha512-Cfd46gdmj1vQ+lR6VRTTadNHu6ALuw2pKR9lYq4FnhvgBc4zWY1EtZcAc6EffShbb1MFrIPfLDXD6Xprbnni4w==",
-      "cpu": [
-        "x64"
-      ],
-      "dev": true,
-      "license": "MPL-2.0",
-      "optional": true,
-      "os": [
-        "linux"
-      ],
-      "engines": {
-        "node": ">= 12.0.0"
-      },
-      "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/parcel"
-      }
-    },
-    "node_modules/lightningcss-linux-x64-musl": {
-      "version": "1.30.2",
-      "resolved": "https://registry.npmjs.org/lightningcss-linux-x64-musl/-/lightningcss-linux-x64-musl-1.30.2.tgz",
-      "integrity": "sha512-XJaLUUFXb6/QG2lGIW6aIk6jKdtjtcffUT0NKvIqhSBY3hh9Ch+1LCeH80dR9q9LBjG3ewbDjnumefsLsP6aiA==",
-      "cpu": [
-        "x64"
-      ],
-      "dev": true,
-      "license": "MPL-2.0",
-      "optional": true,
-      "os": [
-        "linux"
-      ],
-      "engines": {
-        "node": ">= 12.0.0"
-      },
-      "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/parcel"
-      }
-    },
-    "node_modules/lightningcss-win32-arm64-msvc": {
-      "version": "1.30.2",
-      "resolved": "https://registry.npmjs.org/lightningcss-win32-arm64-msvc/-/lightningcss-win32-arm64-msvc-1.30.2.tgz",
-      "integrity": "sha512-FZn+vaj7zLv//D/192WFFVA0RgHawIcHqLX9xuWiQt7P0PtdFEVaxgF9rjM/IRYHQXNnk61/H/gb2Ei+kUQ4xQ==",
-      "cpu": [
-        "arm64"
-      ],
-      "dev": true,
-      "license": "MPL-2.0",
-      "optional": true,
-      "os": [
-        "win32"
-      ],
-      "engines": {
-        "node": ">= 12.0.0"
-      },
-      "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/parcel"
-      }
-    },
-    "node_modules/lightningcss-win32-x64-msvc": {
-      "version": "1.30.2",
-      "resolved": "https://registry.npmjs.org/lightningcss-win32-x64-msvc/-/lightningcss-win32-x64-msvc-1.30.2.tgz",
-      "integrity": "sha512-5g1yc73p+iAkid5phb4oVFMB45417DkRevRbt/El/gKXJk4jid+vPFF/AXbxn05Aky8PapwzZrdJShv5C0avjw==",
-      "cpu": [
-        "x64"
-      ],
-      "dev": true,
-      "license": "MPL-2.0",
-      "optional": true,
-      "os": [
-        "win32"
-      ],
-      "engines": {
-        "node": ">= 12.0.0"
-      },
-      "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/parcel"
-      }
-    },
     "node_modules/lilconfig": {
       "version": "3.1.3",
       "resolved": "https://registry.npmjs.org/lilconfig/-/lilconfig-3.1.3.tgz",
@@ -12253,6 +13507,21 @@ FILE: C:\HostelEase\client\package-lock.json
       "engines": {
         "node": "*"
       }
+    },
+    "node_modules/motion-dom": {
+      "version": "12.35.2",
+      "resolved": "https://registry.npmjs.org/motion-dom/-/motion-dom-12.35.2.tgz",
+      "integrity": "sha512-pWXFMTwvGDbx1Fe9YL5HZebv2NhvGBzRtiNUv58aoK7+XrsuaydQ0JGRKK2r+bTKlwgSWwWxHbP5249Qr/BNpg==",
+      "license": "MIT",
+      "dependencies": {
+        "motion-utils": "^12.29.2"
+      }
+    },
+    "node_modules/motion-utils": {
+      "version": "12.29.2",
+      "resolved": "https://registry.npmjs.org/motion-utils/-/motion-utils-12.29.2.tgz",
+      "integrity": "sha512-G3kc34H2cX2gI63RqU+cZq+zWRRPSsNIOjpdl9TN4AQwC4sgwYPl/Q/Obf/d53nOm569T0fYK+tcoSV50BWx8A==",
+      "license": "MIT"
     },
     "node_modules/ms": {
       "version": "2.1.3",
@@ -12738,6 +14007,15 @@ FILE: C:\HostelEase\client\package-lock.json
       },
       "peerDependencies": {
         "react": "^18.3.1"
+      }
+    },
+    "node_modules/react-icons": {
+      "version": "5.6.0",
+      "resolved": "https://registry.npmjs.org/react-icons/-/react-icons-5.6.0.tgz",
+      "integrity": "sha512-RH93p5ki6LfOiIt0UtDyNg/cee+HLVR6cHHtW3wALfo+eOHTp8RnU2kRkI6E+H19zMIs03DyxUG/GfZMOGvmiA==",
+      "license": "MIT",
+      "peerDependencies": {
+        "react": "*"
       }
     },
     "node_modules/react-is": {
@@ -13282,6 +14560,12 @@ FILE: C:\HostelEase\client\package-lock.json
       "dev": true,
       "license": "Apache-2.0"
     },
+    "node_modules/tslib": {
+      "version": "2.8.1",
+      "resolved": "https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz",
+      "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==",
+      "license": "0BSD"
+    },
     "node_modules/type-check": {
       "version": "0.4.0",
       "resolved": "https://registry.npmjs.org/type-check/-/type-check-0.4.0.tgz",
@@ -13505,25 +14789,28 @@ FILE: C:\HostelEase\client\package.json
   "type": "module",
   "private": true,
   "scripts": {
-    "dev":     "vite",
-    "build":   "vite build",
+    "dev": "vite",
+    "build": "vite build",
     "preview": "vite preview",
-    "lint":    "eslint src --ext .jsx,.js"
+    "lint": "eslint src --ext .jsx,.js"
   },
   "dependencies": {
-    "axios":         "^1.7.2",
-    "react":         "^18.3.1",
-    "react-dom":     "^18.3.1",
+    "@react-oauth/google": "^0.13.4",
+    "axios": "^1.7.2",
+    "framer-motion": "^12.35.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.6.0",
     "react-router-dom": "^6.23.1",
-    "recharts":      "^2.12.7"
+    "recharts": "^2.12.7"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",
-    "autoprefixer":         "^10.4.19",
-    "eslint":               "^8.57.0",
-    "postcss":              "^8.4.38",
-    "tailwindcss":          "^3.4.4",
-    "vite":                 "^5.3.1"
+    "autoprefixer": "^10.4.19",
+    "eslint": "^8.57.0",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4",
+    "vite": "^5.3.1"
   }
 }
 
@@ -13574,6 +14861,18 @@ export default {
   plugins: [],
 }
 
+
+==========================================
+FILE: C:\HostelEase\client\vercel.json
+==========================================
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
 
 ==========================================
 FILE: C:\HostelEase\client\vite.config.js
@@ -14488,170 +15787,234 @@ FILE: C:\HostelEase\server\controllers\wardenController.js
 ==========================================
 // ============================================================
 // controllers/wardenController.js
-// Req 1: Duplicate prevention (email, rollNumber, phoneNumber)
-// Req 2: Atomic writes using MongoDB transactions
-// Req 9: Push notification on room allocation
-// Req 11: Audit logging
 // ============================================================
+
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
 const User = require("../models/User");
 const Student = require("../models/Student");
-const RoomAllocation = require("../models/RoomAllocation");
 const Room = require("../models/Room");
+const RoomAllocation = require("../models/RoomAllocation");
 const Payment = require("../models/Payment");
 const LeaveRequest = require("../models/LeaveRequest");
 
 const auditLog = require("../utils/auditLogger");
 const pushNotification = require("../utils/notificationHelper");
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   ADD STUDENT  â”€  Req 1 + Req 2
-   Checks all three unique fields BEFORE touching the DB.
-   If User creation succeeds but Student fails, the
-   Mongoose session rolls back both writes atomically.
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+
+
+/* ============================================================
+   ADD STUDENT
+============================================================ */
+
 exports.addStudent = async (req, res, next) => {
+
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
+
     const {
-      fullName, email, password, rollNumber, course,
-      department, batch, collegeName, gender, dateOfBirth,
-      bloodGroup, phoneNumber, aadhaarNumber,
-      fatherName, motherName, parentContact, medicalIssues, address,
+      fullName,
+      email,
+      password,
+      rollNumber,
+      phoneNumber,
+      course,
+      department,
+      batch,
+      collegeName,
+      gender,
+      dateOfBirth,
+      bloodGroup,
+      aadhaarNumber,
+      fatherName,
+      motherName,
+      parentContact,
+      medicalIssues,
+      address
     } = req.body;
 
-    // â”€â”€ Req 1: Pre-flight duplicate checks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
     const [emailExists, rollExists, phoneExists] = await Promise.all([
       User.findOne({ email }).lean(),
       Student.findOne({ rollNumber }).lean(),
-      Student.findOne({ phoneNumber }).lean(),
+      Student.findOne({ phoneNumber }).lean()
     ]);
 
+
     if (emailExists || rollExists || phoneExists) {
-      const fields = [
-        emailExists  && "email",
-        rollExists   && "roll number",
-        phoneExists  && "phone number",
-      ].filter(Boolean).join(", ");
 
       await session.abortTransaction();
       session.endSession();
 
       return res.status(409).json({
-        message: `Duplicate detected for: ${fields}. Registration cancelled â€” no record created.`,
-        duplicates: {
-          email: !!emailExists,
-          rollNumber: !!rollExists,
-          phoneNumber: !!phoneExists,
-        },
+        message: "Duplicate student data detected"
       });
+
     }
 
-    // â”€â”€ Req 2: Atomic write â€” both docs or neither â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const [user] = await User.create(
-      [{ name: fullName, email, password: hashedPassword, role: "student" }],
-      { session }
-    );
 
-    const [student] = await Student.create(
-      [{
-        user: user._id, fullName, rollNumber, course, department, batch,
-        collegeName, gender, dateOfBirth, bloodGroup, phoneNumber,
-        aadhaarNumber, fatherName, motherName, parentContact,
-        medicalIssues: medicalIssues || "None", address,
-      }],
-      { session }
-    );
+    const [user] = await User.create([
+      {
+        name: fullName,
+        email,
+        password: hashedPassword,
+        role: "student"
+      }
+    ], { session });
+
+
+    const [student] = await Student.create([
+      {
+        user: user._id,
+        fullName,
+        rollNumber,
+        phoneNumber,
+        course,
+        department,
+        batch,
+        collegeName,
+        gender,
+        dateOfBirth,
+        bloodGroup,
+        aadhaarNumber,
+        fatherName,
+        motherName,
+        parentContact,
+        medicalIssues,
+        address
+      }
+    ], { session });
+
 
     await session.commitTransaction();
     session.endSession();
 
-    // â”€â”€ Req 11: Audit log â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
     await auditLog({
       actor: req.user.id,
       actorRole: req.user.role,
-      action: "STUDENT_REGISTERED",
+      action: "STUDENT_CREATED",
       targetModel: "Student",
       targetId: student._id,
-      description: `Warden registered student ${fullName} (${rollNumber})`,
-      ip: req.ip,
+      description: `Student ${fullName} registered`,
+      ip: req.ip
     });
 
-    return res.status(201).json({
-      message: "Student registered successfully",
-      userId: user._id,
-      studentId: student._id,
+
+    res.status(201).json({
+      message: "Student created successfully",
+      studentId: student._id
     });
 
-  } catch (error) {
+  } catch (err) {
+
     await session.abortTransaction();
     session.endSession();
-    next(error);   // passes to centralised errorHandler
+    next(err);
+
   }
+
 };
 
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+/* ============================================================
    GET ALL STUDENTS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+============================================================ */
+
 exports.getAllStudents = async (req, res, next) => {
+
   try {
+
     const students = await Student
       .find()
-      .populate("user", "email role isActive")
-      .sort({ createdAt: -1 })
-      .lean();
+      .populate("user", "email role")
+      .sort({ createdAt: -1 });
 
     res.json(students);
-  } catch (err) { next(err); }
+
+  } catch (err) {
+
+    next(err);
+
+  }
+
 };
 
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   GET FULL STUDENT DETAILS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+
+/* ============================================================
+   GET STUDENT DETAILS
+============================================================ */
+
 exports.getStudentDetails = async (req, res, next) => {
+
   try {
+
     const student = await Student
       .findById(req.params.id)
-      .populate("user", "email isActive")
-      .lean();
+      .populate("user", "email");
 
-    if (!student) return res.status(404).json({ message: "Student not found" });
+    if (!student)
+      return res.status(404).json({ message: "Student not found" });
+
 
     const [payments, leaves, room] = await Promise.all([
-      Payment.find({ student: student._id }).lean(),
-      LeaveRequest.find({ student: student._id }).sort({ createdAt: -1 }).lean(),
-      RoomAllocation.findOne({ student: student._id, status: "active" })
-        .populate("room").lean(),
+
+      Payment.find({ student: student._id }),
+
+      LeaveRequest.find({ student: student._id }),
+
+      RoomAllocation
+        .findOne({
+          student: student._id,
+          status: "active"
+        })
+        .populate("room")
+
     ]);
 
-    res.json({ student, payments, leaves, room });
-  } catch (err) { next(err); }
+
+    res.json({
+      student,
+      payments,
+      leaves,
+      room
+    });
+
+  } catch (err) {
+
+    next(err);
+
+  }
+
 };
 
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+/* ============================================================
    UPDATE STUDENT
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+============================================================ */
+
 exports.updateStudent = async (req, res, next) => {
+
   try {
-    // Guard against overwriting protected fields
-    const { user: _u, _id: _i, ...safeUpdates } = req.body;
 
     const student = await Student.findByIdAndUpdate(
       req.params.id,
-      safeUpdates,
-      { new: true, runValidators: true }
+      req.body,
+      { new: true }
     );
 
-    if (!student) return res.status(404).json({ message: "Student not found" });
+    if (!student)
+      return res.status(404).json({ message: "Student not found" });
+
 
     await auditLog({
       actor: req.user.id,
@@ -14659,170 +16022,261 @@ exports.updateStudent = async (req, res, next) => {
       action: "STUDENT_UPDATED",
       targetModel: "Student",
       targetId: student._id,
-      description: `Updated profile for ${student.fullName}`,
-      ip: req.ip,
+      description: `Student updated`
     });
 
-    res.json({ message: "Student updated successfully", student });
-  } catch (err) { next(err); }
+
+    res.json(student);
+
+  } catch (err) {
+
+    next(err);
+
+  }
+
 };
 
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   DELETE STUDENT  (cascades to all related collections)
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+
+/* ============================================================
+   DELETE STUDENT
+============================================================ */
+
 exports.deleteStudent = async (req, res, next) => {
+
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    const student = await Student.findById(req.params.id).session(session);
-    if (!student) {
-      await session.abortTransaction(); session.endSession();
-      return res.status(404).json({ message: "Student not found" });
-    }
 
-    await Promise.all([
-      RoomAllocation.deleteMany({ student: student._id }).session(session),
-      Payment.deleteMany({ student: student._id }).session(session),
-      LeaveRequest.deleteMany({ student: student._id }).session(session),
-    ]);
+    const student = await Student.findById(req.params.id).session(session);
+
+    if (!student)
+      return res.status(404).json({ message: "Student not found" });
+
+
+    await RoomAllocation.deleteMany({ student: student._id }).session(session);
+    await Payment.deleteMany({ student: student._id }).session(session);
+    await LeaveRequest.deleteMany({ student: student._id }).session(session);
 
     await User.findByIdAndDelete(student.user).session(session);
+
     await student.deleteOne({ session });
+
 
     await session.commitTransaction();
     session.endSession();
 
-    await auditLog({
-      actor: req.user.id,
-      actorRole: req.user.role,
-      action: "STUDENT_DELETED",
-      targetModel: "Student",
-      targetId: req.params.id,
-      description: `Deleted student ${student.fullName} (${student.rollNumber})`,
-      ip: req.ip,
-    });
 
     res.json({ message: "Student deleted successfully" });
+
   } catch (err) {
+
     await session.abortTransaction();
     session.endSession();
     next(err);
+
   }
+
 };
 
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   ALLOCATE ROOM  â”€  Req 9 (notify student)
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-exports.allocateRoom = async (req, res, next) => {
+
+/* ============================================================
+   GET ROOMS WITH BEDS (FAST API)
+============================================================ */
+
+exports.getRoomsWithBeds = async (req, res, next) => {
+
   try {
-    const { studentId, room, bedNumber } = req.body;
 
-    const student = await Student.findOne({ rollNumber: studentId });
-    if (!student) return res.status(404).json({ message: "Student not found" });
+    const rooms = await Room.find().lean();
 
-    const already = await RoomAllocation.findOne({ student: student._id, status: "active" });
-    if (already) return res.status(400).json({ message: "Student already has an active room" });
-
-    const roomDoc = await Room.findById(room);
-    if (!roomDoc) return res.status(404).json({ message: "Room not found" });
-
-    const allocation = await RoomAllocation.create({
-      student: student._id,
-      room,
-      bedNumber,
-      allocatedBy: req.user.id,
-      checkInDate: new Date(),
-      status: "active",
-    });
-
-    roomDoc.occupiedBeds += 1;
-    await roomDoc.save();
-
-    // â”€â”€ Req 9: Notify student â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    await pushNotification(
-      student.user,
-      "ROOM_ALLOCATED",
-      "Room Allocated ðŸ ",
-      `You have been allocated Room ${roomDoc.roomNumber}, Bed ${bedNumber}.`,
-      { model: "RoomAllocation", id: allocation._id }
-    );
-
-    await auditLog({
-      actor: req.user.id,
-      actorRole: req.user.role,
-      action: "ROOM_ALLOCATED",
-      targetModel: "RoomAllocation",
-      targetId: allocation._id,
-      description: `Room ${roomDoc.roomNumber} bed ${bedNumber} allocated to ${student.fullName}`,
-      ip: req.ip,
-    });
-
-    res.status(201).json({ message: "Room allocated successfully", allocation });
-  } catch (err) { next(err); }
-};
-
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   GET OCCUPIED BEDS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-exports.getOccupiedBeds = async (req, res, next) => {
-  try {
     const allocations = await RoomAllocation.find({
-      room: req.params.roomId,
-      status: "active",
+      status: "active"
     }).lean();
 
-    res.json(allocations.map((a) => a.bedNumber));
-  } catch (err) { next(err); }
+
+    const allocationMap = {};
+
+    allocations.forEach(a => {
+      allocationMap[`${a.room}_${a.bedNumber}`] = true;
+    });
+
+
+    const result = rooms.map(room => {
+
+      const beds = [];
+
+      for (let i = 1; i <= room.totalBeds; i++) {
+
+        const key = `${room._id}_${i}`;
+
+        beds.push({
+          number: String(i),
+          status: allocationMap[key] ? "occupied" : "available"
+        });
+
+      }
+
+      return {
+        ...room,
+        beds
+      };
+
+    });
+
+
+    res.json(result);
+
+  } catch (err) {
+
+    next(err);
+
+  }
+
 };
 
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+/* ============================================================
+   ALLOCATE ROOM
+============================================================ */
+exports.allocateRoom = async (req,res,next)=>{
+
+ try{
+
+  const {studentId,room,bedNumber}=req.body;
+
+  const student = await Student.findOne({rollNumber:studentId});
+
+  if(!student)
+    return res.status(404).json({message:"Student not found"});
+
+
+  const already = await RoomAllocation.findOne({
+   student:student._id,
+   status:"active"
+  });
+
+  if(already)
+   return res.status(400).json({message:"Student already has room"});
+
+
+  const bedTaken = await RoomAllocation.findOne({
+   room,
+   bedNumber,
+   status:"active"
+  });
+
+  if(bedTaken)
+   return res.status(400).json({message:"Bed already occupied"});
+
+
+  const allocation = await RoomAllocation.create({
+   student:student._id,
+   room,
+   bedNumber,
+   allocatedBy:req.user.id
+  });
+
+  res.status(201).json({
+   message:"Room allocated successfully",
+   allocation
+  });
+
+ }catch(err){
+  next(err);
+ }
+
+};
+
+
+/* ============================================================
    GET BED DETAILS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+============================================================ */
+
 exports.getBedDetails = async (req, res, next) => {
+
   try {
+
     const allocation = await RoomAllocation
       .findOne({
         room: req.params.roomId,
         bedNumber: req.params.bedNumber,
-        status: "active",
+        status: "active"
       })
       .populate("student");
 
-    if (!allocation) return res.status(404).json({ message: "Bed is empty" });
+
+    if (!allocation)
+      return res.status(404).json({ message: "Bed empty" });
+
 
     res.json({
       studentName: allocation.student.fullName,
       rollNumber: allocation.student.rollNumber,
-      allocationId: allocation._id,
+      allocationId: allocation._id
     });
-  } catch (err) { next(err); }
+
+  } catch (err) {
+
+    next(err);
+
+  }
+
 };
 
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   REMOVE BED (CHECK-OUT)
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-exports.removeBed = async (req, res, next) => {
-  try {
-    const allocation = await RoomAllocation.findById(req.params.allocationId);
-    if (!allocation) return res.status(404).json({ message: "Allocation not found" });
 
-    const room = await Room.findById(allocation.room);
-    if (room) { room.occupiedBeds = Math.max(0, room.occupiedBeds - 1); await room.save(); }
+/* ============================================================
+   CHECKOUT
+============================================================ */
+exports.removeBed = async (req,res,next)=>{
 
-    allocation.status = "checkedOut";
-    allocation.checkOutDate = new Date();
-    await allocation.save();
+ try{
 
-    res.json({ message: "Student checked out successfully" });
-  } catch (err) { next(err); }
+  const allocation = await RoomAllocation.findById(req.params.allocationId);
+
+  if(!allocation)
+   return res.status(404).json({message:"Allocation not found"});
+
+
+  allocation.status="checkedOut";
+  allocation.checkOutDate=new Date();
+
+  await allocation.save();
+
+  res.json({
+   message:"Bed deallocated successfully"
+  });
+
+ }catch(err){
+  next(err);
+ }
+
 };
+/* ============================================================
+   GET OCCUPIED BEDS
+============================================================ */
+exports.getOccupiedBeds = async (req,res,next)=>{
 
+ try{
+
+  const allocations = await RoomAllocation.find({
+   room:req.params.roomId,
+   status:"active"
+  });
+
+  const occupied = allocations.map(a=>String(a.bedNumber));
+
+  res.json(occupied);
+
+ }catch(err){
+  next(err);
+ }
+
+};
 
 ==========================================
 FILE: C:\HostelEase\server\middleware\authMiddleware.js
@@ -15176,69 +16630,76 @@ FILE: C:\HostelEase\server\models\Room.js
 ==========================================
 const mongoose = require("mongoose");
 
-const roomSchema = new mongoose.Schema(
-  {
-    blockName: { type: String, required: true },
-    roomNumber: { type: String, required: true },
-    totalBeds: { type: Number, required: true },
-    occupiedBeds: { type: Number, default: 0 },
+const roomSchema = new mongoose.Schema({
+  roomNumber: {
+    type: Number,
+    required: true,
+    unique: true
   },
-  { timestamps: true }
-);
+  totalBeds: {
+    type: Number,
+    required: true
+  },
+  occupiedBeds: {
+    type: Number,
+    default: 0
+  }
+});
 
 module.exports = mongoose.model("Room", roomSchema);
-
 
 ==========================================
 FILE: C:\HostelEase\server\models\RoomAllocation.js
 ==========================================
-// server/models/RoomAllocation.js
-//
-// âœ… FIX: Removed `unique: true` from the `student` field.
-//    The old model had `student: { unique: true }` which means one student
-//    could NEVER be allocated a second time â€” after checkout, re-allocation
-//    threw a MongoDB duplicate key error (11000).
-//    Now uniqueness is enforced only for ACTIVE allocations in the controller.
-
 const mongoose = require("mongoose");
 
-const roomAllocationSchema = new mongoose.Schema(
-  {
-    student: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Student",
-      required: true,
-      // âœ… NOT unique â€” a student may have multiple historical allocations
-    },
-    room: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Room",
-      required: true,
-    },
-    bedNumber:   { type: String, required: true },
-    allocatedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    checkInDate:  { type: Date, default: Date.now },
-    checkOutDate: { type: Date, default: null },
-    status: {
-      type: String,
-      enum: ["active", "checkedOut"],
-      default: "active",
-    },
+const roomAllocationSchema = new mongoose.Schema({
+
+  student:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Student",
+    required:true
   },
-  { timestamps: true }
-);
 
-// Compound index: one ACTIVE allocation per student at a time
+  room:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Room",
+    required:true
+  },
+
+  bedNumber:{
+    type:String,
+    required:true
+  },
+
+  allocatedBy:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"User"
+  },
+
+  checkInDate:{
+    type:Date,
+    default:Date.now
+  },
+
+  checkOutDate:{
+    type:Date
+  },
+
+  status:{
+    type:String,
+    enum:["active","checkedOut"],
+    default:"active"
+  }
+
+},{timestamps:true});
+
 roomAllocationSchema.index(
-  { student: 1, status: 1 },
-  { unique: true, partialFilterExpression: { status: "active" } }
+ { student:1, status:1 },
+ { unique:true, partialFilterExpression:{ status:"active" } }
 );
 
-module.exports = mongoose.model("RoomAllocation", roomAllocationSchema);
+module.exports = mongoose.model("RoomAllocation",roomAllocationSchema);
 
 ==========================================
 FILE: C:\HostelEase\server\models\Student.js
@@ -15295,13 +16756,14 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "warden", "student"],
       default: "student",
     },
-    resetPasswordToken: {
-  type: String,
-},
-resetPasswordExpire: {
-  type: Date,
-},
 
+    // â”€â”€ Password Reset â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    resetPasswordToken: {
+      type: String,
+    },
+    resetPasswordExpires: {
+      type: Date,
+    },
 
     isActive: {
       type: Boolean,
@@ -15312,7 +16774,6 @@ resetPasswordExpire: {
 );
 
 module.exports = mongoose.model("User", userSchema);
-
 
 ==========================================
 FILE: C:\HostelEase\server\routes\adminRoutes.js
@@ -15390,23 +16851,142 @@ module.exports = router;
 ==========================================
 FILE: C:\HostelEase\server\routes\authRoutes.js
 ==========================================
+// ============================================================
+// routes/authRoutes.js
+// Forgot Password + Reset Password via Resend
+// ============================================================
 const express = require("express");
+const crypto = require("crypto");
+const bcrypt = require("bcryptjs");
 const router = express.Router();
+const User = require("../models/User");
+const { sendEmail, buildResetEmail } = require("../utils/sendEmail");
 
-const {
-  login,
-  forgotPassword,
-  resetPassword,
-} = require("../controllers/authController");
 
-router.post("/login", login);
+// â”€â”€â”€ POST /auth/login â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
 
-// ðŸ” Forgot password routes
-router.post("/forgot-password", forgotPassword);
-router.post("/reset-password/:token", resetPassword);
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    // Example role handling (Student / Warden / Admin)
+    const role = user.role || "student";
+
+    const jwt = require("jsonwebtoken");
+
+    const token = jwt.sign(
+      { id: user._id, role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.json({
+      token,
+      role,
+      name: user.name,
+      email: user.email
+    });
+
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// â”€â”€â”€ POST /auth/forgot-password â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+router.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    // Always return success â€” don't leak whether email exists
+    if (!user) {
+      return res.json({
+        message: "If that email exists, a reset link has been sent.",
+      });
+    }
+
+    // 1. Generate a secure random token
+    const rawToken = crypto.randomBytes(32).toString("hex");
+
+    // 2. Hash it before saving to DB
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(rawToken)
+      .digest("hex");
+
+    // 3. Save token + expiry on user
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 mins
+    await user.save();
+
+    // 4. Build reset link with RAW token (not hashed)
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${rawToken}`;
+
+    // 5. Send email via Resend
+    await sendEmail(
+      user.email,
+      "Reset Your SmartHostel Password",
+      buildResetEmail(resetLink, user.name)
+    );
+
+    res.json({ message: "Reset link sent to your email." });
+  } catch (err) {
+    console.error("Forgot password error:", err);
+    res.status(500).json({ message: "Server error. Please try again." });
+  }
+});
+
+// â”€â”€â”€ POST /auth/reset-password/:token â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+router.post("/reset-password/:token", async (req, res) => {
+  const { password } = req.body;
+  const { token } = req.params;
+
+  try {
+    // 1. Hash the incoming raw token to compare with DB
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    // 2. Find user with matching token that hasn't expired
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "Reset link expired or invalid." });
+    }
+
+    // 3. Hash new password and save
+    user.password = await bcrypt.hash(password, 12);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.json({ message: "Password reset successful!" });
+  } catch (err) {
+    console.error("Reset password error:", err);
+    res.status(500).json({ message: "Server error. Please try again." });
+  }
+});
 
 module.exports = router;
-
 
 ==========================================
 FILE: C:\HostelEase\server\routes\leaveRoutes.js
@@ -15615,7 +17195,7 @@ const {
   allocateRoom,
   getAllStudents,
   getStudentDetails,
-  deallocateRoom,
+  getRoomsWithBeds,
   deleteStudent,
   getOccupiedBeds,
   getBedDetails,
@@ -15665,13 +17245,6 @@ router.put(
   updateStudent
 );
 
-router.get(
-  "/rooms/:roomId/occupied-beds",
-  protect,
-  authorize("warden"),
-  getOccupiedBeds
-);
-
 // Delete Student
 router.delete(
   "/students/:id",
@@ -15685,6 +17258,14 @@ router.delete(
 // ROOM MANAGEMENT
 // ======================
 
+// Get Rooms With Beds (fast API)
+router.get(
+  "/rooms-with-beds",
+  protect,
+  authorize("warden"),
+  getRoomsWithBeds
+);
+
 // Allocate Room
 router.post(
   "/allocate-room",
@@ -15693,6 +17274,7 @@ router.post(
   allocateRoom
 );
 
+// Get Bed Details
 router.get(
   "/rooms/:roomId/bed/:bedNumber",
   protect,
@@ -15700,6 +17282,7 @@ router.get(
   getBedDetails
 );
 
+// Deallocate Bed (Checkout)
 router.delete(
   "/bed/:allocationId",
   protect,
@@ -15727,6 +17310,7 @@ router.put(
   authorize("warden"),
   updateLeaveStatus
 );
+
 
 module.exports = router;
 
@@ -15971,25 +17555,24 @@ module.exports = { sendEmail, buildResetEmail, buildLeaveStatusEmail };
 ==========================================
 FILE: C:\HostelEase\server\.env
 ==========================================
+# â”€â”€ Server â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 PORT=5000
+NODE_ENV=development
+
+# â”€â”€ Database â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 MONGO_URI=mongodb+srv://hostelAdmin:Hostel_Ease@hostelease.kz0i9nk.mongodb.net/?appName=HostelEase
+
+# â”€â”€ Auth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 JWT_SECRET=hostelEaseJWTSecret2026
-EMAIL_USER=hosteleasee@gmail.com
-EMAIL_PASS=gzornbbfstdxkvre
-FRONTEND_URL=http://localhost:5173
-NODE_ENV=development 
 
-
-
-
-
-# â”€â”€ Resend  (https://resend.com)  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â”€â”€ Resend (https://resend.com) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 RESEND_API_KEY=re_HDZemWL3_4SW4JbFJu2MYeiJUDDLYcTtj
-# Must be a verified domain in your Resend account
-#EMAIL_FROM=noreply@hostelease.com
+# Use onboarding@resend.dev for testing (no domain verification needed)
+# Switch to noreply@hostelease.com once hostelease.com is verified in Resend
 EMAIL_FROM=onboarding@resend.dev
 
-
+# â”€â”€ Frontend â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+FRONTEND_URL=http://localhost:5173
 
 ==========================================
 FILE: C:\HostelEase\server\package-lock.json
@@ -18547,7 +20130,6 @@ FILE: C:\HostelEase\server\server.js
 ==========================================
 // ============================================================
 // server.js  â”€  SmartHostel Production Entry Point
-// Req 12: CORS, error handling, scalable structure
 // ============================================================
 require("dotenv").config();
 const express = require("express");
@@ -18558,29 +20140,27 @@ const rateLimit = require("express-rate-limit");
 const mongoSanitize = require("express-mongo-sanitize");
 const errorHandler = require("./middleware/errorHandler");
 
-// â† ADD THESE TWO LINES
 const dns = require("node:dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
-
 
 const app = express();
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // SECURITY MIDDLEWARE
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-app.use(helmet());                         // Sets secure HTTP headers
-app.use(mongoSanitize());                 // Prevents NoSQL injection
+app.use(helmet());
+app.use(mongoSanitize());
 
-// CORS â€” allow only your Vercel frontend (+ localhost for dev)
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   "http://localhost:5173",
+  "https://hostelease.online",
+  "https://www.hostelease.online",
 ].filter(Boolean);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // allow server-to-server (no origin) or whitelisted origins
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -18593,7 +20173,7 @@ app.use(
   })
 );
 
-// Global rate limiter  â€” 100 req / 15 min per IP
+// Global rate limiter â€” 100 req / 15 min per IP
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -18603,36 +20183,36 @@ const limiter = rateLimit({
 });
 app.use("/api", limiter);
 
-// Stricter limiter for auth endpoints
+// Stricter limiter for auth endpoints â€” 20 req / 15 min
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
   message: { message: "Too many auth attempts. Please wait 15 minutes." },
 });
 
-app.use(express.json({ limit: "10kb" }));  // Prevents large payload attacks
+app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // ROUTES
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-app.use("/api/auth",        authLimiter, require("./routes/authRoutes"));
-app.use("/api/students",    require("./routes/studentRoutes"));
-app.use("/api/warden",      require("./routes/wardenRoutes"));
-app.use("/api/admin",       require("./routes/adminRoutes"));
-app.use("/api/leave",       require("./routes/leaveRoutes"));
-app.use("/api/payments",    require("./routes/paymentRoutes"));
-app.use("/api/rooms",       require("./routes/roomRoutes"));
-app.use("/api/analytics",   require("./routes/analyticsRoutes"));
-app.use("/api/notifications",require("./routes/notificationRoutes"));
-app.use("/api/audit",       require("./routes/auditRoutes"));
+app.use("/api/auth",          authLimiter, require("./routes/authRoutes"));  // â† forgot/reset password lives here
+app.use("/api/students",      require("./routes/studentRoutes"));
+app.use("/api/warden",        require("./routes/wardenRoutes"));
+app.use("/api/admin",         require("./routes/adminRoutes"));
+app.use("/api/leave",         require("./routes/leaveRoutes"));
+app.use("/api/payments",      require("./routes/paymentRoutes"));
+app.use("/api/rooms",         require("./routes/roomRoutes"));
+app.use("/api/analytics",     require("./routes/analyticsRoutes"));
+app.use("/api/notifications", require("./routes/notificationRoutes"));
+app.use("/api/audit",         require("./routes/auditRoutes"));
 
-// Health-check (for Render uptime monitoring)
+// Health-check
 app.get("/health", (req, res) =>
   res.json({ status: "ok", timestamp: new Date().toISOString() })
 );
 
-// 404 handler â€” must be after all routes
+// 404 handler
 app.use((req, res) => res.status(404).json({ message: "Route not found" }));
 
 // Central error handler â€” must be last
@@ -18650,7 +20230,7 @@ const connectDB = async () => {
     console.log("âœ…  MongoDB connected");
   } catch (err) {
     console.error("âŒ  MongoDB connection failed:", err.message);
-    process.exit(1);   // Crash fast â€” let Render restart the service
+    process.exit(1);
   }
 };
 
@@ -18666,4 +20246,3 @@ process.on("SIGTERM", async () => {
   await mongoose.disconnect();
   process.exit(0);
 });
-

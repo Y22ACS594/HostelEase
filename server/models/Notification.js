@@ -1,7 +1,4 @@
-// ============================================================
-// models/Notification.js
-// Req 9: In-app notifications for students
-// ============================================================
+// models/Notification.js — Complete SaaS notification model
 const mongoose = require("mongoose");
 
 const notificationSchema = new mongoose.Schema(
@@ -15,29 +12,28 @@ const notificationSchema = new mongoose.Schema(
     type: {
       type: String,
       enum: [
-        "LEAVE_APPROVED",
-        "LEAVE_REJECTED",
+        "LEAVE_APPROVED",     // → student
+        "LEAVE_REJECTED",     // → student
+        "ROOM_ALLOCATED",     // → student
+        "ROOM_DEALLOCATED",   // → student
+        "PAYMENT_CONFIRMED",  // → student
+        "STUDENT_REGISTERED", // → student (welcome)
+        "LEAVE_APPLIED",      // → warden
+        "PAYMENT_RECEIVED",   // → warden
         "COMPLAINT_RESOLVED",
-        "PAYMENT_CONFIRMED",
-        "ROOM_ALLOCATED",
         "GENERAL",
       ],
       required: true,
     },
-    title: { type: String, required: true },
-    message: { type: String, required: true },
-    isRead: { type: Boolean, default: false, index: true },
-    // Link to the related document (optional)
-    relatedModel: String,
-    relatedId: mongoose.Schema.Types.ObjectId,
+    title:        { type: String, required: true },
+    message:      { type: String, required: true },
+    isRead:       { type: Boolean, default: false, index: true },
+    relatedModel: { type: String },
+    relatedId:    { type: mongoose.Schema.Types.ObjectId },
   },
   { timestamps: true }
 );
 
-// Auto-delete notifications older than 90 days
-notificationSchema.index(
-  { createdAt: 1 },
-  { expireAfterSeconds: 90 * 24 * 60 * 60 }
-);
+notificationSchema.index({ createdAt: 1 }, { expireAfterSeconds: 90 * 24 * 60 * 60 });
 
 module.exports = mongoose.model("Notification", notificationSchema);

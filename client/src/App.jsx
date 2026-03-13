@@ -23,12 +23,15 @@ import AddStudent         from "./pages/warden/AddStudent";
 import RoomAllocation     from "./pages/warden/RoomAllocation";
 import CreateRoom         from "./pages/warden/CreateRoom";
 import LeaveApprovals     from "./pages/warden/LeaveApprovals";
-import LeaveDashboard     from "./pages/warden/LeaveDashboard";
 import AnalyticsDashboard from "./pages/warden/AnalyticsDashboard";
 import WardenPayments     from "./pages/warden/Payments";
 import StudentsList       from "./pages/warden/StudentsList";
 import StudentDetails     from "./pages/warden/StudentDetails";
 import EditStudent        from "./pages/warden/EditStudent";
+// ── Notifications & Audit (new pages) ─────────────────────────────────
+import Notifications from "./pages/warden/Notifications";
+import AuditLogs     from "./pages/warden/AuditLogs";
+ 
 
 // ── Admin pages ─────────────────────────────────────────────
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -161,15 +164,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-        {/* Leave Dashboard — full analytics + approve/reject */}
-        <Route
-          path="/warden/leave-dashboard"
-          element={
-            <ProtectedRoute role="warden">
-              <LeaveDashboard />
-            </ProtectedRoute>
-          }
-        />
         {/* Hostel Analytics Dashboard */}
         <Route
           path="/warden/analytics"
@@ -186,6 +180,17 @@ function App() {
               <WardenPayments />
             </ProtectedRoute>
           }
+        />
+        {/* ── NEW: Notifications ── */}
+        <Route
+          path="/warden/notifications"
+          element={<ProtectedRoute role="warden"><Notifications /></ProtectedRoute>}
+        />
+ 
+        {/* ── NEW: Audit Logs ── */}
+        <Route
+          path="/warden/audit-logs"
+          element={<ProtectedRoute role="warden"><AuditLogs /></ProtectedRoute>}
         />
 
         {/* ═══════════════════════════════════════════════
