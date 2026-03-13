@@ -26,6 +26,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "https://hostelease.online",
   "https://www.hostelease.online",
+  "https://hostelease-zeta.vercel.app"
 ].filter(Boolean);
 
 app.use(
