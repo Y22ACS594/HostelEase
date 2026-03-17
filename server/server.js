@@ -24,6 +24,7 @@ app.use(mongoSanitize());
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   "http://localhost:5173",
+  "http://localhost:5174",
   "https://hostelease.online",
   "https://www.hostelease.online",
   "https://hostelease-zeta.vercel.app"
@@ -61,8 +62,11 @@ const authLimiter = rateLimit({
   message: { message: "Too many auth attempts. Please wait 15 minutes." },
 });
 
-app.use(express.json({ limit: "10kb" }));
-app.use(express.urlencoded({ extended: true }));
+
+// ✅ FIXED: increased limit from "10kb" to "10mb" to allow base64 photo uploads
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
 
 // ─────────────────────────────────────────
 // ROUTES
@@ -77,6 +81,8 @@ app.use("/api/rooms",         require("./routes/roomRoutes"));
 app.use("/api/analytics",     require("./routes/analyticsRoutes"));
 app.use("/api/notifications", require("./routes/notificationRoutes"));
 app.use("/api/audit",         require("./routes/auditRoutes"));
+
+app.use("/api/issues",        require("./routes/issueRoutes"));
 
 // Health-check
 app.get("/health", (req, res) =>

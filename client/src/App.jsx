@@ -16,6 +16,8 @@ import ApplyLeave       from "./pages/student/ApplyLeave";
 import LeaveStatus      from "./pages/student/LeaveStatus";
 import RoomStatus       from "./pages/student/RoomStatus";
 import Payments         from "./pages/student/Payments";
+import Notifications    from "./pages/student/Notifications";   // ✅ student notifications
+import RaiseIssue       from "./pages/student/RaiseIssue";   
 
 // ── Warden pages ────────────────────────────────────────────
 import WardenDashboard    from "./pages/warden/Dashboard";
@@ -29,9 +31,9 @@ import StudentsList       from "./pages/warden/StudentsList";
 import StudentDetails     from "./pages/warden/StudentDetails";
 import EditStudent        from "./pages/warden/EditStudent";
 // ── Notifications & Audit (new pages) ─────────────────────────────────
-import Notifications from "./pages/warden/Notifications";
-import AuditLogs     from "./pages/warden/Auditlogs";
- 
+import WardenNotifications from "./pages/warden/Notifications"; // ✅ warden notifications
+import AuditLogs          from "./pages/warden/AuditLogs";      // ✅ audit logs
+import WardenIssues       from "./pages/warden/Wardenissues";
 
 // ── Admin pages ─────────────────────────────────────────────
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -95,6 +97,10 @@ function App() {
             </ProtectedRoute>
           }
         />
+         <Route path="/student/notifications"
+          element={<ProtectedRoute role="student"><Notifications /></ProtectedRoute>}/>
+        <Route path="/student/issues"
+          element={<ProtectedRoute role="student"><RaiseIssue /></ProtectedRoute>}/>
 
         {/* ═══════════════════════════════════════════════
             WARDEN ROUTES
@@ -182,16 +188,12 @@ function App() {
           }
         />
         {/* ── NEW: Notifications ── */}
-        <Route
-          path="/warden/notifications"
-          element={<ProtectedRoute role="warden"><Notifications /></ProtectedRoute>}
-        />
- 
-        {/* ── NEW: Audit Logs ── */}
-        <Route
-          path="/warden/audit-logs"
-          element={<ProtectedRoute role="warden"><AuditLogs /></ProtectedRoute>}
-        />
+         <Route path="/warden/notifications"
+          element={<ProtectedRoute role="warden"><WardenNotifications /></ProtectedRoute>}/>
+        <Route path="/warden/audit-logs"
+          element={<ProtectedRoute role="warden"><AuditLogs /></ProtectedRoute>}/>
+        <Route path="/warden/issues"
+          element={<ProtectedRoute role="warden"><WardenIssues /></ProtectedRoute>}/>
 
         {/* ═══════════════════════════════════════════════
             ADMIN ROUTES
