@@ -48,12 +48,11 @@ app.use(
 // Global rate limiter — 100 req / 15 min per IP
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 2000, // 🔥 increase (you can even use 5000)
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: "Too many requests, please try again later." },
 });
-app.use("/api", limiter);
 
 // Stricter limiter for auth endpoints — 20 req / 15 min
 const authLimiter = rateLimit({
@@ -81,7 +80,6 @@ app.use("/api/rooms",         require("./routes/roomRoutes"));
 app.use("/api/analytics",     require("./routes/analyticsRoutes"));
 app.use("/api/notifications", require("./routes/notificationRoutes"));
 app.use("/api/audit",         require("./routes/auditRoutes"));
-
 app.use("/api/issues",        require("./routes/issueRoutes"));
 
 // Health-check
