@@ -8,7 +8,7 @@ const {
   getAllIssues,
   updateIssueStatus,
   getIssueStats,
-} = require("../controllers/Issuecontroller");
+} = require("../controllers/issueController");
 
 // Student
 router.post  ("/",          protect, authorize("student"),         raiseIssue);
