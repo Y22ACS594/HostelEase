@@ -32,7 +32,7 @@ import StudentDetails     from "./pages/warden/StudentDetails";
 import EditStudent        from "./pages/warden/EditStudent";
 // ── Notifications & Audit (new pages) ─────────────────────────────────
 import WardenNotifications from "./pages/warden/Notifications"; // ✅ warden notifications
-import AuditLogs          from "./pages/warden/AuditLogs";      // ✅ audit logs
+import AuditLogs   from "./pages/warden/AuditLogs";      // ✅ audit logs
 
 import WardenIssues from "./pages/warden/WardenIssues";
 
