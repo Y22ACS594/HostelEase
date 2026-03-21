@@ -11,8 +11,6 @@ const CARDS = [
   { to:"/warden/room-allocation",icon:"🛏️", title:"Room Allocation",  desc:"Assign students to beds"            },
   { to:"/warden/leaves",         icon:"📄", title:"Leave Approvals",  desc:"Approve or reject leave requests"  },
   { to:"/warden/payments",       icon:"💳", title:"Payments",         desc:"View hostel fee payments"           },
-  { to:"/warden/notifications",  icon:"🔔", title:"Notifications",    desc:"All system notifications"          },
-  { to:"/warden/audit-logs",     icon:"🗂️", title:"Audit Logs",       desc:"Track all warden activity"         },
 ];
 
 function DashCard({ icon, title, desc }) {

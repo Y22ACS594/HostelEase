@@ -85,11 +85,11 @@ const Login = () => {
             fontSize:42, fontWeight:800, color:"#111827",
             lineHeight:1.1, letterSpacing:"-1px", marginBottom:16,
           }}>
-            Welcome back 👋
+            Welcome HostelEase 👋
           </h1>
           <p style={{ fontSize:16, color:"#6B7280", lineHeight:1.6, maxWidth:400, marginBottom:40 }}>
             Manage hostel operations, track student leaves, room allocations,
-            and payments — all in one place.
+             — all in one place.
           </p>
         </div>
 
@@ -117,21 +117,7 @@ const Login = () => {
           ))}
         </div>
 
-        {/* Bottom stat strip */}
-        <div style={{ marginTop:"auto", paddingTop:40 }}>
-          <div style={{ display:"flex", gap:32 }}>
-            {[
-              { v:"500+", l:"Students" },
-              { v:"24/7",  l:"Support"  },
-              { v:"100%",  l:"Secure"   },
-            ].map(({ v, l }) => (
-              <div key={l}>
-                <div style={{ fontSize:20, fontWeight:800, color:"#111827" }}>{v}</div>
-                <div style={{ fontSize:12, color:"#9CA3AF", marginTop:2 }}>{l}</div>
-              </div>
-            ))}
-          </div>
-        </div>
+       
       </div>
 
       {/* ── RIGHT: Form panel ─────────────────────────────── */}
@@ -207,7 +193,7 @@ const Login = () => {
               <div className="he-field-divider"/>
               <input type="email" value={email}
                 onChange={e=>setEmail(e.target.value)}
-                placeholder={role==="student" ? "info.student@gmail.com" : "warden@hostel.edu"}
+                placeholder={role==="student" ? "student@gmail.com" : "warden@gmail.com"}
                 required className="he-bare-input"
                 autoComplete="email"/>
             </div>
@@ -232,7 +218,7 @@ const Login = () => {
                 type={showPass ? "text" : "password"}
                 value={password}
                 onChange={e=>setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder=""
                 required
                 className="he-bare-input"
                 autoComplete="current-password"
