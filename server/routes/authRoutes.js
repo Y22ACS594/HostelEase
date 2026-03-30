@@ -12,6 +12,7 @@ const { sendEmail, buildResetEmail } = require("../utils/sendEmail");
 
 // ─── POST /auth/login ───────────────────────────────
 router.post("/login", async (req, res) => {
+  console.log("Body:",req.body);
   const { email, password } = req.body;
 
   try {
