@@ -186,7 +186,7 @@ const CreateRoom = () => {
                 <input
                   name="blockName" value={form.blockName}
                   onChange={handleChange} required
-                  placeholder="e.g. A Block, North Wing…"
+                  placeholder=""
                   style={inputStyle(focusField === "blockName")}
                   onFocus={() => setFocusField("blockName")}
                   onBlur={()  => setFocusField("")}
@@ -198,7 +198,7 @@ const CreateRoom = () => {
                 <input
                   name="roomNumber" value={form.roomNumber}
                   onChange={handleChange} required
-                  placeholder="e.g. 101, 202, A-301…"
+                  placeholder=""
                   style={inputStyle(focusField === "roomNumber")}
                   onFocus={() => setFocusField("roomNumber")}
                   onBlur={()  => setFocusField("")}

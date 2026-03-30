@@ -109,11 +109,11 @@ export default function AnalyticsDashboard() {
   const cards = overview?.cards || {};
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
 
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900">
           Hostel Analytics
         </h1>
         <p className="text-sm text-gray-400">
@@ -121,9 +121,8 @@ export default function AnalyticsDashboard() {
         </p>
       </div>
 
-      {/* KPI Cards */}
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      {/* KPI Cards — 2 cols on mobile, 4 on md+ */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
 
         <KPICard
           icon="👥"
@@ -157,17 +156,17 @@ export default function AnalyticsDashboard() {
 
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Charts — stack on mobile, side-by-side on lg+ */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
 
         {/* Leave Trends Chart */}
+        <div className="lg:col-span-2 bg-white rounded-xl p-4 md:p-5 shadow border border-gray-100">
 
-        <div className="lg:col-span-2 bg-white rounded-xl p-5 shadow border border-gray-100">
-
-          <h3 className="font-semibold mb-4">
+          <h3 className="font-semibold mb-4 text-sm md:text-base">
             Leave Trends (Last 6 Months)
           </h3>
 
-          <ResponsiveContainer width="100%" height={250}>
+          <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={trendChart}>
 
               <defs>
@@ -186,9 +185,9 @@ export default function AnalyticsDashboard() {
 
               <CartesianGrid strokeDasharray="3 3" />
 
-              <XAxis dataKey="month" />
+              <XAxis dataKey="month" tick={{ fontSize: 11 }} />
 
-              <YAxis />
+              <YAxis tick={{ fontSize: 11 }} />
 
               <Tooltip />
 
@@ -221,10 +220,9 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Room Occupancy */}
+        <div className="bg-white rounded-xl p-4 md:p-5 shadow border border-gray-100">
 
-        <div className="bg-white rounded-xl p-5 shadow border border-gray-100">
-
-          <h3 className="font-semibold mb-4">
+          <h3 className="font-semibold mb-4 text-sm md:text-base">
             Room Occupancy
           </h3>
 

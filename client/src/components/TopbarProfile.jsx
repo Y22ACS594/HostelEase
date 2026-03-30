@@ -79,9 +79,9 @@ export default function TopbarProfile({ theme }) {
   }, []);
 
   return (
-    <div style={{ display:"inline-flex",alignItems:"center",gap:8,fontFamily:"'Inter',sans-serif" }}>
+    <div style={{ display:"inline-flex",alignItems:"center",gap:8,fontFamily:"'Sora',sans-serif" }}>
 
-      {/* ── Bell ── */}
+      {/* — Bell — */}
       <button onClick={()=>navigate(notifPage)} title="Notifications"
         style={{ position:"relative",width:42,height:42,borderRadius:"50%",
           background:pillBg, border:`1.5px solid ${pillBorder}`,
@@ -105,7 +105,7 @@ export default function TopbarProfile({ theme }) {
         )}
       </button>
 
-      {/* ── Avatar pill ── */}
+      {/* — Avatar pill — */}
       <div ref={dropRef} style={{ position:"relative" }}>
         <button onClick={()=>setShowDrop(p=>!p)}
           style={{ display:"flex",alignItems:"center",gap:10,
@@ -152,11 +152,12 @@ export default function TopbarProfile({ theme }) {
         {/* Dropdown */}
         {showDrop && (
           <div style={{ position:"absolute",top:"calc(100% + 8px)",right:0,
-            background:"#fff",border:"1.5px solid #E5E7EB",borderRadius:16,minWidth:210,
+            background:"#fff",border:"1.5px solid #E5E7EB",borderRadius:16,minWidth:220,
             boxShadow:"0 20px 60px rgba(0,0,0,0.15)",overflow:"hidden",zIndex:9999,
             animation:"tp-fade .15s ease" }}>
             <style>{`@keyframes tp-fade{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
+            {/* Profile header */}
             <div style={{ padding:"14px 16px",borderBottom:"1px solid #F3F4F6",
               background:"linear-gradient(135deg,#F8FAFF,#EFF6FF)",
               display:"flex",alignItems:"center",gap:10 }}>

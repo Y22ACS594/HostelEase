@@ -1,8 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import TopbarProfile from "../../components/TopbarProfile";
 
+/* ── useIsMobile ─────────────────────────────────── */
+function useIsMobile() {
+  const [mobile, setMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const fn = () => setMobile(window.innerWidth < 768);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+  return mobile;
+}
 
 const CARDS = [
   { to:"/warden/add-student",    icon:"👩‍🎓", title:"Add Student",     desc:"Register new hostel student"       },
@@ -38,6 +48,7 @@ function DashCard({ icon, title, desc }) {
 
 const WardenDashboard = () => {
   const { user } = useAuth();
+  const isMobile = useIsMobile();
 
   const todayStr = new Date().toLocaleDateString("en-IN", {
     weekday:"long", day:"numeric", month:"long", year:"numeric",
@@ -47,22 +58,24 @@ const WardenDashboard = () => {
     <div style={{
       fontFamily:"'Sora',sans-serif",
       background:"linear-gradient(135deg,#F8FAFF 0%,#EFF6FF 100%)",
-      minHeight:"100vh", padding:24,
+      minHeight:"100vh", padding: isMobile ? 16 : 24,
     }}>
       {/* Header */}
       <div style={{
-        display:"flex", alignItems:"center", justifyContent:"space-between",
+        display:"flex", alignItems: isMobile ? "flex-start" : "center",
+        justifyContent:"space-between",
         marginBottom:32, flexWrap:"wrap", gap:12,
-        background:"#fff", borderRadius:20, padding:"16px 24px",
+        background:"#fff", borderRadius:20, padding: isMobile ? "14px 16px" : "16px 24px",
         border:"1px solid #E8EEFF",
         boxShadow:"0 2px 12px rgba(37,99,235,0.06)",
+        flexDirection: isMobile ? "column" : "row",
       }}>
         <div>
           <div style={{ fontSize:11,fontWeight:600,color:"#2563EB",
             letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4 }}>
             HostelEase · Warden Portal
           </div>
-          <h1 style={{ margin:0,fontSize:22,fontWeight:700,color:"#0F1629" }}>
+          <h1 style={{ margin:0,fontSize: isMobile ? 18 : 22,fontWeight:700,color:"#0F1629" }}>
             🏨 Warden Dashboard
           </h1>
           <p style={{ margin:"4px 0 0",fontSize:13,color:"#6B7A99" }}>
@@ -70,13 +83,16 @@ const WardenDashboard = () => {
           </p>
         </div>
 
-        {/* ✅ Bell + Avatar + Name + Logout tick — all in one */}
+        {/* ✅ Bell + Avatar + Name + Logout tick – all in one */}
         <TopbarProfile />
       </div>
 
-      {/* Dashboard grid */}
+      {/* Dashboard grid — 1 col on mobile, auto-fill on desktop */}
       <div style={{ display:"grid",
-        gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))", gap:16 }}>
+        gridTemplateColumns: isMobile
+          ? "repeat(2, 1fr)"
+          : "repeat(auto-fill,minmax(220px,1fr))",
+        gap: isMobile ? 12 : 16 }}>
         {CARDS.map(({ to, icon, title, desc }) => (
           <Link key={to} to={to} style={{ textDecoration:"none" }}>
             <DashCard icon={icon} title={title} desc={desc}/>

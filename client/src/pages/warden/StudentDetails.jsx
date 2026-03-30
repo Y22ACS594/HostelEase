@@ -11,6 +11,17 @@ if (!document.getElementById("sd-font")) {
   document.head.appendChild(l);
 }
 
+/* ── useIsMobile ─────────────────────────────────── */
+function useIsMobile() {
+  const [mobile, setMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const fn = () => setMobile(window.innerWidth < 768);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+  return mobile;
+}
+
 const P = {
   primary:"#2563EB", approved:"#059669", pending:"#D97706",
   rejected:"#DC2626", surface:"#F8FAFF", border:"#E8EEFF",
@@ -26,7 +37,7 @@ function InfoRow({ label, value }) {
   return (
     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start",
       padding:"8px 0", borderBottom:`1px solid ${P.border}` }}>
-      <span style={{ fontSize:12, color:P.muted, fontWeight:500, minWidth:120 }}>{label}</span>
+      <span style={{ fontSize:12, color:P.muted, fontWeight:500, minWidth:110 }}>{label}</span>
       <span style={{ fontSize:13, color:P.text, fontWeight:500, textAlign:"right",
         maxWidth:200, wordBreak:"break-word" }}>{value || "—"}</span>
     </div>
@@ -35,7 +46,7 @@ function InfoRow({ label, value }) {
 
 function InfoCard({ title, icon, children }) {
   return (
-    <div style={{ background:"#fff", borderRadius:20, padding:"20px 24px",
+    <div style={{ background:"#fff", borderRadius:20, padding:"20px 20px",
       border:`1px solid ${P.border}`, boxShadow:"0 1px 4px rgba(0,0,0,0.04)" }}>
       <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:14 }}>
         <span style={{ fontSize:16 }}>{icon}</span>
@@ -50,9 +61,9 @@ function ConfirmModal({ onConfirm, onCancel }) {
   return (
     <div style={{ position:"fixed",inset:0,background:"rgba(15,22,41,0.6)",
       backdropFilter:"blur(4px)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center",
-      fontFamily:"'Sora',sans-serif" }}>
-      <div style={{ background:"#fff",borderRadius:24,padding:"28px 32px",
-        width:360,boxShadow:"0 32px 80px rgba(0,0,0,0.2)" }}>
+      fontFamily:"'Sora',sans-serif",padding:16 }}>
+      <div style={{ background:"#fff",borderRadius:24,padding:"28px 28px",
+        width:"100%",maxWidth:360,boxShadow:"0 32px 80px rgba(0,0,0,0.2)" }}>
         <div style={{ fontSize:24, textAlign:"center", marginBottom:12 }}>🗑️</div>
         <div style={{ fontSize:16,fontWeight:700,color:P.text,textAlign:"center",marginBottom:8 }}>
           Delete Student?
@@ -78,9 +89,32 @@ function ConfirmModal({ onConfirm, onCancel }) {
   );
 }
 
+/* ── Mobile-friendly table wrapper ── */
+function ResponsiveTable({ headers, rows, isMobile }) {
+  if (!isMobile) {
+    return (
+      <table style={{ width:"100%",borderCollapse:"collapse" }}>
+        <thead>
+          <tr style={{ background:"#F8FAFF" }}>
+            {headers.map(h=>(
+              <th key={h} style={{ padding:"10px 20px",textAlign:"left",
+                fontSize:11,fontWeight:600,color:P.muted,textTransform:"uppercase",
+                letterSpacing:"0.06em",borderBottom:`1px solid ${P.border}` }}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>{rows}</tbody>
+      </table>
+    );
+  }
+  // On mobile just render rows — each row handles its own card layout
+  return <div>{rows}</div>;
+}
+
 const StudentDetails = () => {
   const { id }    = useParams();
   const navigate  = useNavigate();
+  const isMobile  = useIsMobile();
   const [data,    setData]    = useState(null);
   const [confirm, setConfirm] = useState(false);
   const [deleting,setDeleting]= useState(false);
@@ -130,7 +164,7 @@ const StudentDetails = () => {
 
   return (
     <div style={{ fontFamily:"'Sora',sans-serif", background:P.surface,
-      minHeight:"100vh", padding:24, color:P.text }}>
+      minHeight:"100vh", padding: isMobile ? 16 : 24, color:P.text }}>
 
       {confirm && (
         <ConfirmModal
@@ -144,88 +178,107 @@ const StudentDetails = () => {
         style={{ display:"flex",alignItems:"center",gap:6,padding:"8px 14px",
           background:"#fff",border:`1px solid ${P.border}`,borderRadius:10,
           cursor:"pointer",fontSize:13,color:P.muted,fontFamily:"'Sora',sans-serif",
-          marginBottom:24 }}>
+          marginBottom:20 }}>
         ← Back to Students
       </button>
 
       {/* Profile hero card */}
-      <div style={{ background:"#fff", borderRadius:24, padding:"28px 32px",
+      <div style={{ background:"#fff", borderRadius:24,
+        padding: isMobile ? "20px 16px" : "28px 32px",
         border:`1px solid ${P.border}`,
         boxShadow:"0 2px 12px rgba(37,99,235,0.06)",
         marginBottom:20,
-        display:"flex", alignItems:"center", gap:24, flexWrap:"wrap" }}>
+        display:"flex", alignItems: isMobile ? "flex-start" : "center",
+        gap: isMobile ? 16 : 24, flexWrap:"wrap",
+        flexDirection: isMobile ? "column" : "row" }}>
 
-        {/* Avatar */}
-        <div style={{ width:80, height:80, borderRadius:24,
-          background:`linear-gradient(135deg,${avatarBg(student.fullName)},${avatarBg(student.fullName)}99)`,
-          display:"flex", alignItems:"center", justifyContent:"center",
-          fontSize:28, fontWeight:800, color:"#fff",
-          boxShadow:`0 8px 24px ${avatarBg(student.fullName)}40`,
-          flexShrink:0 }}>
-          {initials(student.fullName)}
-        </div>
+        {/* Avatar + Info row on mobile */}
+        <div style={{ display:"flex",alignItems:"center",gap:16,width: isMobile ? "100%" : "auto" }}>
+          <div style={{ width: isMobile ? 64 : 80, height: isMobile ? 64 : 80, borderRadius:24,
+            background:`linear-gradient(135deg,${avatarBg(student.fullName)},${avatarBg(student.fullName)}99)`,
+            display:"flex", alignItems:"center", justifyContent:"center",
+            fontSize: isMobile ? 22 : 28, fontWeight:800, color:"#fff",
+            boxShadow:`0 8px 24px ${avatarBg(student.fullName)}40`,
+            flexShrink:0 }}>
+            {initials(student.fullName)}
+          </div>
 
-        {/* Info */}
-        <div style={{ flex:1, minWidth:200 }}>
-          <div style={{ display:"flex",alignItems:"center",gap:10,flexWrap:"wrap",marginBottom:4 }}>
-            <h1 style={{ margin:0, fontSize:22, fontWeight:700, color:P.text }}>
-              {student.fullName}
-            </h1>
-            <span style={{ background:"#D1FAE5", color:"#065F46",
-              fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:20 }}>
-              ● Active
-            </span>
-          </div>
-          <div style={{ display:"flex",gap:16,flexWrap:"wrap",fontSize:13,color:P.muted,marginTop:4 }}>
-            <span>📋 {student.rollNumber}</span>
-            <span>🏛️ {student.department}</span>
-            <span>📅 {student.batch}</span>
-            <span>📞 {student.phoneNumber}</span>
-          </div>
-          <div style={{ fontSize:12,color:P.muted,marginTop:6 }}>
-            {student.collegeName}
+          {/* Info */}
+          <div style={{ flex:1, minWidth:0 }}>
+            <div style={{ display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:4 }}>
+              <h1 style={{ margin:0, fontSize: isMobile ? 18 : 22, fontWeight:700, color:P.text }}>
+                {student.fullName}
+              </h1>
+              <span style={{ background:"#D1FAE5", color:"#065F46",
+                fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:20 }}>
+                ● Active
+              </span>
+            </div>
+            <div style={{ display:"flex",gap: isMobile ? 10 : 16,flexWrap:"wrap",fontSize: isMobile ? 12 : 13,color:P.muted,marginTop:4 }}>
+              <span>📋 {student.rollNumber}</span>
+              <span>🛏️ {student.department}</span>
+              {!isMobile && <span>📅 {student.batch}</span>}
+              {!isMobile && <span>📞 {student.phoneNumber}</span>}
+            </div>
+            {isMobile && (
+              <div style={{ display:"flex",gap:10,flexWrap:"wrap",fontSize:12,color:P.muted,marginTop:4 }}>
+                <span>📅 {student.batch}</span>
+                <span>📞 {student.phoneNumber}</span>
+              </div>
+            )}
+            <div style={{ fontSize:12,color:P.muted,marginTop:6 }}>
+              {student.collegeName}
+            </div>
           </div>
         </div>
 
         {/* Actions */}
-        <div style={{ display:"flex",gap:10,flexShrink:0 }}>
+        <div style={{ display:"flex",gap:10,flexShrink:0,
+          width: isMobile ? "100%" : "auto" }}>
           <button onClick={() => navigate(`/warden/students/edit/${student._id}`)}
             style={{ padding:"10px 18px",background:"#EFF6FF",color:P.primary,
               border:`1.5px solid ${P.border}`,borderRadius:12,
-              fontFamily:"'Sora',sans-serif",fontWeight:600,fontSize:13,cursor:"pointer" }}>
+              fontFamily:"'Sora',sans-serif",fontWeight:600,fontSize:13,cursor:"pointer",
+              flex: isMobile ? "1" : "none" }}>
             ✏️ Edit
           </button>
           <button onClick={() => setConfirm(true)}
             style={{ padding:"10px 18px",background:"#FEF2F2",color:P.rejected,
               border:`1.5px solid #FCA5A5`,borderRadius:12,
-              fontFamily:"'Sora',sans-serif",fontWeight:600,fontSize:13,cursor:"pointer" }}>
+              fontFamily:"'Sora',sans-serif",fontWeight:600,fontSize:13,cursor:"pointer",
+              flex: isMobile ? "1" : "none" }}>
             🗑️ Delete
           </button>
         </div>
       </div>
 
-      {/* Quick stat strip */}
-      <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:20 }}>
+      {/* Quick stat strip — 2×2 on mobile, 4×1 on desktop */}
+      <div style={{ display:"grid",
+        gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)",
+        gap: isMobile ? 10 : 12, marginBottom:20 }}>
         {[
           { icon:"📄", value:leaves.length,    label:"Total Leaves",    bg:"#EFF6FF" },
           { icon:"⏳", value:pendingLeaves,     label:"Pending",         bg:"#FFFBEB" },
           { icon:"✅", value:approvedLeaves,    label:"Approved",        bg:"#ECFDF5" },
           { icon:"💳", value:`₹${totalPaid}`,  label:"Total Paid",      bg:"#F5F3FF" },
         ].map(({ icon, value, label, bg }) => (
-          <div key={label} style={{ background:"#fff",borderRadius:16,padding:"16px 18px",
+          <div key={label} style={{ background:"#fff",borderRadius:16,
+            padding: isMobile ? "14px 12px" : "16px 18px",
             border:`1px solid ${P.border}`,textAlign:"center",
             boxShadow:"0 1px 4px rgba(0,0,0,0.04)" }}>
             <div style={{ width:32,height:32,borderRadius:10,background:bg,
               display:"flex",alignItems:"center",justifyContent:"center",
               fontSize:15,margin:"0 auto 8px" }}>{icon}</div>
-            <div style={{ fontSize:20,fontWeight:700,color:P.text }}>{value}</div>
+            <div style={{ fontSize: isMobile ? 18 : 20,fontWeight:700,color:P.text }}>{value}</div>
             <div style={{ fontSize:11,color:P.muted,marginTop:2 }}>{label}</div>
           </div>
         ))}
       </div>
 
-      {/* Info grid */}
-      <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16,marginBottom:20 }}>
+      {/* Info grid — 1 col on mobile, 3 cols on desktop */}
+      <div style={{ display:"grid",
+        gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)",
+        gap: isMobile ? 12 : 16, marginBottom:20 }}>
 
         <InfoCard title="Personal Info" icon="👤">
           <InfoRow label="Phone"       value={student.phoneNumber}/>
@@ -279,7 +332,7 @@ const StudentDetails = () => {
       {/* Payment History */}
       <div style={{ background:"#fff",borderRadius:20,border:`1px solid ${P.border}`,
         overflow:"hidden",marginBottom:20,boxShadow:"0 1px 4px rgba(0,0,0,0.04)" }}>
-        <div style={{ padding:"18px 24px",borderBottom:`1px solid ${P.border}`,
+        <div style={{ padding:"18px 20px",borderBottom:`1px solid ${P.border}`,
           display:"flex",alignItems:"center",gap:8 }}>
           <span style={{ fontSize:16 }}>💳</span>
           <span style={{ fontSize:14,fontWeight:700,color:P.text }}>Payment History</span>
@@ -291,6 +344,39 @@ const StudentDetails = () => {
           <div style={{ padding:"32px",textAlign:"center",color:P.muted }}>
             <div style={{ fontSize:28, marginBottom:8 }}>💳</div>
             <div style={{ fontSize:13 }}>No payments recorded</div>
+          </div>
+        ) : isMobile ? (
+          /* Mobile payment cards */
+          <div>
+            {payments.map((p,i) => {
+              const { bg, color } = statusStyle(p.paymentStatus);
+              return (
+                <div key={p._id} style={{ padding:"14px 16px",
+                  borderBottom:i<payments.length-1?`1px solid ${P.border}`:"none",
+                  background:i%2===0?"#fff":"#FAFBFF" }}>
+                  <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8 }}>
+                    <span style={{ fontSize:16,fontWeight:700,color:P.text,fontFamily:"'DM Mono',monospace" }}>₹{p.amount}</span>
+                    <span style={{ background:bg,color,fontSize:11,fontWeight:700,padding:"3px 10px",borderRadius:20 }}>
+                      {p.paymentStatus}
+                    </span>
+                  </div>
+                  <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8 }}>
+                    <div>
+                      <div style={{ fontSize:10,color:P.muted,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:2 }}>Academic Year</div>
+                      <div style={{ fontSize:12,color:P.muted }}>{p.academicYear||"—"}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize:10,color:P.muted,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:2 }}>Mode</div>
+                      <div style={{ fontSize:12,color:P.muted }}>{p.paymentMode||"—"}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize:10,color:P.muted,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:2 }}>Date</div>
+                      <div style={{ fontSize:12,color:P.muted,fontFamily:"'DM Mono',monospace" }}>{fmtDate(p.createdAt)}</div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         ) : (
           <table style={{ width:"100%",borderCollapse:"collapse" }}>
@@ -333,7 +419,7 @@ const StudentDetails = () => {
       {/* Leave History */}
       <div style={{ background:"#fff",borderRadius:20,border:`1px solid ${P.border}`,
         overflow:"hidden",boxShadow:"0 1px 4px rgba(0,0,0,0.04)" }}>
-        <div style={{ padding:"18px 24px",borderBottom:`1px solid ${P.border}`,
+        <div style={{ padding:"18px 20px",borderBottom:`1px solid ${P.border}`,
           display:"flex",alignItems:"center",gap:8 }}>
           <span style={{ fontSize:16 }}>📄</span>
           <span style={{ fontSize:14,fontWeight:700,color:P.text }}>Leave History</span>
@@ -345,6 +431,38 @@ const StudentDetails = () => {
           <div style={{ padding:"32px",textAlign:"center",color:P.muted }}>
             <div style={{ fontSize:28,marginBottom:8 }}>📄</div>
             <div style={{ fontSize:13 }}>No leave requests found</div>
+          </div>
+        ) : isMobile ? (
+          /* Mobile leave cards */
+          <div>
+            {leaves.map((l,i) => {
+              const { bg, color } = statusStyle(l.status);
+              const days = Math.max(1, Math.ceil((new Date(l.toDate)-new Date(l.fromDate))/86400000)+1);
+              return (
+                <div key={l._id} style={{ padding:"14px 16px",
+                  borderBottom:i<leaves.length-1?`1px solid ${P.border}`:"none",
+                  background:i%2===0?"#fff":"#FAFBFF" }}>
+                  <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8 }}>
+                    <span style={{ fontSize:13,fontWeight:700,color:P.text }}>{l.leaveType}</span>
+                    <div style={{ display:"flex",alignItems:"center",gap:8 }}>
+                      <span style={{ fontSize:13,fontWeight:700,color:P.text }}>{days}d</span>
+                      <span style={{ background:bg,color,fontSize:11,fontWeight:700,padding:"3px 10px",borderRadius:20 }}>
+                        {l.status}
+                      </span>
+                    </div>
+                  </div>
+                  <div style={{ fontSize:11,color:P.muted,marginBottom:6,
+                    overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>
+                    {l.reason}
+                  </div>
+                  <div style={{ display:"flex",gap:12,fontSize:11,color:P.muted,fontFamily:"'DM Mono',monospace" }}>
+                    <span>{fmtDate(l.fromDate)}</span>
+                    <span>→</span>
+                    <span>{fmtDate(l.toDate)}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         ) : (
           <table style={{ width:"100%",borderCollapse:"collapse" }}>

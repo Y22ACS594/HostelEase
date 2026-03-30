@@ -1,53 +1,280 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap');
 
+ 
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap');
+ 
+/* ── Safe area variables for Capacitor ─────────────────────────── */
 :root {
+  --safe-top:    env(safe-area-inset-top,    0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left,   0px);
+  --safe-right:  env(safe-area-inset-right,  0px);
   --green: #16a34a;
-  --green-dark: #15803d;
-  --green-deeper: #166534;
-  --green-light: #dcfce7;
-  --green-muted: #bbf7d0;
-  --amber: #f59e0b;
-  --amber-light: #fef3c7;
-  --dark: #0f172a;
-  --dark-2: #1e293b;
-  --slate: #64748b;
-  --slate-light: #94a3b8;
-  --bg: #f8fafc;
-  --bg-2: #f1f5f9;
-  --white: #ffffff;
-  --border: #e2e8f0;
-  --border-dark: #cbd5e1;
-  --red: #ef4444;
-  --blue: #3b82f6;
-  --font-display: 'Outfit', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
-  --shadow-lg: 0 10px 40px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06);
-  --shadow-green: 0 8px 24px rgba(22,163,74,0.25);
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
 }
-
-*, *::before, *::after {
-  box-sizing: border-box;
+ 
+html, body {
   margin: 0;
   padding: 0;
-}
-
-html { scroll-behavior: smooth; }
-
-body {
-  font-family: var(--font-body);
-  background: var(--white);
-  color: var(--dark);
+  -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
-
-button { cursor: pointer; font-family: inherit; }
-a { text-decoration: none; color: inherit; }
-input, textarea { font-family: inherit; }
+ 
+body { overflow-x: hidden; }
+ 
+/* ── Thin scrollbars on desktop, hidden on mobile ───────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+ 
+@media (max-width: 767px) {
+  ::-webkit-scrollbar { display: none; }
+  * { scrollbar-width: none; }
+}
+ 
+/* ================================================================
+   MOBILE OVERRIDES  (< 768px)
+   Each section targets a specific page/component by its patterns.
+   All overrides are additive — desktop styles are unchanged.
+   ================================================================ */
+@media (max-width: 767px) {
+ 
+  /* ── 1. GLOBAL: page padding reduction ────────────────────────── */
+  /* Any element with large inline padding (28-36px sides) */
+  /* We target by class added to page wrappers */
+ 
+  /* ── 2. WARDEN DASHBOARD ──────────────────────────────────────── */
+  /* Cards already use auto-fill minmax(220px,1fr) → works on mobile */
+  /* Header: reduce padding on small screens */
+  [style*="padding:\"16px 24px\""],
+  [style*='padding:"16px 24px"'],
+  [style*="padding: \"16px 24px\""] {
+    padding: 12px 14px !important;
+  }
+ 
+  /* ── 3. ALL PAGES: large inline padding → reduced ─────────────── */
+  /* Pages use padding:"32px 36px" or "28px 36px" — too wide on mobile */
+  /* We handle this with the he-page class approach                   */
+ 
+  /* ── 4. WARDEN / ADMIN: header flex wrap ─────────────────────── */
+  /* "display:flex, justifyContent:space-between" with long content wraps */
+  /* The flexWrap:wrap already handles this in most pages             */
+ 
+  /* ── 5. STATS GRIDS: 4-col → 2-col ───────────────────────────── */
+  /* Analytics dashboard stat cards */
+  .stat-grid-4 {
+    grid-template-columns: 1fr 1fr !important;
+  }
+ 
+  /* ── 6. ROOM ALLOCATION: side panel ──────────────────────────── */
+  /* Right panel on room allocation becomes full-width on mobile */
+  .room-alloc-panel {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    border-radius: 0 !important;
+    z-index: 500 !important;
+  }
+ 
+  /* ── 7. TABLES: horizontal scroll wrapper ─────────────────────── */
+  /* All tables need a scroll wrapper on mobile */
+  table {
+    min-width: 480px;
+  }
+  .table-scroll-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+  }
+ 
+  /* ── 8. MODALS / PANELS: full-width on mobile ─────────────────── */
+  /* Any fixed-position panel that was 400-500px wide */
+  [style*="width:400px"],
+  [style*="width: 400px"],
+  [style*="width:420px"],
+  [style*="width:440px"],
+  [style*="width:480px"],
+  [style*="width:500px"] {
+    width: calc(100vw - 24px) !important;
+    max-width: 100% !important;
+  }
+ 
+  /* ── 9. LEAVE APPROVALS: card grid ───────────────────────────── */
+  .leave-grid {
+    grid-template-columns: 1fr !important;
+  }
+ 
+  /* ── 10. FORM INPUTS: always full width ───────────────────────── */
+  input, select, textarea {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+ 
+  /* ── 11. BUTTONS: prevent overflow ───────────────────────────── */
+  button {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+ 
+  /* ── 12. APPLY LEAVE: two-panel layout → single column ─────────── */
+  /* ApplyLeave uses display:flex with a left sidebar + right calendar */
+  /* We stack them on mobile */
+  .apply-leave-layout {
+    flex-direction: column !important;
+  }
+  .apply-leave-sidebar {
+    width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid #E8EEFF !important;
+  }
+  .apply-leave-calendar {
+    flex: none !important;
+    width: 100% !important;
+  }
+ 
+  /* ── 13. ROOM STATUS: 2-col grid → 1-col ─────────────────────── */
+  /* RoomStatus uses gridTemplateColumns:"1fr 1fr" inline */
+  /* The RoomStatus component reads useIsMobile and adjusts */
+ 
+  /* ── 14. STUDENT DETAILS (warden): two-column → single ────────── */
+  .student-details-grid {
+    grid-template-columns: 1fr !important;
+  }
+ 
+  /* ── 15. ANALYTICS: chart containers ─────────────────────────── */
+  .chart-container {
+    width: 100% !important;
+    overflow-x: auto;
+  }
+ 
+  /* ── 16. NOTIFICATIONS: list padding ─────────────────────────── */
+  .notif-list-item {
+    padding: 12px 12px !important;
+  }
+ 
+  /* ── 17. AUDIT LOGS: table ────────────────────────────────────── */
+  .audit-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+ 
+  /* ── 18. WARDEN ISSUES: filter bar ───────────────────────────── */
+  .issue-filter-bar {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+ 
+  /* ── 19. MAX-WIDTH OVERRIDES for centered containers ─────────── */
+  [style*="maxWidth:1100px"],
+  [style*="maxWidth: 1100px"],
+  [style*="maxWidth:900px"],
+  [style*="maxWidth:800px"] {
+    max-width: 100% !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+ 
+  /* ── 20. WARDEN ADD STUDENT: multi-col form grid → 1 col ──────── */
+  .add-student-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+ 
+  /* ── 21. Page-level padding for pages with inline style padding ── */
+  /* This covers RoomStatus, LeaveStatus, Notifications, Payments    */
+  .he-page-wrap {
+    padding: 16px 14px !important;
+  }
+ 
+} /* end @media mobile */
+ 
+/* ================================================================
+   UTILITY CLASSES (used by updated components)
+   ================================================================ */
+ 
+/* Table auto-scroll wrapper */
+.he-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+ 
+/* Responsive 2-col grid */
+.he-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 767px) {
+  .he-grid-2 { grid-template-columns: 1fr; gap: 12px; }
+}
+ 
+/* Responsive 4-col → 2-col stats */
+.he-stats-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+@media (max-width: 767px) {
+  .he-stats-4 { grid-template-columns: 1fr 1fr; gap: 10px; }
+}
+ 
+/* Responsive 3-col → 1-col */
+.he-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 767px) {
+  .he-grid-3 { grid-template-columns: 1fr; gap: 12px; }
+}
+ 
+/* Page padding */
+.he-page {
+  padding: 28px 36px;
+}
+@media (max-width: 767px) {
+  .he-page { padding: 16px 14px; }
+}
+ 
+/* Cards */
+.he-card {
+  background: #fff;
+  border: 1px solid #E8EEFF;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+@media (max-width: 767px) {
+  .he-card { padding: 14px; border-radius: 12px; }
+}
+ 
+/* Full-width button on mobile */
+.he-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+@media (max-width: 767px) {
+  .he-btn { width: 100%; }
+}
+ 
+/* ── Animation ── */
+@keyframes he-fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+.he-fade-up { animation: he-fade-up 0.3s ease both; }
+ 
+/* ── Touch targets ── */
+@media (max-width: 767px) {
+  a, [role="button"] {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+  }
+  /* Exception: inline links in text */
+  p a, li a, span a {
+    min-height: unset;
+    display: inline;
+  }
+}

@@ -22,6 +22,17 @@ const GRADS = [
 const getGrad  = (n="") => GRADS[(n.charCodeAt(0)||0) % GRADS.length];
 const initials = (n="") => n.split(" ").filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase()||"?";
 
+/* ── useIsMobile ─────────────────────────────────── */
+function useIsMobile() {
+  const [mobile, setMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const fn = () => setMobile(window.innerWidth < 768);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+  return mobile;
+}
+
 function Field({ label, children, full }) {
   return (
     <div style={{ gridColumn:full?"1 / -1":"auto" }}>
@@ -72,15 +83,17 @@ function Textarea({ name, value, onChange, rows=3 }) {
   );
 }
 
-function Section({ title, icon, children }) {
+function Section({ title, icon, children, isMobile }) {
   return (
-    <div style={{ background:"#fff",borderRadius:20,padding:"24px 28px",
+    <div style={{ background:"#fff",borderRadius:20,
+      padding: isMobile ? "18px 16px" : "24px 28px",
       border:`1px solid ${P.border}`,boxShadow:"0 1px 4px rgba(0,0,0,0.04)",marginBottom:16 }}>
       <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:20 }}>
         <span style={{ fontSize:18 }}>{icon}</span>
         <span style={{ fontSize:14,fontWeight:700,color:P.text }}>{title}</span>
       </div>
-      <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16 }}>
+      <div style={{ display:"grid",
+        gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",gap:16 }}>
         {children}
       </div>
     </div>
@@ -91,6 +104,7 @@ const EditStudent = () => {
   const { id }     = useParams();
   const navigate   = useNavigate();
   const fileRef    = useRef(null);
+  const isMobile   = useIsMobile();
 
   const [form, setForm] = useState({
     avatar:"", fullName:"", rollNumber:"", course:"", department:"",
@@ -187,7 +201,7 @@ const EditStudent = () => {
 
   return (
     <div style={{ fontFamily:"'Sora',sans-serif",background:P.surface,
-      minHeight:"100vh",padding:24,color:P.text }}>
+      minHeight:"100vh",padding: isMobile ? 16 : 24,color:P.text }}>
 
       {/* Toast */}
       {toast==="saved" && (
@@ -208,14 +222,16 @@ const EditStudent = () => {
       )}
 
       {/* Header */}
-      <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",
-        marginBottom:28,flexWrap:"wrap",gap:12 }}>
+      <div style={{ display:"flex",alignItems: isMobile ? "flex-start" : "center",
+        justifyContent:"space-between",
+        marginBottom:28,flexWrap:"wrap",gap:12,
+        flexDirection: isMobile ? "column" : "row" }}>
         <div>
           <div style={{ fontSize:11,fontWeight:600,color:P.primary,
             letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4 }}>
             HostelEase · Warden Portal
           </div>
-          <h1 style={{ margin:0,fontSize:24,fontWeight:700,color:P.text }}>
+          <h1 style={{ margin:0,fontSize: isMobile ? 20 : 24,fontWeight:700,color:P.text }}>
             ✏️ Edit Student
           </h1>
           <p style={{ margin:"4px 0 0",fontSize:13,color:P.muted }}>
@@ -225,7 +241,8 @@ const EditStudent = () => {
         <button type="button" onClick={()=>navigate(`/warden/student/${id}`)}
           style={{ padding:"9px 16px",background:"#fff",border:`1px solid ${P.border}`,
             borderRadius:12,cursor:"pointer",fontSize:13,color:P.muted,
-            fontFamily:"'Sora',sans-serif" }}>
+            fontFamily:"'Sora',sans-serif",
+            alignSelf: isMobile ? "flex-start" : "auto" }}>
           ← Back to Profile
         </button>
       </div>
@@ -233,7 +250,8 @@ const EditStudent = () => {
       <form onSubmit={handleSubmit}>
 
         {/* ── Profile Photo ── */}
-        <div style={{ background:"#fff",borderRadius:20,padding:"24px 28px",
+        <div style={{ background:"#fff",borderRadius:20,
+          padding: isMobile ? "18px 16px" : "24px 28px",
           border:`1px solid ${P.border}`,boxShadow:"0 1px 4px rgba(0,0,0,0.04)",marginBottom:16 }}>
           <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:20 }}>
             <span style={{ fontSize:18 }}>📸</span>
@@ -245,7 +263,9 @@ const EditStudent = () => {
               </span>
             )}
           </div>
-          <div style={{ display:"flex",alignItems:"center",gap:20,flexWrap:"wrap" }}>
+          <div style={{ display:"flex",alignItems: isMobile ? "flex-start" : "center",
+            gap: isMobile ? 16 : 20,flexWrap:"wrap",
+            flexDirection: isMobile ? "column" : "row" }}>
             {/* Current photo */}
             <div style={{ width:90,height:90,borderRadius:20,overflow:"hidden",flexShrink:0,
               background:"#F8FAFF",display:"flex",alignItems:"center",justifyContent:"center",
@@ -297,7 +317,7 @@ const EditStudent = () => {
         </div>
 
         {/* ── Academic ── */}
-        <Section title="Academic Details" icon="🎓">
+        <Section title="Academic Details" icon="🎓" isMobile={isMobile}>
           <Field label="Full Name">
             <Input name="fullName" value={form.fullName} onChange={handleChange}/>
           </Field>
@@ -329,7 +349,7 @@ const EditStudent = () => {
         </Section>
 
         {/* ── Personal ── */}
-        <Section title="Personal Details" icon="👤">
+        <Section title="Personal Details" icon="👤" isMobile={isMobile}>
           <Field label="Gender">
             <Select name="gender" value={form.gender} onChange={handleChange}>
               <option value="">Select gender</option>
@@ -353,7 +373,7 @@ const EditStudent = () => {
         </Section>
 
         {/* ── Parent ── */}
-        <Section title="Parent Details" icon="👨‍👩‍👧">
+        <Section title="Parent Details" icon="👨‍👩‍👧" isMobile={isMobile}>
           <Field label="Father Name">
             <Input name="fatherName" value={form.fatherName} onChange={handleChange}/>
           </Field>
@@ -366,7 +386,8 @@ const EditStudent = () => {
         </Section>
 
         {/* ── Address ── */}
-        <div style={{ background:"#fff",borderRadius:20,padding:"24px 28px",
+        <div style={{ background:"#fff",borderRadius:20,
+          padding: isMobile ? "18px 16px" : "24px 28px",
           border:`1px solid ${P.border}`,boxShadow:"0 1px 4px rgba(0,0,0,0.04)",marginBottom:16 }}>
           <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:16 }}>
             <span style={{ fontSize:18 }}>📍</span>
@@ -376,11 +397,13 @@ const EditStudent = () => {
         </div>
 
         {/* ── Buttons ── */}
-        <div style={{ display:"flex",justifyContent:"flex-end",gap:12 }}>
+        <div style={{ display:"flex",justifyContent: isMobile ? "stretch" : "flex-end",
+          gap:12,flexDirection: isMobile ? "column" : "row" }}>
           <button type="button" onClick={()=>navigate(`/warden/student/${id}`)}
             style={{ padding:"12px 24px",border:`1.5px solid ${P.border}`,borderRadius:14,
               background:"#fff",cursor:"pointer",fontSize:14,fontWeight:600,
-              color:P.muted,fontFamily:"'Sora',sans-serif" }}>
+              color:P.muted,fontFamily:"'Sora',sans-serif",
+              width: isMobile ? "100%" : "auto" }}>
             Cancel
           </button>
           <button type="submit" disabled={saving}
@@ -389,7 +412,8 @@ const EditStudent = () => {
               border:"none",borderRadius:14,cursor:saving?"not-allowed":"pointer",
               fontSize:14,fontWeight:700,color:"#fff",fontFamily:"'Sora',sans-serif",
               boxShadow:saving?"none":"0 6px 20px rgba(37,99,235,0.4)",
-              display:"flex",alignItems:"center",gap:8 }}>
+              display:"flex",alignItems:"center",justifyContent:"center",gap:8,
+              width: isMobile ? "100%" : "auto" }}>
             {saving ? (
               <><span style={{ width:14,height:14,border:"2px solid rgba(255,255,255,0.4)",
                 borderTop:"2px solid #fff",borderRadius:"50%",display:"inline-block",

@@ -10,6 +10,10 @@
     "lint": "eslint src --ext .jsx,.js"
   },
   "dependencies": {
+    "@capacitor/android": "^8.3.0",
+    "@capacitor/cli": "^8.3.0",
+    "@capacitor/core": "^8.3.0",
+    "@capacitor/ios": "^8.3.0",
     "@react-oauth/google": "^0.13.4",
     "axios": "^1.7.2",
     "framer-motion": "^12.35.2",

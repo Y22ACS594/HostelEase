@@ -1,3 +1,197 @@
+/* src/index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ─── Sora font ─────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap');
+
+/* ─── Safe area (Capacitor / notch phones) ───────────────────────── */
+:root {
+  --safe-top:    env(safe-area-inset-top,    0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left,   0px);
+  --safe-right:  env(safe-area-inset-right,  0px);
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Sora', sans-serif;
+  -webkit-tap-highlight-color: transparent;    /* removes tap flash on Android */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Prevent horizontal scroll on mobile ────────────────────────── */
+body {
+  overflow-x: hidden;
+}
+
+/* ─── Scrollbars — thin on desktop, hidden on mobile ─────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+
+@media (max-width: 767px) {
+  ::-webkit-scrollbar { display: none; }
+  * { scrollbar-width: none; }
+}
+
+/* ─── Responsive helper classes ──────────────────────────────────── */
+
+/* Cards: full-width on mobile, auto on desktop */
+.he-card {
+  background: #fff;
+  border: 1px solid #E8EEFF;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+/* Grid: 1 col mobile → 2 col desktop */
+.he-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 768px) {
+  .he-grid-2 {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+}
+
+/* Grid: 1 col mobile → 3 col desktop */
+.he-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 768px) {
+  .he-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
+
+/* Stats row: 2 col mobile → 4 col desktop */
+.he-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (min-width: 768px) {
+  .he-stats {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+}
+
+/* Page padding: tighter on mobile */
+.he-page {
+  padding: 16px;
+}
+@media (min-width: 768px) {
+  .he-page {
+    padding: 32px 36px;
+  }
+}
+
+/* ─── Mobile: hide desktop sidebar ───────────────────────────────── */
+@media (max-width: 767px) {
+  /* Any element with class "desktop-sidebar" vanishes on mobile */
+  .desktop-sidebar {
+    display: none !important;
+  }
+
+  /* Any element with class "desktop-topbar" vanishes on mobile */
+  .desktop-topbar {
+    display: none !important;
+  }
+
+  /* Remove the left margin that pages use to offset the sidebar */
+  .sidebar-offset {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  /* Full-width override for any hard-coded max-width containers */
+  .he-container {
+    max-width: 100% !important;
+    padding: 0 12px !important;
+  }
+
+  /* Tables: allow horizontal scroll on mobile */
+  .he-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Make action buttons full-width on mobile */
+  .he-btn-full {
+    width: 100% !important;
+  }
+
+  /* Form inputs: always full-width */
+  .he-input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 2-col grids collapse to 1 col on mobile */
+  [style*="gridTemplateColumns: \"1fr 1fr\""],
+  [style*='gridTemplateColumns: "1fr 1fr"'] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Room details grid 2-col → 1col */
+  .room-details-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Padding overrides for existing pages */
+  [style*="padding: \"32px 36px\""],
+  [style*='padding: "32px 36px"'] {
+    padding: 16px !important;
+  }
+}
+
+/* ─── Desktop: ensure pages have proper left margin for sidebar ───── */
+@media (min-width: 768px) {
+  /* The main content area of each portal gets pushed right of sidebar */
+  /* This is handled by existing code — no override needed */
+}
+
+/* ─── Touch targets: min 44px on mobile ─────────────────────────── */
+@media (max-width: 767px) {
+  button, [role="button"], a, input[type="checkbox"], input[type="radio"] {
+    min-height: 44px;
+  }
+  /* Exception for bottom nav items — they have their own sizing */
+  nav button {
+    min-height: unset;
+  }
+}
+
+/* ─── Prevent font scaling on iOS (keeps layout predictable) ─────── */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* ─── Animation: slide up for mobile page transitions ────────────── */
+@keyframes he-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.he-page-enter {
+  animation: he-slide-up 0.28s ease both;
+}
+
+/* ─── Capacitor Android status bar gap ───────────────────────────── */
+@media (max-width: 767px) {
+  .mobile-topbar-safe {
+    padding-top: max(56px, calc(56px + var(--safe-top)));
+  }
+}

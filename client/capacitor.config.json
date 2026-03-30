@@ -1,0 +1,19 @@
+{
+  "appId": "com.hostelease.app",
+  "appName": "HostelEase",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "backgroundColor": "#ffffff"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#2563EB",
+      "showSpinner": false
+    }
+  }
+}

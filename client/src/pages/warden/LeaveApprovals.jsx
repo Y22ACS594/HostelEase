@@ -6,14 +6,25 @@ import {
   BarChart, Bar,
 } from "recharts";
 
-/* ── Google Font ─────────────────────────────────────────── */
+/* ── Google Font ─────────────────────────────────────────────────────── */
 const fontLink = document.createElement("link");
 fontLink.href =
   "https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap";
 fontLink.rel = "stylesheet";
 document.head.appendChild(fontLink);
 
-/* ── Palette ─────────────────────────────────────────────── */
+/* ── useIsMobile ─────────────────────────────────── */
+function useIsMobile() {
+  const [mobile, setMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const fn = () => setMobile(window.innerWidth < 768);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+  return mobile;
+}
+
+/* ── Palette ─────────────────────────────────────────────────────────── */
 const P = {
   primary:  "#2563EB",
   approved: "#059669",
@@ -26,7 +37,7 @@ const P = {
   pieColors:["#2563EB","#059669","#F59E0B","#EC4899","#8B5CF6","#0891B2"],
 };
 
-/* ── Priority config ─────────────────────────────────────── */
+/* ── Priority config ─────────────────────────────────────────────────── */
 const PRIORITY_ORDER = { Emergency: 0, Medical: 1 };
 const getPriority = (t) => PRIORITY_ORDER[t] ?? 99;
 
@@ -35,14 +46,14 @@ const PRIORITY_BADGE = {
   Medical:   { bg:"#FFFBEB", color:"#D97706", icon:"🏥", label:"HIGH"    },
 };
 
-/* ── Status helpers ──────────────────────────────────────── */
+/* ── Status helpers ──────────────────────────────────────────────────── */
 const statusStyle = (s) => ({
   Pending:  { bg:"#FEF3C7", color:"#92400E" },
   Approved: { bg:"#D1FAE5", color:"#065F46" },
   Rejected: { bg:"#FEE2E2", color:"#991B1B" },
 }[s] || { bg:"#F1F5F9", color:"#475569" });
 
-/* ── Helpers ─────────────────────────────────────────────── */
+/* ── Helpers ─────────────────────────────────────────────────────────── */
 const fmtDate = (d) => (d ? String(d).slice(0,10) : "—");
 const daysBetween = (from, to) => {
   const a = new Date(from), b = new Date(to);
@@ -53,7 +64,7 @@ const avatarColors = ["#2563EB","#7C3AED","#059669","#D97706","#DC2626","#0891B2
 const avatarBg = (n="") => avatarColors[(n.charCodeAt(0)||0) % avatarColors.length];
 const initials  = (n="") => n.split(" ").filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
 
-/* ── Stat Card ───────────────────────────────────────────── */
+/* ── Stat Card ─────────────────────────────────────────────────────── */
 function StatCard({ icon, value, label, color, bg }) {
   const [hov, setHov] = useState(false);
   return (
@@ -70,7 +81,7 @@ function StatCard({ icon, value, label, color, bg }) {
   );
 }
 
-/* ── Chart Tooltip ───────────────────────────────────────── */
+/* ── Chart Tooltip ──────────────────────────────────────────────────── */
 const ChartTooltip = ({ active, payload, label }) => {
   if (!active||!payload?.length) return null;
   return (
@@ -88,7 +99,7 @@ const ChartTooltip = ({ active, payload, label }) => {
   );
 };
 
-/* ── Mini Calendar ───────────────────────────────────────── */
+/* ── Mini Calendar ─────────────────────────────────────────────────── */
 function MiniCalendar({ leaves }) {
   const now = new Date();
   const [cur, setCur] = useState(new Date(now.getFullYear(), now.getMonth(), 1));
@@ -140,7 +151,7 @@ function MiniCalendar({ leaves }) {
         fontSize:11,color:P.muted,display:"flex",alignItems:"center",gap:8 }}>
         <span style={{ width:10,height:10,borderRadius:2,background:"#DBEAFE",display:"inline-block",
           border:`1px solid ${P.primary}` }}/>
-        Total – students on leave per day
+        Total — students on leave per day
       </div>
       <div style={{ marginTop:12,borderTop:`1px solid ${P.border}`,paddingTop:12 }}>
         <div style={{ fontSize:12,color:P.muted,marginBottom:2 }}>Total on leave</div>
@@ -153,7 +164,7 @@ function MiniCalendar({ leaves }) {
   );
 }
 
-/* ── Reject Modal ────────────────────────────────────────── */
+/* ── Reject Modal ──────────────────────────────────────────────────── */
 function RejectModal({ leave, onClose, onConfirm, loading }) {
   const [reason, setReason] = useState("");
   const [err, setErr]       = useState("");
@@ -162,8 +173,9 @@ function RejectModal({ leave, onClose, onConfirm, loading }) {
   return (
     <div onClick={e=>e.target===e.currentTarget&&onClose()}
       style={{ position:"fixed",inset:0,background:"rgba(15,22,41,0.55)",
-        backdropFilter:"blur(4px)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center" }}>
-      <div style={{ background:"#fff",borderRadius:24,width:420,overflow:"hidden",
+        backdropFilter:"blur(4px)",zIndex:100,display:"flex",alignItems:"center",
+        justifyContent:"center",padding:16 }}>
+      <div style={{ background:"#fff",borderRadius:24,width:"100%",maxWidth:420,overflow:"hidden",
         boxShadow:"0 32px 80px rgba(0,0,0,0.18)",fontFamily:"'Sora',sans-serif" }}>
         <div style={{ background:"linear-gradient(135deg,#DC2626,#B91C1C)",padding:"24px 28px" }}>
           <div style={{ fontSize:18,fontWeight:700,color:"#fff" }}>Reject Leave Request</div>
@@ -206,8 +218,8 @@ function RejectModal({ leave, onClose, onConfirm, loading }) {
   );
 }
 
-/* ── Pagination Component ────────────────────────────────── */
-function Pagination({ page, totalPages, total, limit, onPageChange, onLimitChange }) {
+/* ── Pagination Component ─────────────────────────────────────────── */
+function Pagination({ page, totalPages, total, limit, onPageChange, onLimitChange, isMobile }) {
   const start = Math.max(1, page-2);
   const end   = Math.min(totalPages, page+2);
   const pages = [];
@@ -224,7 +236,8 @@ function Pagination({ page, totalPages, total, limit, onPageChange, onLimitChang
   return (
     <div style={{ padding:"12px 20px",borderTop:`1px solid ${P.border}`,
       display:"flex",justifyContent:"space-between",alignItems:"center",
-      background:"#FAFBFF",flexWrap:"wrap",gap:10 }}>
+      background:"#FAFBFF",flexWrap:"wrap",gap:10,
+      flexDirection: isMobile ? "column" : "row" }}>
       <div style={{ display:"flex",alignItems:"center",gap:10 }}>
         <span style={{ fontSize:12,color:P.muted }}>
           Showing {total===0?0:Math.min((page-1)*limit+1,total)}–{Math.min(page*limit,total)} of {total}
@@ -255,10 +268,100 @@ function Pagination({ page, totalPages, total, limit, onPageChange, onLimitChang
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ── Mobile Leave Card ────────────────────────────────────────────── */
+function MobileLeaveCard({ leave, onApprove, onReject, loading }) {
+  const {bg:sBg,color:sColor} = statusStyle(leave.status);
+  const name  = leave.student?.fullName ?? "Unknown";
+  const dept  = leave.student?.department ?? "";
+  const batch = leave.student?.batch ?? leave.student?.year ?? "";
+  const days  = daysBetween(leave.fromDate, leave.toDate);
+  const pBadge= PRIORITY_BADGE[leave.leaveType];
+  const isEmergency = leave.leaveType==="Emergency" && leave.status==="Pending";
+
+  return (
+    <div style={{ padding:"14px 16px",borderBottom:`1px solid ${P.border}`,
+      background: isEmergency ? "#FFF8F8" : "#fff" }}>
+      <div style={{ display:"flex",alignItems:"flex-start",gap:10,marginBottom:8 }}>
+        <div style={{ width:38,height:38,borderRadius:12,background:avatarBg(name),
+          color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",
+          fontSize:12,fontWeight:700,flexShrink:0 }}>
+          {initials(name)}
+        </div>
+        <div style={{ flex:1,minWidth:0 }}>
+          <div style={{ display:"flex",alignItems:"center",gap:6,flexWrap:"wrap" }}>
+            <span style={{ fontSize:13,fontWeight:700,color:P.text }}>{name}</span>
+            {pBadge && leave.status==="Pending" && (
+              <span style={{ fontSize:10,fontWeight:700,background:pBadge.bg,
+                color:pBadge.color,padding:"2px 6px",borderRadius:12 }}>
+                {pBadge.icon} {pBadge.label}
+              </span>
+            )}
+          </div>
+          <div style={{ fontSize:11,color:P.muted }}>{dept}{batch?` — ${batch}`:""}</div>
+        </div>
+        <span style={{ background:sBg,color:sColor,fontSize:11,fontWeight:700,
+          padding:"4px 10px",borderRadius:20,flexShrink:0 }}>
+          {leave.status}
+        </span>
+      </div>
+
+      <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10 }}>
+        <div>
+          <div style={{ fontSize:10,color:P.muted,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:3 }}>Dates</div>
+          <div style={{ fontSize:11,color:P.text,fontFamily:"'DM Mono',monospace" }}>
+            {fmtDate(leave.fromDate)} – {fmtDate(leave.toDate)}
+          </div>
+        </div>
+        <div>
+          <div style={{ fontSize:10,color:P.muted,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:3 }}>Duration</div>
+          <div style={{ fontSize:13,fontWeight:700,color:P.text }}>{days!=="—"?`${days}d`:"—"}</div>
+        </div>
+        <div>
+          <div style={{ fontSize:10,color:P.muted,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:3 }}>Type</div>
+          <div style={{ fontSize:12,color:P.muted,display:"flex",alignItems:"center",gap:5 }}>
+            <span style={{ width:6,height:6,borderRadius:"50%",background:P.primary,display:"inline-block" }}/>
+            {leave.leaveType||"Other"}
+          </div>
+        </div>
+        <div>
+          <div style={{ fontSize:10,color:P.muted,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:3 }}>Reason</div>
+          <div style={{ fontSize:11,color:P.muted,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:130 }}>
+            {leave.reason?.slice(0,30)||"—"}
+          </div>
+        </div>
+      </div>
+
+      {leave.status==="Pending" && (
+        <div style={{ display:"flex",gap:8 }}>
+          <button onClick={()=>onApprove(leave._id)} disabled={loading}
+            style={{ flex:1,padding:"8px",background:P.approved,color:"#fff",border:"none",
+              borderRadius:10,fontSize:13,fontWeight:600,
+              cursor:loading?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif" }}>
+            ✓ Approve
+          </button>
+          <button onClick={()=>onReject(leave)} disabled={loading}
+            style={{ flex:1,padding:"8px",background:"#fff",color:P.rejected,
+              border:`1.5px solid ${P.rejected}`,borderRadius:10,fontSize:13,
+              fontWeight:600,cursor:loading?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif" }}>
+            ✗ Reject
+          </button>
+        </div>
+      )}
+      {leave.status!=="Pending" && (
+        <div style={{ fontSize:12,color:P.muted,fontStyle:"italic" }}>
+          {leave.status==="Rejected"?"Reason on file":"—"}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    MAIN COMPONENT
-══════════════════════════════════════════════════════════ */
+═══════════════════════════════════════════════════════════════════ */
 const LeaveApprovals = () => {
+  const isMobile = useIsMobile();
+
   const [leaves, setLeaves]         = useState([]);
   const [pagination, setPagination] = useState({ total:0, page:1, limit:20, totalPages:1 });
   const [analyticsData, setAnalyticsData] = useState(null);
@@ -274,7 +377,6 @@ const LeaveApprovals = () => {
   const [fetching, setFetching]         = useState(true);
   const [statsLoading, setStatsLoading] = useState(false);
 
-  /* ── Internal fetch with explicit params ── */
   const doFetch = useCallback(async (params={}) => {
     setFetching(true);
     try {
@@ -290,10 +392,8 @@ const LeaveApprovals = () => {
     } finally { setFetching(false); }
   }, []);
 
-  /* ── Initial load ── */
   useEffect(()=>{ doFetch({ page:1, limit:20 }); }, []);
 
-  /* ── Analytics fetch ── */
   const fetchAnalytics = async () => {
     setStatsLoading(true);
     try {
@@ -307,7 +407,6 @@ const LeaveApprovals = () => {
     if(activeTab==="analytics"&&!analyticsData) fetchAnalytics();
   },[activeTab]);
 
-  /* ── Apply filters & go page 1 ── */
   const applyFilters = useCallback((overrides={}) => {
     const params = {
       page:       overrides.page   ?? 1,
@@ -320,7 +419,6 @@ const LeaveApprovals = () => {
     doFetch(params);
   }, [doFetch, pagination.limit, typeFilter, deptFilter, statusFilter, search]);
 
-  /* ── Approve ── */
   const handleApprove = async (id) => {
     setLoading(true);
     try {
@@ -330,7 +428,6 @@ const LeaveApprovals = () => {
     finally { setLoading(false); }
   };
 
-  /* ── Reject ── */
   const handleRejectConfirm = async (id, reason) => {
     setLoading(true);
     try {
@@ -341,12 +438,10 @@ const LeaveApprovals = () => {
     finally { setLoading(false); }
   };
 
-  /* ── Summary stats (prefer API stats, fallback to pagination total) ── */
   const summary = analyticsData?.summary ?? {
     total:pagination.total, pending:0, approved:0, rejected:0,
   };
 
-  /* ── Priority-sorted current page ── */
   const sortedLeaves = useMemo(()=>{
     if(!sortPriority) return leaves;
     return [...leaves].sort((a,b)=>{
@@ -358,7 +453,6 @@ const LeaveApprovals = () => {
     });
   },[leaves,sortPriority]);
 
-  /* ── Chart datasets ── */
   const monthlyChartData = useMemo(()=>{
     if(!analyticsData?.monthly) return [];
     const map={};
@@ -391,7 +485,8 @@ const LeaveApprovals = () => {
   const emergencyPending = leaves.filter(l=>l.leaveType==="Emergency"&&l.status==="Pending");
 
   return (
-    <div style={{ fontFamily:"'Sora',sans-serif",background:P.surface,minHeight:"100vh",padding:24,color:P.text }}>
+    <div style={{ fontFamily:"'Sora',sans-serif",background:P.surface,minHeight:"100vh",
+      padding: isMobile ? 16 : 24,color:P.text }}>
 
       {rejectModal&&(
         <RejectModal leave={rejectModal} onClose={()=>setRejectModal(null)}
@@ -399,32 +494,39 @@ const LeaveApprovals = () => {
       )}
 
       {/* Header */}
-      <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:28,flexWrap:"wrap",gap:12 }}>
+      <div style={{ display:"flex",alignItems: isMobile ? "flex-start" : "center",
+        justifyContent:"space-between",marginBottom:28,flexWrap:"wrap",gap:12,
+        flexDirection: isMobile ? "column" : "row" }}>
         <div>
           <div style={{ fontSize:11,fontWeight:600,color:P.primary,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4 }}>
             HostelEase · Warden Portal
           </div>
-          <h1 style={{ margin:0,fontSize:24,fontWeight:700,color:P.text }}>Leave Management</h1>
+          <h1 style={{ margin:0,fontSize: isMobile ? 20 : 24,fontWeight:700,color:P.text }}>Leave Management</h1>
           <p style={{ margin:"4px 0 0",fontSize:13,color:P.muted }}>{todayStr}</p>
         </div>
         <button onClick={()=>applyFilters({ page:pagination.page })}
           style={{ display:"flex",alignItems:"center",gap:8,padding:"10px 18px",background:P.primary,
             color:"#fff",border:"none",borderRadius:12,fontFamily:"'Sora',sans-serif",fontWeight:600,
-            fontSize:13,cursor:"pointer",boxShadow:"0 4px 14px rgba(37,99,235,0.35)" }}>
+            fontSize:13,cursor:"pointer",boxShadow:"0 4px 14px rgba(37,99,235,0.35)",
+            alignSelf: isMobile ? "flex-start" : "auto" }}>
           ↻ Refresh
         </button>
       </div>
 
-      {/* Stat Cards */}
-      <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16,marginBottom:24 }}>
+      {/* Stat Cards — 2×2 on mobile, 4×1 on desktop */}
+      <div style={{ display:"grid",
+        gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)",
+        gap: isMobile ? 10 : 16,marginBottom:24 }}>
         <StatCard icon="📋" value={fetching?"…":summary.total}    label="Total Leaves"  color={P.primary}  bg="#EFF6FF"/>
         <StatCard icon="✅" value={fetching?"…":summary.approved}  label="Approved"      color={P.approved} bg="#ECFDF5"/>
         <StatCard icon="⏳" value={fetching?"…":summary.pending}   label="Pending"       color={P.pending}  bg="#FFFBEB"/>
         <StatCard icon="✖" value={fetching?"…":summary.rejected}  label="Rejected"      color={P.rejected} bg="#FEF2F2"/>
       </div>
 
-      {/* Main layout */}
-      <div style={{ display:"grid",gridTemplateColumns:"1fr 300px",gap:20,alignItems:"start" }}>
+      {/* Main layout — stack on mobile */}
+      <div style={{ display:"grid",
+        gridTemplateColumns: isMobile ? "1fr" : "1fr 300px",
+        gap:20,alignItems:"start" }}>
 
         {/* LEFT */}
         <div>
@@ -434,10 +536,10 @@ const LeaveApprovals = () => {
             boxShadow:"0 1px 4px rgba(0,0,0,0.04)" }}>
             {[["requests","📋 Leave Requests"],["analytics","📊 Analytics"]].map(([key,lbl])=>(
               <button key={key} onClick={()=>setActiveTab(key)}
-                style={{ padding:"8px 20px",borderRadius:10,border:"none",
+                style={{ padding: isMobile ? "8px 12px" : "8px 20px",borderRadius:10,border:"none",
                   background:activeTab===key?P.primary:"none",
                   color:activeTab===key?"#fff":P.muted,fontFamily:"'Sora',sans-serif",
-                  fontWeight:600,fontSize:13,cursor:"pointer",transition:"all .15s" }}>
+                  fontWeight:600,fontSize: isMobile ? 12 : 13,cursor:"pointer",transition:"all .15s" }}>
                 {lbl}
               </button>
             ))}
@@ -449,11 +551,13 @@ const LeaveApprovals = () => {
               overflow:"hidden",boxShadow:"0 1px 4px rgba(0,0,0,0.04)" }}>
 
               {/* Filter bar */}
-              <div style={{ padding:"14px 20px",borderBottom:`1px solid ${P.border}`,
+              <div style={{ padding:"14px 16px",borderBottom:`1px solid ${P.border}`,
                 background:"#FAFBFF",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center" }}>
 
                 <div style={{ display:"flex",alignItems:"center",gap:8,padding:"8px 14px",
-                  border:`1.5px solid ${P.border}`,borderRadius:10,background:"#fff",flex:1,minWidth:150,maxWidth:220 }}>
+                  border:`1.5px solid ${P.border}`,borderRadius:10,background:"#fff",
+                  width: isMobile ? "100%" : "auto",flex: isMobile ? "1 1 100%" : "1",
+                  minWidth:150,maxWidth: isMobile ? "none" : 220,boxSizing:"border-box" }}>
                   <span style={{ color:P.muted,fontSize:14 }}>🔍</span>
                   <input value={search} onChange={e=>setSearch(e.target.value)}
                     onKeyDown={e=>e.key==="Enter"&&applyFilters()}
@@ -462,53 +566,59 @@ const LeaveApprovals = () => {
                       fontFamily:"'Sora',sans-serif",background:"none",width:"100%" }}/>
                 </div>
 
-                {[[TYPES,typeFilter,setTypeFilter,"Type of leave"],
-                  [DEPTS,deptFilter,setDeptFilter,"Department"],
-                  [STATUSES,statusFilter,setStatusFilter,"All Status"]
-                ].map(([opts,val,setter,ph])=>(
-                  <div key={ph} style={{ position:"relative" }}>
-                    <select value={val} onChange={e=>setter(e.target.value)}
-                      style={{ appearance:"none",padding:"8px 32px 8px 12px",
-                        border:`1.5px solid ${P.border}`,borderRadius:10,fontSize:13,
-                        fontFamily:"'Sora',sans-serif",color:P.text,background:"#fff",
-                        cursor:"pointer",outline:"none" }}>
-                      {opts.map(o=><option key={o}>{o==="All"?ph:o}</option>)}
-                    </select>
-                    <span style={{ position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",
-                      color:P.muted,pointerEvents:"none",fontSize:10 }}>▼</span>
-                  </div>
-                ))}
+                <div style={{ display:"flex",gap:8,flexWrap:"wrap",width: isMobile ? "100%" : "auto" }}>
+                  {[[TYPES,typeFilter,setTypeFilter,"Type of leave"],
+                    [DEPTS,deptFilter,setDeptFilter,"Department"],
+                    [STATUSES,statusFilter,setStatusFilter,"All Status"]
+                  ].map(([opts,val,setter,ph])=>(
+                    <div key={ph} style={{ position:"relative",flex: isMobile ? "1" : "none",minWidth: isMobile ? 0 : "auto" }}>
+                      <select value={val} onChange={e=>setter(e.target.value)}
+                        style={{ appearance:"none",padding:"8px 32px 8px 12px",
+                          border:`1.5px solid ${P.border}`,borderRadius:10,fontSize:12,
+                          fontFamily:"'Sora',sans-serif",color:P.text,background:"#fff",
+                          cursor:"pointer",outline:"none",width:"100%" }}>
+                        {opts.map(o=><option key={o}>{o==="All"?ph:o}</option>)}
+                      </select>
+                      <span style={{ position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",
+                        color:P.muted,pointerEvents:"none",fontSize:10 }}>▼</span>
+                    </div>
+                  ))}
+                </div>
 
-                <button onClick={()=>applyFilters()}
-                  style={{ padding:"8px 16px",background:P.primary,color:"#fff",border:"none",
-                    borderRadius:10,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif" }}>
-                  Apply
-                </button>
-
-                <button onClick={()=>setSortPriority(!sortPriority)}
-                  style={{ display:"flex",alignItems:"center",gap:6,padding:"8px 12px",
-                    border:`1.5px solid ${sortPriority?P.rejected:P.border}`,borderRadius:10,
-                    background:sortPriority?"#FEF2F2":"none",
-                    color:sortPriority?P.rejected:P.muted,
-                    fontFamily:"'Sora',sans-serif",fontSize:12,fontWeight:600,cursor:"pointer" }}>
-                  🚨 Priority {sortPriority?"ON":"OFF"}
-                </button>
-
-                {(search||typeFilter!=="All"||deptFilter!=="All"||statusFilter!=="All")&&(
-                  <button onClick={()=>{
-                    setSearch("");setTypeFilter("All");setDeptFilter("All");setStatusFilter("All");
-                    doFetch({page:1,limit:pagination.limit});
-                  }} style={{ padding:"8px 12px",border:`1.5px solid ${P.border}`,borderRadius:10,
-                    background:"none",color:P.muted,fontFamily:"'Sora',sans-serif",fontSize:12,cursor:"pointer" }}>
-                    ✕ Clear
+                <div style={{ display:"flex",gap:8,flexWrap:"wrap",width: isMobile ? "100%" : "auto" }}>
+                  <button onClick={()=>applyFilters()}
+                    style={{ padding:"8px 16px",background:P.primary,color:"#fff",border:"none",
+                      borderRadius:10,fontSize:13,fontWeight:600,cursor:"pointer",
+                      fontFamily:"'Sora',sans-serif",flex: isMobile ? "1" : "none" }}>
+                    Apply
                   </button>
-                )}
+
+                  <button onClick={()=>setSortPriority(!sortPriority)}
+                    style={{ display:"flex",alignItems:"center",gap:6,padding:"8px 12px",
+                      border:`1.5px solid ${sortPriority?P.rejected:P.border}`,borderRadius:10,
+                      background:sortPriority?"#FEF2F2":"none",
+                      color:sortPriority?P.rejected:P.muted,
+                      fontFamily:"'Sora',sans-serif",fontSize:12,fontWeight:600,cursor:"pointer",
+                      flex: isMobile ? "1" : "none" }}>
+                    🚨 Priority {sortPriority?"ON":"OFF"}
+                  </button>
+
+                  {(search||typeFilter!=="All"||deptFilter!=="All"||statusFilter!=="All")&&(
+                    <button onClick={()=>{
+                      setSearch("");setTypeFilter("All");setDeptFilter("All");setStatusFilter("All");
+                      doFetch({page:1,limit:pagination.limit});
+                    }} style={{ padding:"8px 12px",border:`1.5px solid ${P.border}`,borderRadius:10,
+                      background:"none",color:P.muted,fontFamily:"'Sora',sans-serif",fontSize:12,cursor:"pointer" }}>
+                      ✕ Clear
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Priority legend strip */}
               {sortPriority&&(
-                <div style={{ padding:"7px 20px",background:"#FFFBEB",borderBottom:`1px solid ${P.border}`,
-                  display:"flex",gap:12,alignItems:"center" }}>
+                <div style={{ padding:"7px 16px",background:"#FFFBEB",borderBottom:`1px solid ${P.border}`,
+                  display:"flex",gap:8,alignItems:"center",flexWrap:"wrap" }}>
                   <span style={{ fontSize:11,fontWeight:600,color:P.muted }}>PRIORITY:</span>
                   {[{icon:"🚨",label:"Emergency",color:P.rejected,bg:"#FEF2F2"},
                     {icon:"🏥",label:"Medical",  color:P.pending, bg:"#FFFBEB"},
@@ -522,121 +632,151 @@ const LeaveApprovals = () => {
                 </div>
               )}
 
-              {/* Table header */}
-              <div style={{ display:"grid",gridTemplateColumns:"2fr 1.3fr 0.7fr 1.1fr 1fr 150px",
-                padding:"10px 20px",borderBottom:`1px solid ${P.border}`,background:"#F8FAFF" }}>
-                {["Student Name ","Leave Request Dates","Days","Type","Status","Action"].map(h=>(
-                  <div key={h} style={{ fontSize:11,fontWeight:600,color:P.muted,
-                    textTransform:"uppercase",letterSpacing:"0.06em" }}>{h}</div>
-                ))}
-              </div>
-
-              {/* Rows */}
-              <div>
-                {fetching?(
-                  <div style={{ padding:"48px 20px",textAlign:"center",color:P.muted }}>
-                    <div style={{ fontSize:28,marginBottom:8 }}>⏳</div>
-                    <div style={{ fontWeight:600 }}>Loading leave requests…</div>
+              {/* ── Desktop table / Mobile cards ── */}
+              {!isMobile && (
+                <>
+                  {/* Table header */}
+                  <div style={{ display:"grid",gridTemplateColumns:"2fr 1.3fr 0.7fr 1.1fr 1fr 150px",
+                    padding:"10px 20px",borderBottom:`1px solid ${P.border}`,background:"#F8FAFF" }}>
+                    {["Student Name ","Leave Request Dates","Days","Type","Status","Action"].map(h=>(
+                      <div key={h} style={{ fontSize:11,fontWeight:600,color:P.muted,
+                        textTransform:"uppercase",letterSpacing:"0.06em" }}>{h}</div>
+                    ))}
                   </div>
-                ):sortedLeaves.length===0?(
-                  <div style={{ padding:"48px 20px",textAlign:"center",color:P.muted }}>
-                    <div style={{ fontSize:36,marginBottom:8 }}>🗂️</div>
-                    <div style={{ fontWeight:600 }}>No leave requests found</div>
-                  </div>
-                ):sortedLeaves.map((leave,idx)=>{
-                  const {bg:sBg,color:sColor}=statusStyle(leave.status);
-                  const name =leave.student?.fullName??"Unknown";
-                  const dept =leave.student?.department??"";
-                  const batch=leave.student?.batch??leave.student?.year??"";
-                  const days =daysBetween(leave.fromDate,leave.toDate);
-                  const pBadge=PRIORITY_BADGE[leave.leaveType];
-                  const isEmergency=leave.leaveType==="Emergency"&&leave.status==="Pending";
 
-                  return (
-                    <div key={leave._id}
-                      style={{ display:"grid",gridTemplateColumns:"2fr 1.3fr 0.7fr 1.1fr 1fr 150px",
-                        padding:"14px 20px",
-                        borderBottom:idx<sortedLeaves.length-1?`1px solid ${P.border}`:"none",
-                        alignItems:"center",transition:"background .15s",
-                        background:isEmergency?"#FFF8F8":"transparent" }}
-                      onMouseEnter={e=>e.currentTarget.style.background=isEmergency?"#FEF0F0":"#F0F5FF"}
-                      onMouseLeave={e=>e.currentTarget.style.background=isEmergency?"#FFF8F8":"transparent"}>
+                  {/* Desktop rows */}
+                  <div>
+                    {fetching?(
+                      <div style={{ padding:"48px 20px",textAlign:"center",color:P.muted }}>
+                        <div style={{ fontSize:28,marginBottom:8 }}>⏳</div>
+                        <div style={{ fontWeight:600 }}>Loading leave requests…</div>
+                      </div>
+                    ):sortedLeaves.length===0?(
+                      <div style={{ padding:"48px 20px",textAlign:"center",color:P.muted }}>
+                        <div style={{ fontSize:36,marginBottom:8 }}>🗂️</div>
+                        <div style={{ fontWeight:600 }}>No leave requests found</div>
+                      </div>
+                    ):sortedLeaves.map((leave,idx)=>{
+                      const {bg:sBg,color:sColor}=statusStyle(leave.status);
+                      const name =leave.student?.fullName??"Unknown";
+                      const dept =leave.student?.department??"";
+                      const batch=leave.student?.batch??leave.student?.year??"";
+                      const days =daysBetween(leave.fromDate,leave.toDate);
+                      const pBadge=PRIORITY_BADGE[leave.leaveType];
+                      const isEmergency=leave.leaveType==="Emergency"&&leave.status==="Pending";
 
-                      <div style={{ display:"flex",alignItems:"center",gap:10 }}>
-                        <div style={{ width:36,height:36,borderRadius:12,background:avatarBg(name),
-                          color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",
-                          fontSize:12,fontWeight:700,flexShrink:0 }}>
-                          {initials(name)}
-                        </div>
-                        <div>
-                          <div style={{ fontSize:13,fontWeight:600,color:P.text,
-                            display:"flex",alignItems:"center",gap:6,flexWrap:"wrap" }}>
-                            {name}
-                            {pBadge&&leave.status==="Pending"&&(
-                              <span style={{ fontSize:10,fontWeight:700,background:pBadge.bg,
-                                color:pBadge.color,padding:"2px 6px",borderRadius:12 }}>
-                                {pBadge.icon} {pBadge.label}
+                      return (
+                        <div key={leave._id}
+                          style={{ display:"grid",gridTemplateColumns:"2fr 1.3fr 0.7fr 1.1fr 1fr 150px",
+                            padding:"14px 20px",
+                            borderBottom:idx<sortedLeaves.length-1?`1px solid ${P.border}`:"none",
+                            alignItems:"center",transition:"background .15s",
+                            background:isEmergency?"#FFF8F8":"transparent" }}
+                          onMouseEnter={e=>e.currentTarget.style.background=isEmergency?"#FEF0F0":"#F0F5FF"}
+                          onMouseLeave={e=>e.currentTarget.style.background=isEmergency?"#FFF8F8":"transparent"}>
+
+                          <div style={{ display:"flex",alignItems:"center",gap:10 }}>
+                            <div style={{ width:36,height:36,borderRadius:12,background:avatarBg(name),
+                              color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",
+                              fontSize:12,fontWeight:700,flexShrink:0 }}>
+                              {initials(name)}
+                            </div>
+                            <div>
+                              <div style={{ fontSize:13,fontWeight:600,color:P.text,
+                                display:"flex",alignItems:"center",gap:6,flexWrap:"wrap" }}>
+                                {name}
+                                {pBadge&&leave.status==="Pending"&&(
+                                  <span style={{ fontSize:10,fontWeight:700,background:pBadge.bg,
+                                    color:pBadge.color,padding:"2px 6px",borderRadius:12 }}>
+                                    {pBadge.icon} {pBadge.label}
+                                  </span>
+                                )}
+                              </div>
+                              <div style={{ fontSize:11,color:P.muted }}>
+                                {dept}{batch?` — ${batch}`:""}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div>
+                            <div style={{ fontSize:12,fontFamily:"'DM Mono',monospace",color:P.text }}>
+                              {fmtDate(leave.fromDate)} — {fmtDate(leave.toDate)}
+                            </div>
+                            <div style={{ fontSize:11,color:P.muted,overflow:"hidden",
+                              textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:150 }}>
+                              {leave.reason?.slice(0,30)||"—"}
+                            </div>
+                          </div>
+
+                          <div style={{ fontSize:13,fontWeight:600,color:P.text }}>
+                            {days!=="—"?`${days}d`:"—"}
+                          </div>
+
+                          <div style={{ fontSize:12,color:P.muted,display:"flex",alignItems:"center",gap:5 }}>
+                            <span style={{ width:6,height:6,borderRadius:"50%",background:P.primary,display:"inline-block" }}/>
+                            {leave.leaveType||"Other"}
+                          </div>
+
+                          <div>
+                            <span style={{ background:sBg,color:sColor,fontSize:11,fontWeight:700,
+                              padding:"4px 10px",borderRadius:20 }}>
+                              {leave.status}
+                            </span>
+                          </div>
+
+                          <div style={{ display:"flex",gap:6 }}>
+                            {leave.status==="Pending"?(
+                              <>
+                                <button onClick={()=>handleApprove(leave._id)} disabled={loading}
+                                  style={{ padding:"6px 12px",background:P.approved,color:"#fff",border:"none",
+                                    borderRadius:8,fontSize:12,fontWeight:600,
+                                    cursor:loading?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif" }}>
+                                  Approve
+                                </button>
+                                <button onClick={()=>setRejectModal(leave)} disabled={loading}
+                                  style={{ padding:"6px 12px",background:"#fff",color:P.rejected,
+                                    border:`1.5px solid ${P.rejected}`,borderRadius:8,fontSize:12,
+                                    fontWeight:600,cursor:loading?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif" }}>
+                                  Reject
+                                </button>
+                              </>
+                            ):(
+                              <span style={{ fontSize:12,color:P.muted,fontStyle:"italic" }}>
+                                {leave.status==="Rejected"?"Reason on file":"—"}
                               </span>
                             )}
                           </div>
-                          <div style={{ fontSize:11,color:P.muted }}>
-                            {dept}{batch?` – ${batch}`:""}
-                          </div>
                         </div>
-                      </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
 
-                      <div>
-                        <div style={{ fontSize:12,fontFamily:"'DM Mono',monospace",color:P.text }}>
-                          {fmtDate(leave.fromDate)} – {fmtDate(leave.toDate)}
-                        </div>
-                        <div style={{ fontSize:11,color:P.muted,overflow:"hidden",
-                          textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:150 }}>
-                          {leave.reason?.slice(0,30)||"—"}
-                        </div>
-                      </div>
-
-                      <div style={{ fontSize:13,fontWeight:600,color:P.text }}>
-                        {days!=="—"?`${days}d`:"—"}
-                      </div>
-
-                      <div style={{ fontSize:12,color:P.muted,display:"flex",alignItems:"center",gap:5 }}>
-                        <span style={{ width:6,height:6,borderRadius:"50%",background:P.primary,display:"inline-block" }}/>
-                        {leave.leaveType||"Other"}
-                      </div>
-
-                      <div>
-                        <span style={{ background:sBg,color:sColor,fontSize:11,fontWeight:700,
-                          padding:"4px 10px",borderRadius:20 }}>
-                          {leave.status}
-                        </span>
-                      </div>
-
-                      <div style={{ display:"flex",gap:6 }}>
-                        {leave.status==="Pending"?(
-                          <>
-                            <button onClick={()=>handleApprove(leave._id)} disabled={loading}
-                              style={{ padding:"6px 12px",background:P.approved,color:"#fff",border:"none",
-                                borderRadius:8,fontSize:12,fontWeight:600,
-                                cursor:loading?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif" }}>
-                              Approve
-                            </button>
-                            <button onClick={()=>setRejectModal(leave)} disabled={loading}
-                              style={{ padding:"6px 12px",background:"#fff",color:P.rejected,
-                                border:`1.5px solid ${P.rejected}`,borderRadius:8,fontSize:12,
-                                fontWeight:600,cursor:loading?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif" }}>
-                              Reject
-                            </button>
-                          </>
-                        ):(
-                          <span style={{ fontSize:12,color:P.muted,fontStyle:"italic" }}>
-                            {leave.status==="Rejected"?"Reason on file":"—"}
-                          </span>
-                        )}
-                      </div>
+              {/* Mobile card list */}
+              {isMobile && (
+                <div>
+                  {fetching?(
+                    <div style={{ padding:"48px 20px",textAlign:"center",color:P.muted }}>
+                      <div style={{ fontSize:28,marginBottom:8 }}>⏳</div>
+                      <div style={{ fontWeight:600 }}>Loading leave requests…</div>
                     </div>
-                  );
-                })}
-              </div>
+                  ):sortedLeaves.length===0?(
+                    <div style={{ padding:"48px 20px",textAlign:"center",color:P.muted }}>
+                      <div style={{ fontSize:36,marginBottom:8 }}>🗂️</div>
+                      <div style={{ fontWeight:600 }}>No leave requests found</div>
+                    </div>
+                  ):sortedLeaves.map(leave=>(
+                    <MobileLeaveCard
+                      key={leave._id}
+                      leave={leave}
+                      onApprove={handleApprove}
+                      onReject={setRejectModal}
+                      loading={loading}
+                    />
+                  ))}
+                </div>
+              )}
 
               {/* Pagination */}
               <Pagination
@@ -644,6 +784,7 @@ const LeaveApprovals = () => {
                 totalPages={pagination.totalPages}
                 total={pagination.total}
                 limit={pagination.limit}
+                isMobile={isMobile}
                 onPageChange={(p)=>applyFilters({page:p})}
                 onLimitChange={(l)=>{
                   setPagination(prev=>({...prev,limit:l,page:1}));
@@ -670,9 +811,9 @@ const LeaveApprovals = () => {
               ):(
                 <>
                   {/* Monthly Trend */}
-                  <div style={{ background:"#fff",borderRadius:20,padding:"20px 24px",
+                  <div style={{ background:"#fff",borderRadius:20,padding:"20px 20px",
                     border:`1px solid ${P.border}`,boxShadow:"0 1px 4px rgba(0,0,0,0.04)" }}>
-                    <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16 }}>
+                    <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16,flexWrap:"wrap",gap:8 }}>
                       <div>
                         <div style={{ fontWeight:700,fontSize:15,color:P.text }}>Monthly Leave Trend</div>
                         <div style={{ fontSize:12,color:P.muted,marginTop:2 }}>
@@ -685,11 +826,11 @@ const LeaveApprovals = () => {
                       </span>
                     </div>
                     {monthlyChartData.length===0?(
-                      <div style={{ height:220,display:"flex",alignItems:"center",justifyContent:"center",color:P.muted,fontSize:13 }}>
+                      <div style={{ height:180,display:"flex",alignItems:"center",justifyContent:"center",color:P.muted,fontSize:13 }}>
                         No monthly data yet
                       </div>
                     ):(
-                      <ResponsiveContainer width="100%" height={220}>
+                      <ResponsiveContainer width="100%" height={isMobile?180:220}>
                         <AreaChart data={monthlyChartData} margin={{top:0,right:0,left:-20,bottom:0}}>
                           <defs>
                             {[["approved","#059669"],["pending","#D97706"],["rejected","#DC2626"]].map(([k,c])=>(
@@ -700,8 +841,8 @@ const LeaveApprovals = () => {
                             ))}
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#F0F4FF"/>
-                          <XAxis dataKey="month" tick={{fontSize:11,fill:P.muted,fontFamily:"Sora"}} axisLine={false} tickLine={false}/>
-                          <YAxis tick={{fontSize:11,fill:P.muted,fontFamily:"Sora"}} axisLine={false} tickLine={false}/>
+                          <XAxis dataKey="month" tick={{fontSize:10,fill:P.muted,fontFamily:"Sora"}} axisLine={false} tickLine={false}/>
+                          <YAxis tick={{fontSize:10,fill:P.muted,fontFamily:"Sora"}} axisLine={false} tickLine={false}/>
                           <Tooltip content={<ChartTooltip/>}/>
                           <Legend iconType="circle" iconSize={8} formatter={v=><span style={{fontSize:11,color:P.muted,fontFamily:"Sora"}}>{v}</span>}/>
                           <Area type="monotone" dataKey="Approved" stroke="#059669" fill="url(#g_approved)" strokeWidth={2.5} dot={{r:4,fill:"#059669",strokeWidth:0}} activeDot={{r:6}}/>
@@ -713,7 +854,7 @@ const LeaveApprovals = () => {
                   </div>
 
                   {/* Dept bar chart */}
-                  <div style={{ background:"#fff",borderRadius:20,padding:"20px 24px",
+                  <div style={{ background:"#fff",borderRadius:20,padding:"20px 20px",
                     border:`1px solid ${P.border}`,boxShadow:"0 1px 4px rgba(0,0,0,0.04)" }}>
                     <div style={{ fontWeight:700,fontSize:15,color:P.text,marginBottom:4 }}>
                       Department-wise Breakdown
@@ -722,15 +863,15 @@ const LeaveApprovals = () => {
                       Leave counts per department — approved vs pending vs rejected
                     </div>
                     {deptChartData.length===0?(
-                      <div style={{ height:180,display:"flex",alignItems:"center",justifyContent:"center",color:P.muted,fontSize:13 }}>
+                      <div style={{ height:160,display:"flex",alignItems:"center",justifyContent:"center",color:P.muted,fontSize:13 }}>
                         No department data available
                       </div>
                     ):(
-                      <ResponsiveContainer width="100%" height={200}>
+                      <ResponsiveContainer width="100%" height={isMobile?160:200}>
                         <BarChart data={deptChartData} margin={{top:0,right:0,left:-20,bottom:0}}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#F0F4FF"/>
-                          <XAxis dataKey="dept" tick={{fontSize:11,fill:P.muted,fontFamily:"Sora"}} axisLine={false} tickLine={false}/>
-                          <YAxis tick={{fontSize:11,fill:P.muted,fontFamily:"Sora"}} axisLine={false} tickLine={false}/>
+                          <XAxis dataKey="dept" tick={{fontSize:10,fill:P.muted,fontFamily:"Sora"}} axisLine={false} tickLine={false}/>
+                          <YAxis tick={{fontSize:10,fill:P.muted,fontFamily:"Sora"}} axisLine={false} tickLine={false}/>
                           <Tooltip content={<ChartTooltip/>}/>
                           <Legend iconType="circle" iconSize={8} formatter={v=><span style={{fontSize:11,color:P.muted,fontFamily:"Sora"}}>{v}</span>}/>
                           <Bar dataKey="Total"    fill="#BFDBFE" radius={[4,4,0,0]}/>
@@ -742,19 +883,20 @@ const LeaveApprovals = () => {
                     )}
                   </div>
 
-                  {/* Pie + Snapshot */}
-                  <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16 }}>
-                    <div style={{ background:"#fff",borderRadius:20,padding:"20px 24px",
+                  {/* Pie + Snapshot — stack on mobile */}
+                  <div style={{ display:"grid",
+                    gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",gap:16 }}>
+                    <div style={{ background:"#fff",borderRadius:20,padding:"20px 20px",
                       border:`1px solid ${P.border}`,boxShadow:"0 1px 4px rgba(0,0,0,0.04)" }}>
                       <div style={{ fontWeight:700,fontSize:15,color:P.text,marginBottom:4 }}>Leave Type Mix</div>
                       <div style={{ fontSize:12,color:P.muted,marginBottom:12 }}>Distribution by category</div>
                       {typeChartData.length===0?(
-                        <div style={{ height:200,display:"flex",alignItems:"center",justifyContent:"center",color:P.muted,fontSize:13 }}>No data yet</div>
+                        <div style={{ height:160,display:"flex",alignItems:"center",justifyContent:"center",color:P.muted,fontSize:13 }}>No data yet</div>
                       ):(
-                        <ResponsiveContainer width="100%" height={200}>
+                        <ResponsiveContainer width="100%" height={180}>
                           <PieChart>
                             <Pie data={typeChartData} cx="50%" cy="50%"
-                              innerRadius={52} outerRadius={80} paddingAngle={3} dataKey="value">
+                              innerRadius={48} outerRadius={72} paddingAngle={3} dataKey="value">
                               {typeChartData.map((_,i)=><Cell key={i} fill={P.pieColors[i%P.pieColors.length]}/>)}
                             </Pie>
                             <Legend iconType="circle" iconSize={8} formatter={v=><span style={{fontSize:11,color:P.muted,fontFamily:"Sora"}}>{v}</span>}/>
@@ -764,7 +906,7 @@ const LeaveApprovals = () => {
                       )}
                     </div>
 
-                    <div style={{ background:"#fff",borderRadius:20,padding:"20px 24px",
+                    <div style={{ background:"#fff",borderRadius:20,padding:"20px 20px",
                       border:`1px solid ${P.border}`,boxShadow:"0 1px 4px rgba(0,0,0,0.04)" }}>
                       <div style={{ fontWeight:700,fontSize:15,color:P.text,marginBottom:4 }}>Snapshot</div>
                       <div style={{ fontSize:12,color:P.muted,marginBottom:18 }}>Current leave statistics</div>
@@ -799,7 +941,7 @@ const LeaveApprovals = () => {
           )}
         </div>
 
-        {/* RIGHT PANEL */}
+        {/* RIGHT PANEL — shown below on mobile */}
         <div style={{ display:"flex",flexDirection:"column",gap:16 }}>
 
           <div style={{ background:"#fff",borderRadius:20,padding:"20px 20px 16px",
@@ -819,7 +961,7 @@ const LeaveApprovals = () => {
                     <div>
                       <div style={{ fontSize:12,fontWeight:600,color:P.text }}>{leave.student?.fullName??"Unknown"}</div>
                       <div style={{ fontSize:11,color:P.muted,marginTop:2,fontFamily:"'DM Mono',monospace" }}>
-                        {fmtDate(leave.fromDate)} – {fmtDate(leave.toDate)}
+                        {fmtDate(leave.fromDate)} — {fmtDate(leave.toDate)}
                       </div>
                     </div>
                     <span style={{ background:sBg,color:sColor,fontSize:10,fontWeight:700,padding:"3px 8px",borderRadius:20 }}>

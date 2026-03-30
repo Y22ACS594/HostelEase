@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
@@ -24,7 +24,18 @@ const initial = {
   address:"",
 };
 
-/* ── Reusable Field components ───────────────────────── */
+/* ── useIsMobile ─────────────────────────────────── */
+function useIsMobile() {
+  const [mobile, setMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const fn = () => setMobile(window.innerWidth < 768);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+  return mobile;
+}
+
+/* ── Reusable Field components ─────────────────── */
 function Field({ label, children, full }) {
   return (
     <div style={{ gridColumn: full ? "1 / -1" : "auto" }}>
@@ -77,28 +88,29 @@ function Textarea({ name, value, onChange, rows=3 }) {
   );
 }
 
-function Section({ title, icon, children }) {
+function Section({ title, icon, children, isMobile }) {
   return (
-    <div style={{ background:"#fff",borderRadius:20,padding:"24px 28px",
+    <div style={{ background:"#fff",borderRadius:20,padding: isMobile ? "18px 16px" : "24px 28px",
       border:`1px solid ${P.border}`,boxShadow:"0 1px 4px rgba(0,0,0,0.04)",
       marginBottom:16 }}>
       <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:20 }}>
         <span style={{ fontSize:18 }}>{icon}</span>
         <span style={{ fontSize:14,fontWeight:700,color:P.text }}>{title}</span>
       </div>
-      <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16 }}>
+      <div style={{ display:"grid",gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",gap:16 }}>
         {children}
       </div>
     </div>
   );
 }
 
-/* ══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════
    MAIN COMPONENT
-══════════════════════════════════════════════════════ */
+═══════════════════════════════════════════════ */
 const AddStudent = () => {
   const navigate = useNavigate();
   const fileRef  = useRef(null);
+  const isMobile = useIsMobile();
   const [form,    setForm]    = useState(initial);
   const [msg,     setMsg]     = useState(""); // "success" | "error" | ""
   const [loading, setLoading] = useState(false);
@@ -147,17 +159,19 @@ const AddStudent = () => {
 
   return (
     <div style={{ fontFamily:"'Sora',sans-serif",background:P.surface,
-      minHeight:"100vh",padding:24,color:P.text }}>
+      minHeight:"100vh",padding: isMobile ? 16 : 24,color:P.text }}>
 
       {/* Header */}
-      <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",
-        marginBottom:28,flexWrap:"wrap",gap:12 }}>
+      <div style={{ display:"flex",alignItems: isMobile ? "flex-start" : "center",
+        justifyContent:"space-between",
+        marginBottom:28,flexWrap:"wrap",gap:12,
+        flexDirection: isMobile ? "column" : "row" }}>
         <div>
           <div style={{ fontSize:11,fontWeight:600,color:P.primary,
             letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4 }}>
             HostelEase · Warden Portal
           </div>
-          <h1 style={{ margin:0,fontSize:24,fontWeight:700,color:P.text }}>
+          <h1 style={{ margin:0,fontSize: isMobile ? 20 : 24,fontWeight:700,color:P.text }}>
             👩‍🎓 Add New Student
           </h1>
           <p style={{ margin:"4px 0 0",fontSize:13,color:P.muted }}>
@@ -167,7 +181,7 @@ const AddStudent = () => {
         <button type="button" onClick={()=>navigate("/warden/students")}
           style={{ padding:"9px 16px",background:"#fff",border:`1px solid ${P.border}`,
             borderRadius:12,cursor:"pointer",fontSize:13,color:P.muted,
-            fontFamily:"'Sora',sans-serif" }}>
+            fontFamily:"'Sora',sans-serif", alignSelf: isMobile ? "flex-start" : "auto" }}>
           ← Back to List
         </button>
       </div>
@@ -197,7 +211,7 @@ const AddStudent = () => {
       <form onSubmit={submit}>
 
         {/* ── Profile Photo ── */}
-        <div style={{ background:"#fff",borderRadius:20,padding:"24px 28px",
+        <div style={{ background:"#fff",borderRadius:20,padding: isMobile ? "18px 16px" : "24px 28px",
           border:`1px solid ${P.border}`,boxShadow:"0 1px 4px rgba(0,0,0,0.04)",
           marginBottom:16 }}>
           <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:20 }}>
@@ -205,7 +219,8 @@ const AddStudent = () => {
             <span style={{ fontSize:14,fontWeight:700,color:P.text }}>Profile Photo</span>
             <span style={{ fontSize:12,color:P.muted,marginLeft:4 }}>Optional · max 2 MB</span>
           </div>
-          <div style={{ display:"flex",alignItems:"center",gap:20 }}>
+          <div style={{ display:"flex",alignItems: isMobile ? "flex-start" : "center",
+            gap: isMobile ? 16 : 20, flexDirection: isMobile ? "column" : "row" }}>
             {/* Preview */}
             <div style={{ width:90,height:90,borderRadius:20,overflow:"hidden",
               border:`2px dashed ${P.border}`,flexShrink:0,
@@ -260,7 +275,7 @@ const AddStudent = () => {
         </div>
 
         {/* ── Basic Info ── */}
-        <Section title="Basic Information" icon="📋">
+        <Section title="Basic Information" icon="📋" isMobile={isMobile}>
           <Field label="Full Name *">
             <Input name="fullName" value={form.fullName} onChange={handleChange} required placeholder="e.g. T Durga"/>
           </Field>
@@ -276,7 +291,7 @@ const AddStudent = () => {
         </Section>
 
         {/* ── Academic ── */}
-        <Section title="Academic Details" icon="🎓">
+        <Section title="Academic Details" icon="🎓" isMobile={isMobile}>
           <Field label="Course">
             <Input name="course" value={form.course} onChange={handleChange} placeholder="e.g. B.Tech"/>
           </Field>
@@ -302,7 +317,7 @@ const AddStudent = () => {
         </Section>
 
         {/* ── Personal ── */}
-        <Section title="Personal Details" icon="👤">
+        <Section title="Personal Details" icon="👤" isMobile={isMobile}>
           <Field label="Gender">
             <Select name="gender" value={form.gender} onChange={handleChange}>
               <option value="">Select gender</option>
@@ -328,7 +343,7 @@ const AddStudent = () => {
         </Section>
 
         {/* ── Contact ── */}
-        <Section title="Contact Details" icon="📞">
+        <Section title="Contact Details" icon="📞" isMobile={isMobile}>
           <Field label="Phone Number">
             <Input name="phoneNumber" value={form.phoneNumber} onChange={handleChange} placeholder="10-digit number"/>
           </Field>
@@ -341,7 +356,7 @@ const AddStudent = () => {
         </Section>
 
         {/* ── Parent Info ── */}
-        <Section title="Parent Details" icon="👨‍👩‍👧">
+        <Section title="Parent Details" icon="👨‍👩‍👧" isMobile={isMobile}>
           <Field label="Father Name">
             <Input name="fatherName" value={form.fatherName} onChange={handleChange}/>
           </Field>
@@ -354,11 +369,13 @@ const AddStudent = () => {
         </Section>
 
         {/* ── Submit ── */}
-        <div style={{ display:"flex",justifyContent:"flex-end",gap:12,marginTop:8 }}>
+        <div style={{ display:"flex",justifyContent: isMobile ? "stretch" : "flex-end",
+          gap:12,marginTop:8,flexDirection: isMobile ? "column" : "row" }}>
           <button type="button" onClick={()=>navigate("/warden/students")}
             style={{ padding:"12px 24px",border:`1.5px solid ${P.border}`,borderRadius:14,
               background:"#fff",cursor:"pointer",fontSize:14,fontWeight:600,
-              color:P.muted,fontFamily:"'Sora',sans-serif" }}>
+              color:P.muted,fontFamily:"'Sora',sans-serif",
+              width: isMobile ? "100%" : "auto" }}>
             Cancel
           </button>
           <button type="submit" disabled={loading}
@@ -367,7 +384,8 @@ const AddStudent = () => {
               border:"none",borderRadius:14,cursor:loading?"not-allowed":"pointer",
               fontSize:14,fontWeight:700,color:"#fff",fontFamily:"'Sora',sans-serif",
               boxShadow:loading?"none":"0 6px 20px rgba(37,99,235,0.4)",
-              display:"flex",alignItems:"center",gap:8 }}>
+              display:"flex",alignItems:"center",justifyContent:"center",gap:8,
+              width: isMobile ? "100%" : "auto" }}>
             {loading ? (
               <><span style={{ width:14,height:14,border:"2px solid rgba(255,255,255,0.4)",
                 borderTop:"2px solid #fff",borderRadius:"50%",display:"inline-block",
