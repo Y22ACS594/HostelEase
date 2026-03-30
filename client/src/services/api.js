@@ -6,7 +6,7 @@ const api = axios.create({
 });*/
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://192.168.210.9:5000/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://192.168.1.16:5000/api",
   
 });
 api.interceptors.request.use((config) => {

@@ -1,17 +1,27 @@
-// pages/admin/Login.jsx
-import { useState } from "react";
+// pages/admin/Login.jsx — Mobile + Desktop responsive
+import { useState, useEffect } from "react";
 import { useAuth }    from "../../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
+
+function useIsMobile() {
+  const [mobile, setMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const fn = () => setMobile(window.innerWidth < 768);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+  return mobile;
+}
 
 const AdminLogin = () => {
   const { login }  = useAuth();
   const navigate   = useNavigate();
+  const isMobile   = useIsMobile();
   const [email,    setEmail]    = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [error,    setError]    = useState("");
   const [loading,  setLoading]  = useState(false);
-  const [focused,  setFocused]  = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,7 +40,8 @@ const AdminLogin = () => {
 
   return (
     <div style={{ display:"flex", minHeight:"100vh",
-      fontFamily:"'Inter',-apple-system,sans-serif", background:"#fff" }}>
+      fontFamily:"'Inter',-apple-system,sans-serif", background:"#fff",
+      flexDirection: isMobile ? "column" : "row" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         *{box-sizing:border-box;margin:0;padding:0}
@@ -47,77 +58,95 @@ const AdminLogin = () => {
         .al-feature:hover{background:#F3F4F6!important;transform:translateY(-1px)}
       `}</style>
 
-      {/* ── LEFT ─────────────────────────────────── */}
-      <div style={{ flex:1, padding:"48px 56px",
-        background:"linear-gradient(145deg,#FFF7ED 0%,#FEF3C7 40%,#FEF9C3 100%)",
-        display:"flex", flexDirection:"column",
-        borderRight:"1px solid #F3F4F6" }}>
+      {/* ── LEFT panel — hidden on mobile ─────────────────────────────── */}
+      {!isMobile && (
+        <div style={{ flex:1, padding:"48px 56px",
+          background:"linear-gradient(145deg,#FFF7ED 0%,#FEF3C7 40%,#FEF9C3 100%)",
+          display:"flex", flexDirection:"column",
+          borderRight:"1px solid #F3F4F6" }}>
 
-        {/* Logo */}
-        <div style={{ display:"flex",alignItems:"center",gap:12,marginBottom:60 }}>
-          <div style={{ width:44,height:44,borderRadius:12,
-            background:"linear-gradient(135deg,#D97706,#B45309)",
-            display:"flex",alignItems:"center",justifyContent:"center",
-            fontSize:22,boxShadow:"0 4px 12px rgba(217,119,6,0.35)" }}>🏠</div>
-          <span style={{ fontSize:20,fontWeight:800,color:"#111827",letterSpacing:"-0.4px" }}>
-            HostelEase
-          </span>
-        </div>
+          {/* Logo */}
+          <div style={{ display:"flex",alignItems:"center",gap:12,marginBottom:60 }}>
+            <div style={{ width:44,height:44,borderRadius:12,
+              background:"linear-gradient(135deg,#D97706,#B45309)",
+              display:"flex",alignItems:"center",justifyContent:"center",
+              fontSize:22,boxShadow:"0 4px 12px rgba(217,119,6,0.35)" }}>🏠</div>
+            <span style={{ fontSize:20,fontWeight:800,color:"#111827",letterSpacing:"-0.4px" }}>
+              HostelEase
+            </span>
+          </div>
 
-        <h1 style={{ fontSize:38,fontWeight:800,color:"#111827",
-          letterSpacing:"-1px",lineHeight:1.1,marginBottom:16 }}>
-          Admin Control<br/>Center
-        </h1>
-        <p style={{ fontSize:16,color:"#6B7280",lineHeight:1.65,maxWidth:380,marginBottom:40 }}>
-          Manage wardens, monitor the entire hostel system and maintain operational control from one place.
-        </p>
+          <h1 style={{ fontSize:38,fontWeight:800,color:"#111827",
+            letterSpacing:"-1px",lineHeight:1.1,marginBottom:16 }}>
+            Admin Control<br/>Center
+          </h1>
+          <p style={{ fontSize:16,color:"#6B7280",lineHeight:1.65,maxWidth:380,marginBottom:40 }}>
+            Manage wardens, monitor the entire hostel system and maintain operational control from one place.
+          </p>
 
-        {/* Feature cards */}
-        <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:440 }}>
-          {[
-            { icon:"👷", title:"Warden Management", desc:"Create & manage warden accounts"   },
-            { icon:"📊", title:"System Overview",   desc:"Monitor all hostel activities"     },
-            { icon:"🔔", title:"Notifications",     desc:"System-wide alerts & updates"      },
-            { icon:"🛡️", title:"Secure Access",     desc:"Role-based access control"         },
-          ].map(({ icon, title, desc }) => (
-            <div key={title} className="al-feature"
-              style={{ padding:"14px",borderRadius:14,
-                background:"rgba(255,255,255,0.72)",
-                border:"1px solid rgba(255,255,255,0.9)",
-                backdropFilter:"blur(8px)",
-                transition:"all .2s",cursor:"default" }}>
-              <div style={{ fontSize:22,marginBottom:6 }}>{icon}</div>
-              <div style={{ fontSize:13,fontWeight:700,color:"#111827",marginBottom:3 }}>{title}</div>
-              <div style={{ fontSize:11,color:"#9CA3AF",lineHeight:1.4 }}>{desc}</div>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ marginTop:"auto",paddingTop:40,display:"flex",gap:32 }}>
-          {[{v:"Secure",l:"Admin Access"},{v:"Full",l:"Control"},{v:"24/7",l:"Monitoring"}]
-            .map(({v,l})=>(
-              <div key={l}>
-                <div style={{ fontSize:17,fontWeight:800,color:"#111827" }}>{v}</div>
-                <div style={{ fontSize:12,color:"#9CA3AF",marginTop:2 }}>{l}</div>
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:440 }}>
+            {[
+              { icon:"👷", title:"Warden Management", desc:"Create & manage warden accounts"   },
+              { icon:"📊", title:"System Overview",   desc:"Monitor all hostel activities"     },
+              { icon:"🔔", title:"Notifications",     desc:"System-wide alerts & updates"      },
+              { icon:"🛡️", title:"Secure Access",     desc:"Role-based access control"         },
+            ].map(({ icon, title, desc }) => (
+              <div key={title} className="al-feature"
+                style={{ padding:"14px",borderRadius:14,
+                  background:"rgba(255,255,255,0.72)",
+                  border:"1px solid rgba(255,255,255,0.9)",
+                  backdropFilter:"blur(8px)",
+                  transition:"all .2s",cursor:"default" }}>
+                <div style={{ fontSize:22,marginBottom:6 }}>{icon}</div>
+                <div style={{ fontSize:13,fontWeight:700,color:"#111827",marginBottom:3 }}>{title}</div>
+                <div style={{ fontSize:11,color:"#9CA3AF",lineHeight:1.4 }}>{desc}</div>
               </div>
             ))}
-        </div>
-      </div>
+          </div>
 
-      {/* ── RIGHT ────────────────────────────────── */}
-      <div style={{ width:480,padding:"48px 52px",
-        display:"flex",flexDirection:"column",justifyContent:"center",
-        animation:"al-fade .4s ease both" }}>
+          <div style={{ marginTop:"auto",paddingTop:40,display:"flex",gap:32 }}>
+            {[{v:"Secure",l:"Admin Access"},{v:"Full",l:"Control"},{v:"24/7",l:"Monitoring"}]
+              .map(({v,l})=>(
+                <div key={l}>
+                  <div style={{ fontSize:17,fontWeight:800,color:"#111827" }}>{v}</div>
+                  <div style={{ fontSize:12,color:"#9CA3AF",marginTop:2 }}>{l}</div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── RIGHT panel / Mobile full-screen ───────────────────────────── */}
+      <div style={{
+        width: isMobile ? "100%" : 480,
+        padding: isMobile ? "40px 24px 40px" : "48px 52px",
+        display:"flex", flexDirection:"column",
+        justifyContent: isMobile ? "flex-start" : "center",
+        animation:"al-fade .4s ease both",
+        minHeight: isMobile ? "100vh" : "auto",
+        background: "#fff",
+      }}>
+
+        {/* Mobile logo */}
+        {isMobile && (
+          <div style={{ display:"flex",alignItems:"center",gap:10,marginBottom:32 }}>
+            <div style={{ width:40,height:40,borderRadius:11,
+              background:"linear-gradient(135deg,#D97706,#B45309)",
+              display:"flex",alignItems:"center",justifyContent:"center",
+              fontSize:20 }}>🏠</div>
+            <span style={{ fontSize:18,fontWeight:800,color:"#111827" }}>HostelEase</span>
+          </div>
+        )}
 
         <div style={{ fontSize:11,fontWeight:700,color:"#D97706",
           textTransform:"uppercase",letterSpacing:"0.12em",marginBottom:8 }}>
           Admin Portal
         </div>
-        <h2 style={{ fontSize:28,fontWeight:800,color:"#111827",
+        <h2 style={{ fontSize: isMobile ? 26 : 28,fontWeight:800,color:"#111827",
           letterSpacing:"-0.5px",marginBottom:6 }}>
           Welcome back
         </h2>
-        <p style={{ fontSize:14,color:"#9CA3AF",marginBottom:32 }}>
+        <p style={{ fontSize:14,color:"#9CA3AF",marginBottom: isMobile ? 28 : 32 }}>
           Sign in to continue to your admin dashboard
         </p>
 
@@ -192,7 +221,7 @@ const AdminLogin = () => {
               fontSize:14,fontWeight:700,cursor:loading?"not-allowed":"pointer",
               display:"flex",alignItems:"center",justifyContent:"center",gap:10,
               fontFamily:"'Inter',sans-serif",transition:"background .15s",
-              boxShadow:"0 4px 12px rgba(0,0,0,0.15)" }}>
+              boxShadow:"0 4px 12px rgba(0,0,0,0.15)",minHeight:50 }}>
             {loading?(
               <><span style={{ width:14,height:14,border:"2px solid rgba(255,255,255,0.35)",
                 borderTop:"2px solid #fff",borderRadius:"50%",display:"inline-block",
@@ -200,6 +229,26 @@ const AdminLogin = () => {
             ):"Sign in as Admin"}
           </button>
         </form>
+
+        {/* Mobile features summary */}
+        {isMobile && (
+          <div style={{ marginTop:32,display:"grid",gridTemplateColumns:"1fr 1fr",gap:10 }}>
+            {[
+              { icon:"👷", title:"Warden Mgmt" },
+              { icon:"📊", title:"Analytics"   },
+              { icon:"🔔", title:"Notifications"},
+              { icon:"🛡️", title:"Secure Access"},
+            ].map(({ icon, title }) => (
+              <div key={title}
+                style={{ padding:"12px",borderRadius:12,
+                  background:"#FFF7ED",border:"1px solid #FEF3C7",
+                  display:"flex",alignItems:"center",gap:8 }}>
+                <span style={{ fontSize:18 }}>{icon}</span>
+                <span style={{ fontSize:12,fontWeight:600,color:"#111827" }}>{title}</span>
+              </div>
+            ))}
+          </div>
+        )}
 
         <p style={{ textAlign:"center",marginTop:24,fontSize:13,color:"#9CA3AF" }}>
           Not an admin?{" "}

@@ -1,15 +1,25 @@
-// src/pages/student/ApplyLeave.jsx — Fully responsive mobile + desktop
-import { useState, useEffect, useCallback } from "react";
+// src/pages/student/ApplyLeave.jsx — Fixed + Fully responsive mobile + desktop
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { applyLeave }  from "../../services/leaveService";
 import { useAuth }     from "../../context/AuthContext";
-import useIsMobile     from "../../hooks/useIsMobile";
 
 if (!document.getElementById("al-font")) {
   const l = document.createElement("link");
   l.id = "al-font"; l.rel = "stylesheet";
   l.href = "https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap";
   document.head.appendChild(l);
+}
+
+/* ── useIsMobile (inline — no external hook needed) ── */
+function useIsMobile() {
+  const [mobile, setMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const fn = () => setMobile(window.innerWidth < 768);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+  return mobile;
 }
 
 const LEAVE_TYPES = [
@@ -38,6 +48,12 @@ const inputSt   = (foc, err) => ({
   boxShadow: err ? "0 0 0 3px rgba(220,38,38,.10)" : foc ? "0 0 0 3px rgba(37,99,235,.10)" : "none",
   transition: "border-color .14s,box-shadow .14s", boxSizing: "border-box",
 });
+
+/* ──────────────────────────────────────────────
+   Sub-components defined OUTSIDE the main component
+   so React never unmounts/remounts them on re-render.
+   This is the fix for the "one character" input bug.
+────────────────────────────────────────────── */
 
 function FInput({ value, onChange, type = "text", placeholder, required, multiline, rows, err }) {
   const [foc, setFoc] = useState(false);
@@ -134,7 +150,6 @@ function RangeCalendar({ from, to, onChange }) {
   );
 }
 
-// ── STEP INDICATOR ──
 function StepBar({ step, isMobile }) {
   const steps = ["Select Type & Dates", "Leave Details"];
   return (
@@ -163,23 +178,59 @@ function StepBar({ step, isMobile }) {
   );
 }
 
-// ══ MAIN ══
+/* ── Desktop header (defined OUTSIDE main component) ── */
+function DesktopHeader({ onBack, step }) {
+  return (
+    <div style={{ background: "#fff", borderBottom: `1px solid ${C.border}`,
+      padding: "16px 32px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <button onClick={onBack}
+          style={{ padding: "8px 14px", background: "#F9FAFB", border: `1px solid ${C.border}`,
+            borderRadius: 10, fontSize: 13, cursor: "pointer", color: C.muted, fontFamily: "'Sora',sans-serif" }}>
+          ← Back
+        </button>
+        <div>
+          <div style={{ fontSize: 11, color: C.primary, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>Student Portal</div>
+          <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: C.text }}>Apply for Leave</h1>
+        </div>
+      </div>
+      <StepBar step={step} isMobile={false}/>
+    </div>
+  );
+}
+
+function MobileHeader({ onBack, step }) {
+  return (
+    <div style={{ padding: "16px 16px 0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <button onClick={onBack}
+        style={{ padding: "8px 12px", background: "#fff", border: `1px solid ${C.border}`,
+          borderRadius: 10, fontSize: 13, cursor: "pointer", color: C.muted, fontFamily: "'Sora',sans-serif" }}>
+        ←
+      </button>
+      <StepBar step={step} isMobile={true}/>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════
+   MAIN COMPONENT — PageWrap removed, layout inlined
+══════════════════════════════════════════════════ */
 export default function ApplyLeave() {
   const { user }  = useAuth();
   const navigate  = useNavigate();
   const isMobile  = useIsMobile();
 
-  const [step,      setStep]     = useState(0);
-  const [leaveType, setLType]    = useState("");
-  const [from,      setFrom]     = useState("");
-  const [to,        setTo]       = useState("");
-  const [reason,    setReason]   = useState("");
-  const [destination, setDest]   = useState("");
-  const [contact,   setContact]  = useState("");
-  const [loading,   setLoading]  = useState(false);
-  const [success,   setSuccess]  = useState(false);
-  const [error,     setError]    = useState("");
-  const [errors,    setErrors]   = useState({});
+  const [step,        setStep]    = useState(0);
+  const [leaveType,   setLType]   = useState("");
+  const [from,        setFrom]    = useState("");
+  const [to,          setTo]      = useState("");
+  const [reason,      setReason]  = useState("");
+  const [destination, setDest]    = useState("");
+  const [contact,     setContact] = useState("");
+  const [loading,     setLoading] = useState(false);
+  const [success,     setSuccess] = useState(false);
+  const [error,       setError]   = useState("");
+  const [errors,      setErrors]  = useState({});
 
   const days    = calcDays(from, to);
   const selType = LEAVE_TYPES.find(t => t.v === leaveType);
@@ -204,13 +255,14 @@ export default function ApplyLeave() {
     if (!validate2()) return;
     setLoading(true); setError("");
     try {
-      await applyLeave({ leaveType, fromDate: from, toDate: to, reason, destination, contactDuringLeave: contact });
+      await applyLeave({ leaveType, fromDate: from, toDate: to, reason, destination: destination || "", emergencyContact: contact || "" });
       setSuccess(true);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to submit leave request.");
     } finally { setLoading(false); }
   };
 
+  /* ── Success screen ── */
   if (success) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
@@ -240,50 +292,24 @@ export default function ApplyLeave() {
     );
   }
 
-  const PageWrap = ({ children }) => (
-    <div style={{ minHeight: "100vh", background: C.surface, fontFamily: "'Sora',sans-serif",
-      paddingTop: isMobile ? 56 : 0 }}>
-      {!isMobile && (
-        <div style={{ background: "#fff", borderBottom: `1px solid ${C.border}`,
-          padding: "16px 32px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <button onClick={() => navigate("/student/dashboard")}
-              style={{ padding: "8px 14px", background: "#F9FAFB", border: `1px solid ${C.border}`,
-                borderRadius: 10, fontSize: 13, cursor: "pointer", color: C.muted, fontFamily: "'Sora',sans-serif" }}>
-              ← Back
-            </button>
-            <div>
-              <div style={{ fontSize: 11, color: C.primary, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>Student Portal</div>
-              <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: C.text }}>Apply for Leave</h1>
-            </div>
-          </div>
-          <StepBar step={step} isMobile={false}/>
-        </div>
-      )}
-      {isMobile && (
-        <div style={{ padding: "16px 16px 0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <button onClick={() => step > 0 ? setStep(0) : navigate("/student/dashboard")}
-            style={{ padding: "8px 12px", background: "#fff", border: `1px solid ${C.border}`,
-              borderRadius: 10, fontSize: 13, cursor: "pointer", color: C.muted, fontFamily: "'Sora',sans-serif" }}>
-            ←
-          </button>
-          <StepBar step={step} isMobile={true}/>
-        </div>
-      )}
-      {children}
-    </div>
-  );
+  const handleBack0 = () => navigate("/student/dashboard");
+  const handleBack1 = () => setStep(0);
 
-  // ── STEP 0: Select type + dates ──
+  /* ── STEP 0: Select type + dates ── */
   if (step === 0) {
     return (
-      <PageWrap>
+      <div style={{ minHeight: "100vh", background: C.surface, fontFamily: "'Sora',sans-serif",
+        paddingTop: isMobile ? 0 : 0 }}>
+        {isMobile
+          ? <MobileHeader onBack={handleBack0} step={step}/>
+          : <DesktopHeader onBack={handleBack0} step={step}/>}
+
         <div style={{ maxWidth: isMobile ? "100%" : 1100, margin: "0 auto",
           padding: isMobile ? "16px 16px 80px" : "24px 32px",
           display: isMobile ? "block" : "grid",
           gridTemplateColumns: "280px 1fr 280px", gap: 20 }}>
 
-          {/* Leave types */}
+          {/* Leave type selector */}
           <div>
             {!isMobile && <div style={{ fontSize: 11, fontWeight: 700, color: C.muted,
               textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
@@ -337,7 +363,7 @@ export default function ApplyLeave() {
             </div>
           </div>
 
-          {/* Summary */}
+          {/* Summary + Next */}
           <div>
             <div style={{ background: "#fff", border: `1px solid ${C.border}`, borderRadius: 16,
               padding: isMobile ? "16px" : "20px", marginTop: isMobile ? 16 : 0,
@@ -386,13 +412,17 @@ export default function ApplyLeave() {
             </button>
           </div>
         </div>
-      </PageWrap>
+      </div>
     );
   }
 
-  // ── STEP 1: Details ──
+  /* ── STEP 1: Details ── */
   return (
-    <PageWrap>
+    <div style={{ minHeight: "100vh", background: C.surface, fontFamily: "'Sora',sans-serif" }}>
+      {isMobile
+        ? <MobileHeader onBack={handleBack1} step={step}/>
+        : <DesktopHeader onBack={handleBack1} step={step}/>}
+
       <div style={{ maxWidth: isMobile ? "100%" : 640, margin: "0 auto",
         padding: isMobile ? "16px 16px 80px" : "24px 32px" }}>
         {/* Summary banner */}
@@ -422,10 +452,19 @@ export default function ApplyLeave() {
               textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>
               Reason <span style={{ color: "#DC2626" }}>*</span>
             </label>
-            <FInput value={reason} onChange={e => setReason(e.target.value)}
-              multiline rows={4} required
+            {/* ✅ Direct controlled textarea — no wrapper, no re-mount issue */}
+            <textarea
+              value={reason}
+              onChange={e => setReason(e.target.value)}
+              rows={4}
+              required
               placeholder="Describe the reason for your leave (at least 10 characters)..."
-              err={!!errors.reason}/>
+              style={{
+                ...inputSt(false, !!errors.reason),
+                resize: "vertical", minHeight: 80,
+                border: `1.5px solid ${errors.reason ? "#DC2626" : "#E5E7EB"}`,
+              }}
+            />
             {errors.reason && <div style={{ color: "#DC2626", fontSize: 12, marginTop: 4 }}>{errors.reason}</div>}
           </div>
 
@@ -434,8 +473,13 @@ export default function ApplyLeave() {
               textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>
               Destination (optional)
             </label>
-            <FInput value={destination} onChange={e => setDest(e.target.value)}
-              placeholder="Where will you be going?"/>
+            <input
+              type="text"
+              value={destination}
+              onChange={e => setDest(e.target.value)}
+              placeholder="Where will you be going?"
+              style={inputSt(false, false)}
+            />
           </div>
 
           <div style={{ marginBottom: 4 }}>
@@ -443,8 +487,13 @@ export default function ApplyLeave() {
               textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>
               Contact during leave (optional)
             </label>
-            <FInput value={contact} onChange={e => setContact(e.target.value)}
-              type="tel" placeholder="Phone number during leave"/>
+            <input
+              type="tel"
+              value={contact}
+              onChange={e => setContact(e.target.value)}
+              placeholder="Phone number during leave"
+              style={inputSt(false, false)}
+            />
           </div>
         </div>
 
@@ -477,6 +526,6 @@ export default function ApplyLeave() {
         </div>
         <style>{`@keyframes al-spin { to { transform: rotate(360deg) } }`}</style>
       </div>
-    </PageWrap>
+    </div>
   );
 }

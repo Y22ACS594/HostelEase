@@ -8,15 +8,30 @@ const auditLog         = require("../utils/auditLogger");
 const pushNotification = require("../utils/notificationHelper");
 const { sendEmail, buildLeaveStatusEmail } = require("../utils/sendEmail");
 
-/* ── STUDENT → APPLY LEAVE ─────────────────────────────────── */
+/* ── STUDENT → APPLY LEAVE ─────────────────────────────────────── */
 exports.applyLeave = async (req, res, next) => {
   try {
-    const { leaveType, reason, fromDate, toDate, destination, emergencyContact } = req.body;
+    // Accept both field names for backward compatibility
+    const {
+      leaveType,
+      reason,
+      fromDate,
+      toDate,
+      destination,
+      emergencyContact,
+      contactDuringLeave, // alias sent by frontend
+    } = req.body;
 
-    if (!leaveType || !reason || !fromDate || !toDate || !destination || !emergencyContact)
-      return res.status(400).json({ message: "All fields are required" });
+    // Resolve emergency contact from either field name
+    const contact = emergencyContact || contactDuringLeave || "";
+
+    // Only leaveType, reason, fromDate, toDate are truly required
+    if (!leaveType || !reason || !fromDate || !toDate)
+      return res.status(400).json({ message: "leaveType, reason, fromDate and toDate are required" });
+
     if (reason.length < 10)
       return res.status(400).json({ message: "Reason must be at least 10 characters" });
+
     if (new Date(fromDate) > new Date(toDate))
       return res.status(400).json({ message: "fromDate cannot be after toDate" });
 
@@ -25,11 +40,16 @@ exports.applyLeave = async (req, res, next) => {
 
     const leave = await LeaveRequest.create({
       student: student._id,
-      leaveType, reason, fromDate, toDate, destination, emergencyContact,
+      leaveType,
+      reason,
+      fromDate,
+      toDate,
+      destination:      destination || "",
+      emergencyContact: contact,
     });
 
-    // ── Notify ALL wardens ─────────────────────────────────
-    const wardens = await User.find({ role: "warden" }).select("_id").lean();
+    // ── Notify ALL wardens ──────────────────────────────────────────
+    const wardens  = await User.find({ role: "warden" }).select("_id").lean();
     const isUrgent = ["Emergency", "Medical"].includes(leaveType);
     const prefix   = leaveType === "Emergency" ? "🚨 URGENT: "
                    : leaveType === "Medical"   ? "🏥 Medical: " : "";
@@ -52,7 +72,7 @@ exports.applyLeave = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-/* ── STUDENT → VIEW OWN LEAVES ────────────────────────────── */
+/* ── STUDENT → VIEW OWN LEAVES ────────────────────────────────── */
 exports.getMyLeaves = async (req, res, next) => {
   try {
     const student = await Student.findOne({ user: req.user.id });
@@ -65,7 +85,7 @@ exports.getMyLeaves = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-/* ── WARDEN → GET ALL LEAVES (paginated + filtered) ────────── */
+/* ── WARDEN → GET ALL LEAVES (paginated + filtered) ────────────── */
 exports.getAllLeaves = async (req, res, next) => {
   try {
     const {
@@ -114,7 +134,7 @@ exports.getAllLeaves = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-/* ── WARDEN → APPROVE / REJECT ─────────────────────────────── */
+/* ── WARDEN → APPROVE / REJECT ─────────────────────────────────── */
 exports.updateLeaveStatus = async (req, res, next) => {
   try {
     const { status, remarks, rejectionReason } = req.body;
@@ -166,7 +186,7 @@ exports.updateLeaveStatus = async (req, res, next) => {
       action: status === "Approved" ? "LEAVE_APPROVED" : "LEAVE_REJECTED",
       targetModel: "LeaveRequest", targetId: leave._id,
       description: `Leave ${status.toLowerCase()} for ${leave.student?.fullName}` +
-        (status === "Rejected" ? ` – Reason: ${rejectionReason}` : ""),
+        (status === "Rejected" ? ` — Reason: ${rejectionReason}` : ""),
       ip: req.ip,
     });
 
@@ -174,7 +194,7 @@ exports.updateLeaveStatus = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-/* ── WARDEN → LEAVE STATISTICS ─────────────────────────────── */
+/* ── WARDEN → LEAVE STATISTICS ─────────────────────────────────── */
 exports.getLeaveStats = async (req, res, next) => {
   try {
     const [total, approved, pending, rejected] = await Promise.all([

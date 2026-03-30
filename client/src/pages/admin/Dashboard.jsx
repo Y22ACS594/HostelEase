@@ -736,9 +736,17 @@ function AdminNotificationsPanel({ isMobile }) {
               if(!form.title||!form.message) return;
               setSending(true);
               try {
-                showToast("Notification sent to all wardens");
+                const res = await api.post("/notifications/broadcast", {
+                  title: form.title,
+                  message: form.message,
+                  type: form.type,
+                });
+                const sent = res.data?.sent ?? 0;
+                showToast(`Notification sent to ${sent} warden${sent !== 1 ? "s" : ""}!`);
                 setForm({title:"",message:"",type:"GENERAL"});
                 setCompose(false);
+              } catch (err) {
+                showToast(err.response?.data?.message || "Failed to send notification");
               } finally { setSending(false); }
             }}
               disabled={sending||!form.title||!form.message}
