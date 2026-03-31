@@ -1,5 +1,5 @@
 // pages/warden/CreateRoom.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createRoom } from "../../services/roomService";
 
 if (!document.getElementById("cr-font")) {
@@ -17,20 +17,63 @@ const P = {
 };
 
 const PRESETS = [2, 3, 4, 5, 6];
-
 const initialState = { blockName:"", roomNumber:"", totalBeds:"" };
 
+/* ── useIsMobile ── OUTSIDE component ─────────────────── */
+function useIsMobile() {
+  const [mobile, setMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const fn = () => setMobile(window.innerWidth < 768);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+  return mobile;
+}
+
+/* ══════════════════════════════════════════════════════
+   ⚠️  CRITICAL: Field MUST be defined OUTSIDE CreateRoom.
+   If defined inside, React sees a new component type on
+   every render → unmounts input → loses focus after 1 char.
+══════════════════════════════════════════════════════ */
+function Field({ label, required, children }) {
+  return (
+    <div>
+      <label style={{
+        display:"block", fontSize:11, fontWeight:700,
+        color:P.muted, textTransform:"uppercase",
+        letterSpacing:"0.08em", marginBottom:8,
+      }}>
+        {label}
+        {required && <span style={{ color:P.red, marginLeft:2 }}>*</span>}
+      </label>
+      {children}
+    </div>
+  );
+}
+
 const CreateRoom = () => {
-  const [form,    setForm]    = useState(initialState);
-  const [status,  setStatus]  = useState(""); // "" | "success" | "error"
-  const [errMsg,  setErrMsg]  = useState("");
-  const [loading, setLoading] = useState(false);
+  const isMobile = useIsMobile();
+  const [form,       setForm]       = useState(initialState);
+  const [status,     setStatus]     = useState("");
+  const [errMsg,     setErrMsg]     = useState("");
+  const [loading,    setLoading]    = useState(false);
+  const [focusField, setFocusField] = useState("");
 
   const handleChange = (e) =>
     setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
   const setBeds = (n) =>
     setForm(f => ({ ...f, totalBeds: String(n) }));
+
+  const inputStyle = (focused) => ({
+    width:"100%", padding: isMobile ? "10px 12px" : "11px 14px",
+    border:`1.5px solid ${focused ? P.primary : P.border}`,
+    borderRadius:12, fontSize: isMobile ? 15 : 14,
+    fontFamily:"'Sora',sans-serif",
+    color:P.text, background:"#fff", outline:"none",
+    boxSizing:"border-box", transition:"border .15s",
+    boxShadow:focused ? "0 0 0 3px rgba(37,99,235,0.10)" : "none",
+  });
 
   const submit = async (e) => {
     e.preventDefault();
@@ -48,36 +91,12 @@ const CreateRoom = () => {
     }
   };
 
-  /* ── Field wrapper ─────────────────────────────────────── */
-  const Field = ({ label, required, children }) => (
-    <div>
-      <label style={{
-        display:"block", fontSize:11, fontWeight:700,
-        color:P.muted, textTransform:"uppercase",
-        letterSpacing:"0.08em", marginBottom:8,
-      }}>
-        {label}
-        {required && <span style={{ color:P.red, marginLeft:2 }}>*</span>}
-      </label>
-      {children}
-    </div>
-  );
-
-  const inputStyle = (focused) => ({
-    width:"100%", padding:"11px 14px",
-    border:`1.5px solid ${focused ? P.primary : P.border}`,
-    borderRadius:12, fontSize:14, fontFamily:"'Sora',sans-serif",
-    color:P.text, background:"#fff", outline:"none",
-    boxSizing:"border-box", transition:"border .15s",
-    boxShadow:focused ? "0 0 0 3px rgba(37,99,235,0.10)" : "none",
-  });
-
-  const [focusField, setFocusField] = useState("");
-
   return (
     <div style={{
       fontFamily:"'Sora',sans-serif", background:P.surface,
-      minHeight:"100vh", padding:"32px 36px", color:P.text,
+      minHeight:"100vh",
+      padding: isMobile ? "20px 16px" : "32px 36px",
+      color:P.text,
     }}>
       <style>{`
         @keyframes cr-fade { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
@@ -88,14 +107,14 @@ const CreateRoom = () => {
       <div style={{ maxWidth:580, margin:"0 auto", animation:"cr-fade .4s ease" }}>
 
         {/* Page header */}
-        <div style={{ marginBottom:28 }}>
+        <div style={{ marginBottom: isMobile ? 20 : 28 }}>
           <div style={{
             fontSize:10, fontWeight:700, color:P.primary,
             letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4,
           }}>
             HostelEase · Warden Portal
           </div>
-          <h1 style={{ margin:0, fontSize:26, fontWeight:800, letterSpacing:"-0.5px" }}>
+          <h1 style={{ margin:0, fontSize: isMobile ? 22 : 26, fontWeight:800, letterSpacing:"-0.5px" }}>
             🏗️ Create New Room
           </h1>
           <p style={{ margin:"6px 0 0", fontSize:13, color:P.muted }}>
@@ -154,7 +173,7 @@ const CreateRoom = () => {
         {/* Form card */}
         <div style={{
           background:"#fff", border:`1px solid ${P.border}`,
-          borderRadius:20, padding:"28px 32px",
+          borderRadius:20, padding: isMobile ? "20px 18px" : "28px 32px",
           boxShadow:"0 4px 20px rgba(37,99,235,0.08)",
         }}>
 
@@ -184,9 +203,11 @@ const CreateRoom = () => {
               {/* Block Name */}
               <Field label="Block Name" required>
                 <input
-                  name="blockName" value={form.blockName}
-                  onChange={handleChange} required
-                  placeholder=""
+                  name="blockName"
+                  value={form.blockName}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g. Block A"
                   style={inputStyle(focusField === "blockName")}
                   onFocus={() => setFocusField("blockName")}
                   onBlur={()  => setFocusField("")}
@@ -196,9 +217,11 @@ const CreateRoom = () => {
               {/* Room Number */}
               <Field label="Room Number" required>
                 <input
-                  name="roomNumber" value={form.roomNumber}
-                  onChange={handleChange} required
-                  placeholder=""
+                  name="roomNumber"
+                  value={form.roomNumber}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g. 101"
                   style={inputStyle(focusField === "roomNumber")}
                   onFocus={() => setFocusField("roomNumber")}
                   onBlur={()  => setFocusField("")}
@@ -230,8 +253,13 @@ const CreateRoom = () => {
                   })}
                 </div>
                 <input
-                  type="number" name="totalBeds" value={form.totalBeds}
-                  onChange={handleChange} required min="1" max="20"
+                  type="number"
+                  name="totalBeds"
+                  value={form.totalBeds}
+                  onChange={handleChange}
+                  required
+                  min="1"
+                  max="20"
                   placeholder="Or enter custom number…"
                   style={inputStyle(focusField === "totalBeds")}
                   onFocus={() => setFocusField("totalBeds")}
