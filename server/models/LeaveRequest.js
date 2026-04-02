@@ -1,11 +1,5 @@
 // server/models/LeaveRequest.js
-//
-// ✅ FIX 1: Added "Casual" to leaveType enum.
-//    ApplyLeave.jsx sends leaveType:"Casual" but the old model only had
-//    ["Home","Medical","Emergency","Event","Other"] → Mongoose threw a
-//    ValidationError → 500 on every leave submission.
-//
-// ✅ FIX 2: Added totalDays field so frontend value is persisted.
+// ✅ Added exitedAt + exitMarkedBy for gatekeeper exit tracking
 
 const mongoose = require("mongoose");
 
@@ -20,13 +14,11 @@ const leaveRequestSchema = new mongoose.Schema(
     leaveType: {
       type: String,
       required: true,
-      // ✅ "Casual" added — matches what ApplyLeave.jsx sends
       enum: ["Casual", "Home", "Medical", "Emergency", "Event", "Other"],
     },
     reason:           { type: String, required: true, minlength: 10 },
     fromDate:         { type: Date,   required: true },
     toDate:           { type: Date,   required: true },
-    // ✅ totalDays persisted from frontend calculation
     totalDays:        { type: Number },
     destination:      { type: String, required: true },
     emergencyContact: { type: String, required: true },
@@ -36,8 +28,7 @@ const leaveRequestSchema = new mongoose.Schema(
       default: "Pending",
       index: true,
     },
-    remarks: String,
-    // Mandatory when status = Rejected (enforced in controller too)
+    remarks:         String,
     rejectionReason: {
       type: String,
       validate: {
@@ -51,6 +42,27 @@ const leaveRequestSchema = new mongoose.Schema(
     approvedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+    },
+
+    // ── GATEKEEPER EXIT TRACKING ────────────────────────────────────
+    exitedAt: {
+      type: Date,
+      default: null,
+    },
+    exitMarkedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    // "Exited" means exitedAt is set; "Denied" means gatekeeper blocked
+    gateStatus: {
+      type: String,
+      enum: ["Pending", "Exited", "Denied", null],
+      default: null,
+    },
+    gateDeniedReason: {
+      type: String,
+      default: null,
     },
   },
   { timestamps: true }

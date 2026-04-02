@@ -616,11 +616,11 @@ const LeaveApprovals = () => {
         <div>
           {/* Tabs */}
           <div style={{ display:"flex", gap:4, background:"#fff", borderRadius:14, padding:4,
-            width:"fit-content", marginBottom:16, border:`1px solid ${P.border}`,
+            width: isMobile ?"100%" : "fit-content", marginBottom:16, border:`1px solid ${P.border}`,
             boxShadow:"0 1px 4px rgba(0,0,0,0.04)" }}>
             {[["requests","📋 Requests"],["analytics","📊 Analytics"]].map(([key,lbl]) => (
               <button key={key} onClick={() => setActiveTab(key)}
-                style={{ padding: isMobile ? "7px 14px" : "8px 20px", borderRadius:10, border:"none",
+                style={{ flex: isMobile ? 1 :"unset", padding: isMobile ? "7px 14px" : "8px 20px", borderRadius:10, border:"none",
                   background:activeTab===key?P.primary:"none",
                   color:activeTab===key?"#fff":P.muted,
                   fontFamily:"'Sora',sans-serif", fontWeight:600,

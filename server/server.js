@@ -81,7 +81,8 @@ app.use("/api/analytics",     require("./routes/analyticsRoutes"));
 app.use("/api/notifications", require("./routes/notificationRoutes"));
 app.use("/api/audit",         require("./routes/auditRoutes"));
 app.use("/api/issues",        require("./routes/issueRoutes"));
-
+// ✅ NEW — Gatekeeper portal routes
+app.use("/api/gate",          require("./routes/gateRoutes"));
 // Health-check
 app.get("/health", (req, res) =>
   res.json({ status: "ok", timestamp: new Date().toISOString() })

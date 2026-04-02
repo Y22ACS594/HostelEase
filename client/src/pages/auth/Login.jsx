@@ -1,4 +1,5 @@
 // src/pages/auth/Login.jsx  — Fully responsive (mobile + desktop)
+// ✅ UPDATED: Added "Gatekeeper Login" button at bottom
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -79,6 +80,7 @@ const Login = () => {
         .he-role-btn:hover { background: #F9FAFB !important; }
         .he-feat-card:hover { background: #F3F4F6 !important; transform: translateY(-2px); }
         .he-submit:hover:not(:disabled) { background: #1F2937 !important; }
+        .he-gate-btn:hover { background: #F0FDF4 !important; border-color: #059669 !important; color: #059669 !important; }
       `}</style>
 
       {/* ── LEFT INFO PANEL (hidden on mobile) ── */}
@@ -129,6 +131,46 @@ const Login = () => {
                 <div style={{ fontSize: 11, color: "#9CA3AF", lineHeight: 1.4 }}>{desc}</div>
               </div>
             ))}
+          </div>
+
+          {/* ✅ Desktop gatekeeper link */}
+          <div style={{ marginTop: "auto", paddingTop: 32 }}>
+            <Link to="/gatekeeper/login" style={{ textDecoration: "none" }}>
+              <div style={{
+                display: "flex", alignItems: "center", gap: 12,
+                padding: "14px 18px", borderRadius: 14,
+                border: "1.5px solid #D1FAE5", background: "#fff",
+                transition: "all .2s", cursor: "pointer",
+              }}
+                className="he-gate-btn"
+              >
+                <div style={{
+                  width: 36, height: 36, borderRadius: 10,
+                  background: "linear-gradient(135deg,#059669,#047857)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  flexShrink: 0,
+                }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0110 0v4"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>
+                    Gatekeeper Portal
+                  </div>
+                  <div style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>
+                    Entry &amp; exit control access
+                  </div>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                  style={{ marginLeft: "auto" }}>
+                  <polyline points="9 18 15 12 9 6"/>
+                </svg>
+              </div>
+            </Link>
           </div>
         </div>
       )}
@@ -301,7 +343,28 @@ const Login = () => {
           </button>
         </form>
 
-        <p style={{ textAlign: "center", marginTop: 24, fontSize: 13, color: "#9CA3AF" }}>
+        {/* ✅ NEW — Gatekeeper login button (mobile only; desktop has it in left panel) */}
+        {isMobile && (
+          <Link to="/gatekeeper/login" style={{ textDecoration: "none", display: "block", marginTop: 16 }}>
+            <button type="button" className="he-gate-btn" style={{
+              width: "100%", padding: "13px 16px",
+              background: "#fff", color: "#059669",
+              border: "1.5px solid #D1FAE5", borderRadius: 12,
+              fontSize: 14, fontWeight: 700, cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+              fontFamily: "'Sora', sans-serif", transition: "all .2s", minHeight: 50,
+            }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0110 0v4"/>
+              </svg>
+              Gatekeeper Login
+            </button>
+          </Link>
+        )}
+
+        <p style={{ textAlign: "center", marginTop: 20, fontSize: 13, color: "#9CA3AF" }}>
           Admin?{" "}
           <Link to="/admin/login"
             style={{ color: "#111827", fontWeight: 700, textDecoration: "none" }}>
