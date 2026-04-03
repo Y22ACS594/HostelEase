@@ -24,7 +24,6 @@ const activeLeaveFilter = () => {
   const today = new Date();
   return {
     status:   "Approved",
-    fromDate: { $lte: today },
     toDate:   { $gte: today },
   };
 };

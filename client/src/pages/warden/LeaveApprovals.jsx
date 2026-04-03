@@ -535,36 +535,91 @@ const LeaveApprovals = () => {
       )}
 
       {/* ── MOBILE HEADER ── */}
+     {/* ── MOBILE HEADER — tabs moved INSIDE sticky so always visible ── */}
       {isMobile ? (
         <div style={{ background:"#fff", borderBottom:`1px solid ${P.border}`,
-          padding:"14px 16px", position:"sticky", top:56, zIndex:10 }}>
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
+          padding:"14px 16px 0 16px", position:"sticky", top:56, zIndex:10 }}>
+
+          {/* Row 1: title + refresh */}
+          <div style={{ display:"flex", alignItems:"center",
+            justifyContent:"space-between", marginBottom:12 }}>
             <div>
               <div style={{ fontSize:11, fontWeight:700, color:P.primary,
                 letterSpacing:"0.1em", textTransform:"uppercase" }}>Warden Portal</div>
-              <h1 style={{ margin:0, fontSize:18, fontWeight:800, color:P.text }}>Leave Management</h1>
+              <h1 style={{ margin:0, fontSize:18, fontWeight:800, color:P.text }}>
+                Leave Management
+              </h1>
             </div>
             <button onClick={() => applyFilters({page:pagination.page})}
-              style={{ padding:"8px 14px", background:P.primary, color:"#fff", border:"none",
-                borderRadius:10, fontFamily:"'Sora',sans-serif", fontWeight:600, fontSize:13, cursor:"pointer" }}>
+              style={{ padding:"8px 14px", background:P.primary, color:"#fff",
+                border:"none", borderRadius:10, fontFamily:"'Sora',sans-serif",
+                fontWeight:600, fontSize:13, cursor:"pointer" }}>
               ↻ {fetching ? "…" : "Refresh"}
             </button>
           </div>
-          {/* Mobile stat row */}
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8 }}>
+
+          {/* Row 2: stat pills */}
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8, marginBottom:12 }}>
             {[
-              {icon:"📋",v:summary.total,   label:"Total",    color:P.primary,  bg:"#EFF6FF"},
-              {icon:"✅",v:summary.approved, label:"Approved", color:P.approved, bg:"#ECFDF5"},
-              {icon:"⏳",v:summary.pending,  label:"Pending",  color:P.pending,  bg:"#FFFBEB", pulse:summary.pending>0},
-              {icon:"✖",v:summary.rejected,  label:"Rejected", color:P.rejected, bg:"#FEF2F2"},
+              {icon:"📋", v:summary.total,    label:"Total",    color:P.primary,  pulse:false},
+              {icon:"✅", v:summary.approved, label:"Approved", color:P.approved, pulse:false},
+              {icon:"⏳", v:summary.pending,  label:"Pending",  color:P.pending,  pulse:summary.pending>0},
+              {icon:"✖",  v:summary.rejected, label:"Rejected", color:P.rejected, pulse:false},
             ].map(c => (
-              <div key={c.label} style={{ background:"#fff", border:`1px solid ${c.pulse?c.color:P.border}`,
-                borderRadius:10, padding:"8px", textAlign:"center", position:"relative" }}>
-                {c.pulse && <span style={{ position:"absolute", top:4, right:4, width:6, height:6,
-                  borderRadius:"50%", background:c.color, animation:"la-pulse 1.5s ease infinite" }}/>}
-                <div style={{ fontSize:16, fontWeight:800, color:c.color }}>{fetching?"…":c.v}</div>
+              <div key={c.label} style={{
+                background:"#fff",
+                border:`1px solid ${c.pulse ? c.color : P.border}`,
+                borderRadius:10, padding:"8px", textAlign:"center", position:"relative",
+              }}>
+                {c.pulse && (
+                  <span style={{ position:"absolute", top:4, right:4, width:6, height:6,
+                    borderRadius:"50%", background:c.color,
+                    animation:"la-pulse 1.5s ease infinite" }}/>
+                )}
+                <div style={{ fontSize:16, fontWeight:800, color:c.color }}>
+                  {fetching ? "…" : c.v}
+                </div>
                 <div style={{ fontSize:9, color:P.muted, marginTop:2 }}>{c.label}</div>
               </div>
+            ))}
+          </div>
+
+          {/* ✅ Row 3: TAB BUTTONS — inside sticky, always visible */}
+          <div style={{
+            display:"flex", gap:0,
+            background:"#EFF6FF",
+            borderRadius:"12px 12px 0 0",
+            padding:4,
+            border:`1.5px solid ${P.primary}33`,
+            borderBottom:"none",
+          }}>
+            {[["requests","📋 Requests"],["analytics","📊 Analytics"]].map(([key,lbl]) => (
+              <button key={key} onClick={() => setActiveTab(key)}
+                style={{
+                  flex:1, padding:"11px 8px",
+                  borderRadius:9, border:"none",
+                  background: activeTab===key
+                    ? `linear-gradient(135deg,${P.primary},#1D4ED8)`
+                    : "transparent",
+                  color: activeTab===key ? "#fff" : P.primary,
+                  fontFamily:"'Sora',sans-serif", fontWeight:700,
+                  fontSize:13, cursor:"pointer", transition:"all .15s",
+                  display:"flex", alignItems:"center",
+                  justifyContent:"center", gap:5, minHeight:44,
+                  boxShadow: activeTab===key
+                    ? "0 4px 12px rgba(37,99,235,0.3)"
+                    : "none",
+                }}>
+                {lbl}
+                {key==="requests" && livePending>0 && (
+                  <span style={{
+                    background: activeTab===key
+                      ? "rgba(255,255,255,0.3)" : P.primary,
+                    color:"#fff", fontSize:10, borderRadius:20,
+                    padding:"1px 7px", fontWeight:700, marginLeft:2,
+                  }}>{livePending}</span>
+                )}
+              </button>
             ))}
           </div>
         </div>
@@ -612,29 +667,56 @@ const LeaveApprovals = () => {
       <div style={isMobile ? { padding:"12px 16px" } :
         { display:"grid", gridTemplateColumns:"1fr 300px", gap:20, alignItems:"start" }}>
 
-        {/* LEFT COLUMN */}
-        <div>
-          {/* Tabs */}
-          <div style={{ display:"flex", gap:4, background:"#fff", borderRadius:14, padding:4,
-            width: isMobile ?"100%" : "fit-content", marginBottom:16, border:`1px solid ${P.border}`,
-            boxShadow:"0 1px 4px rgba(0,0,0,0.04)" }}>
-            {[["requests","📋 Requests"],["analytics","📊 Analytics"]].map(([key,lbl]) => (
-              <button key={key} onClick={() => setActiveTab(key)}
-                style={{ flex: isMobile ? 1 :"unset", padding: isMobile ? "7px 14px" : "8px 20px", borderRadius:10, border:"none",
-                  background:activeTab===key?P.primary:"none",
-                  color:activeTab===key?"#fff":P.muted,
-                  fontFamily:"'Sora',sans-serif", fontWeight:600,
-                  fontSize: isMobile ? 12 : 13, cursor:"pointer", transition:"all .15s" }}>
-                {lbl}
-                {key==="requests" && livePending>0 && (
-                  <span style={{ marginLeft:5, background:activeTab===key?"rgba(255,255,255,0.28)":P.pending,
-                    color:"#fff", fontSize:10, borderRadius:20, padding:"1px 6px", fontWeight:700 }}>
-                    {livePending}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
+       {/* LEFT COLUMN */}
+<div>
+
+  {/* ✅ DESKTOP ONLY TAB BAR */}
+  {!isMobile && (
+    <div style={{
+      display:"flex", gap:0, background:"#EFF6FF", borderRadius:14,
+      padding:4, width:"100%", marginBottom:16,
+      border:`1.5px solid ${P.primary}33`,
+      boxShadow:"0 2px 8px rgba(37,99,235,0.10)",
+      boxSizing:"border-box",
+    }}>
+      {[["requests","📋 Requests"],["analytics","📊 Analytics"]].map(([key,lbl]) => (
+        <button key={key} onClick={() => setActiveTab(key)}
+          style={{
+            flex:1,
+            padding:"11px 8px",
+            borderRadius:10, border:"none",
+            background: activeTab===key
+              ? `linear-gradient(135deg,${P.primary},#1D4ED8)`
+              : "transparent",
+            color: activeTab===key ? "#fff" : P.primary,
+            fontFamily:"'Sora',sans-serif", fontWeight:700,
+            fontSize:13, cursor:"pointer",
+            transition:"all .15s",
+            whiteSpace:"nowrap",
+            display:"flex", alignItems:"center",
+            justifyContent:"center", gap:5,
+            boxShadow: activeTab===key
+              ? "0 4px 12px rgba(37,99,235,0.35)"
+              : "none",
+            minHeight:44,
+          }}>
+          {lbl}
+          {key==="requests" && livePending>0 && (
+            <span style={{
+              background: activeTab===key
+                ? "rgba(255,255,255,0.3)"
+                : P.primary,
+              color:"#fff", fontSize:10, borderRadius:20,
+              padding:"1px 7px", fontWeight:700, marginLeft:2,
+            }}>
+              {livePending}
+            </span>
+          )}
+        </button>
+      ))}
+    </div>
+  )}
+
 
           {/* ── REQUESTS TAB ── */}
           {activeTab==="requests" && (
@@ -899,6 +981,7 @@ const LeaveApprovals = () => {
                 </div>
               ) : (
                 <>
+                  {/* Monthly Trend — shown on both mobile and desktop */}
                   <div style={{ background:"#fff", borderRadius:16, padding:isMobile?"16px":"20px 24px",
                     border:`1px solid ${P.border}`, boxShadow:"0 1px 4px rgba(0,0,0,0.04)" }}>
                     <div style={{ fontWeight:700, fontSize:14, color:P.text, marginBottom:4 }}>Monthly Leave Trend</div>
@@ -930,33 +1013,77 @@ const LeaveApprovals = () => {
                     )}
                   </div>
 
-                  {!isMobile && (
-                    <div style={{ background:"#fff", borderRadius:16, padding:"20px 24px",
-                      border:`1px solid ${P.border}`, boxShadow:"0 1px 4px rgba(0,0,0,0.04)" }}>
-                      <div style={{ fontWeight:700, fontSize:14, color:P.text, marginBottom:4 }}>Department-wise Breakdown</div>
-                      <div style={{ fontSize:12, color:P.muted, marginBottom:14 }}>Leave counts per department</div>
-                      {deptChartData.length===0 ? (
-                        <div style={{ height:160, display:"flex", alignItems:"center",
-                          justifyContent:"center", color:P.muted, fontSize:13 }}>No data available</div>
-                      ) : (
-                        <ResponsiveContainer width="100%" height={200}>
-                          <BarChart data={deptChartData} margin={{top:0,right:0,left:-20,bottom:0}}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#F0F4FF"/>
-                            <XAxis dataKey="dept" tick={{fontSize:10,fill:P.muted}} axisLine={false} tickLine={false}/>
-                            <YAxis tick={{fontSize:10,fill:P.muted}} axisLine={false} tickLine={false}/>
-                            <Tooltip content={<ChartTooltip/>}/>
-                            <Legend iconType="circle" iconSize={8}/>
-                            <Bar dataKey="Total"    fill="#BFDBFE" radius={[4,4,0,0]}/>
-                            <Bar dataKey="Approved" fill="#059669" radius={[4,4,0,0]}/>
-                            <Bar dataKey="Pending"  fill="#D97706" radius={[4,4,0,0]}/>
-                            <Bar dataKey="Rejected" fill="#DC2626" radius={[4,4,0,0]}/>
-                          </BarChart>
-                        </ResponsiveContainer>
-                      )}
-                    </div>
-                  )}
+                  {/* ✅ Dept breakdown — NOW shown on BOTH mobile and desktop */}
+                  <div style={{ background:"#fff", borderRadius:16, padding:isMobile?"16px":"20px 24px",
+                    border:`1px solid ${P.border}`, boxShadow:"0 1px 4px rgba(0,0,0,0.04)" }}>
+                    <div style={{ fontWeight:700, fontSize:14, color:P.text, marginBottom:4 }}>Department-wise Breakdown</div>
+                    <div style={{ fontSize:12, color:P.muted, marginBottom:14 }}>Leave counts per department</div>
+                    {deptChartData.length===0 ? (
+                      <div style={{ height:160, display:"flex", alignItems:"center",
+                        justifyContent:"center", color:P.muted, fontSize:13 }}>No data available</div>
+                    ) : isMobile ? (
+                      /* ✅ Mobile dept breakdown — horizontal bar list (no chart clipping) */
+                      <div>
+                        {deptChartData.map((d, i) => {
+                          const maxTotal = Math.max(...deptChartData.map(x => x.Total || 1));
+                          return (
+                            <div key={d.dept} style={{ marginBottom:14 }}>
+                              <div style={{ display:"flex", justifyContent:"space-between", marginBottom:5 }}>
+                                <span style={{ fontSize:12, fontWeight:600, color:P.text }}>{d.dept}</span>
+                                <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                                  {[
+                                    {label:"A", val:d.Approved, color:P.approved},
+                                    {label:"P", val:d.Pending,  color:P.pending},
+                                    {label:"R", val:d.Rejected, color:P.rejected},
+                                  ].map(({label,val,color}) => val > 0 && (
+                                    <span key={label} style={{ fontSize:10, fontWeight:700,
+                                      color, background:color+"18",
+                                      padding:"1px 6px", borderRadius:10 }}>
+                                      {label} {val}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                              {/* Stacked progress bar */}
+                              <div style={{ height:8, borderRadius:8, background:"#F1F5F9", overflow:"hidden", display:"flex" }}>
+                                {[
+                                  {val:d.Approved, color:P.approved},
+                                  {val:d.Pending,  color:P.pending},
+                                  {val:d.Rejected, color:P.rejected},
+                                ].map(({val, color}, si) => val > 0 && (
+                                  <div key={si} style={{
+                                    width:`${(val / maxTotal) * 100}%`,
+                                    background:color,
+                                    transition:"width .4s ease",
+                                  }}/>
+                                ))}
+                              </div>
+                              <div style={{ fontSize:10, color:P.muted, marginTop:3 }}>
+                                Total: {d.Total} leaves
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      /* Desktop bar chart — unchanged */
+                      <ResponsiveContainer width="100%" height={200}>
+                        <BarChart data={deptChartData} margin={{top:0,right:0,left:-20,bottom:0}}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#F0F4FF"/>
+                          <XAxis dataKey="dept" tick={{fontSize:10,fill:P.muted}} axisLine={false} tickLine={false}/>
+                          <YAxis tick={{fontSize:10,fill:P.muted}} axisLine={false} tickLine={false}/>
+                          <Tooltip content={<ChartTooltip/>}/>
+                          <Legend iconType="circle" iconSize={8}/>
+                          <Bar dataKey="Total"    fill="#BFDBFE" radius={[4,4,0,0]}/>
+                          <Bar dataKey="Approved" fill="#059669" radius={[4,4,0,0]}/>
+                          <Bar dataKey="Pending"  fill="#D97706" radius={[4,4,0,0]}/>
+                          <Bar dataKey="Rejected" fill="#DC2626" radius={[4,4,0,0]}/>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    )}
+                  </div>
 
-                  {/* Snapshot */}
+                  {/* Snapshot — both mobile and desktop */}
                   <div style={{ background:"#fff", borderRadius:16, padding:isMobile?"16px":"20px 24px",
                     border:`1px solid ${P.border}`, boxShadow:"0 1px 4px rgba(0,0,0,0.04)" }}>
                     <div style={{ fontWeight:700, fontSize:14, color:P.text, marginBottom:14 }}>Snapshot</div>
