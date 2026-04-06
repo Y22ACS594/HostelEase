@@ -22,8 +22,7 @@ const TYPE_META = {
   LEAVE_REJECTED:     { icon: "❌", color: "#DC2626", bg: "#FEF2F2", label: "Leave"   },
   ROOM_ALLOCATED:     { icon: "🏠", color: "#7C3AED", bg: "#F5F3FF", label: "Room"    },
   ROOM_DEALLOCATED:   { icon: "🚪", color: "#D97706", bg: "#FFFBEB", label: "Room"    },
-  PAYMENT_RECEIVED:   { icon: "💰", color: "#059669", bg: "#ECFDF5", label: "Payment" },
-  PAYMENT_CONFIRMED:  { icon: "💳", color: "#059669", bg: "#ECFDF5", label: "Payment" },
+
   STUDENT_REGISTERED: { icon: "🎉", color: "#2563EB", bg: "#EFF6FF", label: "Student" },
   COMPLAINT_RESOLVED: { icon: "🔧", color: "#6366F1", bg: "#EEF2FF", label: "Issues"  },
   GENERAL:            { icon: "🔔", color: "#D97706", bg: "#FFFBEB", label: "General" },
@@ -39,7 +38,7 @@ const timeAgo = (d) => {
   return new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 };
 
-const FILTERS = ["All", "Unread", "Leave", "Room", "Payment", "Student"];
+const FILTERS = ["All", "Unread", "Leave", "Room", "Student"];
 
 export default function WardenNotifications() {
   const navigate  = useNavigate();

@@ -38,7 +38,6 @@ const NAV = [
   { to: "/student/room-status",   Icon: IcoRoom,   label: "My Room"      },
   { to: "/student/apply-leave",   Icon: IcoEdit,   label: "Apply Leave"  },
   { to: "/student/leave-status",  Icon: IcoDoc,    label: "Leave Status" },
-  { to: "/student/payments",      Icon: IcoCard,   label: "Payments"     },
   { to: "/student/notifications", Icon: IcoBell,   label: "Notifications"},
   { to: "/student/issues",        Icon: IcoWrench, label: "My Issues"    },
 ];
@@ -47,7 +46,6 @@ const CARDS = [
   { to: "/student/room-status",  Icon: IcoRoom,  title: "My Room",      desc: "View room & bed details",    grad: "linear-gradient(135deg,#2563EB,#1D4ED8)", shadow: "rgba(37,99,235,0.3)" },
   { to: "/student/apply-leave",  Icon: IcoEdit,  title: "Apply Leave",  desc: "Submit a new leave request", grad: "linear-gradient(135deg,#7C3AED,#6D28D9)", shadow: "rgba(124,58,237,0.3)" },
   { to: "/student/leave-status", Icon: IcoDoc,   title: "Leave Status", desc: "Track your approvals",       grad: "linear-gradient(135deg,#059669,#047857)", shadow: "rgba(5,150,105,0.3)"  },
-  { to: "/student/payments",     Icon: IcoCard,  title: "Payments",     desc: "Fee & transaction history",  grad: "linear-gradient(135deg,#D97706,#B45309)", shadow: "rgba(217,119,6,0.3)"  },
 ];
 
 const avatarColors = ["#2563EB","#7C3AED","#059669","#D97706","#DC2626","#0891B2"];

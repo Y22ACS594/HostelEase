@@ -20,7 +20,6 @@ const CARDS = [
   { to:"/warden/create-room",    icon:"🏠", title:"Create Rooms",     desc:"Add and manage hostel rooms"        },
   { to:"/warden/room-allocation",icon:"🛏️", title:"Room Allocation",  desc:"Assign students to beds"            },
   { to:"/warden/leaves",         icon:"📄", title:"Leave Approvals",  desc:"Approve or reject leave requests"  },
-  { to:"/warden/payments",       icon:"💳", title:"Payments",         desc:"View hostel fee payments"           },
 ];
 
 function DashCard({ icon, title, desc }) {
@@ -102,5 +101,9 @@ const WardenDashboard = () => {
     </div>
   );
 };
+
+
+
+
 
 export default WardenDashboard;

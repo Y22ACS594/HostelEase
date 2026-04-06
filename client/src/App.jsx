@@ -21,7 +21,6 @@ import StudentDashboard from "./pages/student/Dashboard";
 import ApplyLeave       from "./pages/student/ApplyLeave";
 import LeaveStatus      from "./pages/student/LeaveStatus";
 import RoomStatus       from "./pages/student/RoomStatus";
-import Payments         from "./pages/student/Payments";
 import Notifications    from "./pages/student/Notifications";
 import RaiseIssue       from "./pages/student/RaiseIssue";
 
@@ -32,7 +31,6 @@ import RoomAllocation     from "./pages/warden/RoomAllocation";
 import CreateRoom         from "./pages/warden/CreateRoom";
 import LeaveApprovals     from "./pages/warden/LeaveApprovals";
 import AnalyticsDashboard from "./pages/warden/AnalyticsDashboard";
-import WardenPayments     from "./pages/warden/Payments";
 import StudentsList       from "./pages/warden/StudentsList";
 import StudentDetails     from "./pages/warden/StudentDetails";
 import EditStudent        from "./pages/warden/EditStudent";
@@ -116,8 +114,7 @@ function App() {
             element={<ProtectedRoute role="student"><LeaveStatus /></ProtectedRoute>}/>
           <Route path="/student/room-status"
             element={<ProtectedRoute role="student"><RoomStatus /></ProtectedRoute>}/>
-          <Route path="/student/payments"
-            element={<ProtectedRoute role="student"><Payments /></ProtectedRoute>}/>
+         
           <Route path="/student/notifications"
             element={<ProtectedRoute role="student"><Notifications /></ProtectedRoute>}/>
           <Route path="/student/issues"
@@ -142,8 +139,7 @@ function App() {
             element={<ProtectedRoute role="warden"><LeaveApprovals /></ProtectedRoute>}/>
           <Route path="/warden/analytics"
             element={<ProtectedRoute role="warden"><AnalyticsDashboard /></ProtectedRoute>}/>
-          <Route path="/warden/payments"
-            element={<ProtectedRoute role="warden"><WardenPayments /></ProtectedRoute>}/>
+         
           <Route path="/warden/notifications"
             element={<ProtectedRoute role="warden"><WardenNotifications /></ProtectedRoute>}/>
           <Route path="/warden/audit-logs"
